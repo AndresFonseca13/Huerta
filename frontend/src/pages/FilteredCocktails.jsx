@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
 import { getCocktails } from "../services/cocktailService";
 import CardCocktail from "../components/CardCocktail";
+import CocktailDetailModal from "../components/CocktailDetailModal";
 
 const FilteredCocktails = () => {
 	const { categoria } = useParams();
@@ -13,6 +14,8 @@ const FilteredCocktails = () => {
 	const [totalPages, setTotalPages] = useState(0);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
+	const [selectedCocktail, setSelectedCocktail] = useState(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
 	// Determinar el tipo basado en la ruta
@@ -50,6 +53,16 @@ const FilteredCocktails = () => {
 			behavior: "smooth",
 			block: "start",
 		});
+	};
+
+	const handleCardClick = (cocktail) => {
+		setSelectedCocktail(cocktail);
+		setIsModalOpen(true);
+	};
+
+	const handleCloseModal = () => {
+		setIsModalOpen(false);
+		setSelectedCocktail(null);
 	};
 
 	const containerVariants = {
@@ -119,7 +132,7 @@ const FilteredCocktails = () => {
 				<AnimatePresence mode="wait">
 					{cocktails.map((cocktail) => (
 						<motion.div key={cocktail.id} variants={itemVariants} layout>
-							<CardCocktail cocktail={cocktail} />
+							<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
 						</motion.div>
 					))}
 				</AnimatePresence>
@@ -174,6 +187,13 @@ const FilteredCocktails = () => {
 					</div>
 				</motion.div>
 			)}
+
+			{/* Modal de detalles del cóctel */}
+			<CocktailDetailModal
+				cocktail={selectedCocktail}
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+			/>
 		</div>
 	);
 };

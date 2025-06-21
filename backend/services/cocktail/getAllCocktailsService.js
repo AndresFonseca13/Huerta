@@ -47,11 +47,24 @@ const getAllCocktailsService = async ({
 		pool.query(countQuery, countValues),
 	]);
 
+	// Procesar los resultados para limpiar los arrays
+	const processedCocktails = result.rows.map((cocktail) => {
+		// Filtrar valores null de ingredientes, categorías e imágenes
+		cocktail.ingredients = cocktail.ingredients.filter(
+			(ingredient) => ingredient !== null
+		);
+		cocktail.categories = cocktail.categories.filter(
+			(category) => category !== null
+		);
+		cocktail.images = cocktail.images.filter((image) => image !== null);
+		return cocktail;
+	});
+
 	const totalRecords = parseInt(countResult.rows[0].total);
 	const totalPages = Math.ceil(totalRecords / limite);
 
 	return {
-		cocktails: result.rows,
+		cocktails: processedCocktails,
 		pagination: {
 			totalRecords,
 			totalPages,
