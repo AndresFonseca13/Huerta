@@ -13,7 +13,7 @@ import {
 	FiTag,
 	FiImage,
 } from "react-icons/fi";
-import CardCocktail from "../components/CardCocktail";
+import PreviewCardCocktail from "../components/PreviewCardCocktail";
 import ErrorModal from "../components/ErrorModal";
 
 const CreateCocktail = () => {
@@ -218,7 +218,7 @@ const CreateCocktail = () => {
 
 						{/* Card del coctel */}
 						<div className="mb-6">
-							<CardCocktail cocktail={createdCocktail} />
+							<PreviewCardCocktail cocktail={createdCocktail} />
 						</div>
 
 						{/* Botones de acción */}

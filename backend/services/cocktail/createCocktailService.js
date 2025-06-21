@@ -113,7 +113,44 @@ const createCocktailService = async (
 		// Confirmamos la transaccion
 		await pool.query("COMMIT");
 
-		return cocktailResult.rows[0];
+		// Obtener el cóctel completo con ingredientes y categorías
+		const completeCocktailQuery = `
+			SELECT 
+				p.id,
+				p.name,
+				p.price,
+				p.description,
+				ARRAY_AGG(DISTINCT i.name) as ingredients,
+				ARRAY_AGG(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) as categories,
+				ARRAY_AGG(DISTINCT img.url) as images
+			FROM products p
+			LEFT JOIN products_ingredients pi ON p.id = pi.product_id
+			LEFT JOIN ingredients i ON pi.ingredient_id = i.id
+			LEFT JOIN products_categories pc ON p.id = pc.product_id
+			LEFT JOIN categories c ON pc.category_id = c.id
+			LEFT JOIN images img ON p.id = img.product_id
+			WHERE p.id = $1
+			GROUP BY p.id, p.name, p.price, p.description
+		`;
+
+		const completeResult = await pool.query(completeCocktailQuery, [
+			cocktailId,
+		]);
+
+		// Procesar los resultados para limpiar los arrays
+		const cocktail = completeResult.rows[0];
+		if (cocktail) {
+			// Filtrar valores null de ingredientes y categorías
+			cocktail.ingredients = cocktail.ingredients.filter(
+				(ingredient) => ingredient !== null
+			);
+			// No filtrar categorías por ahora para debug
+			cocktail.categories = cocktail.categories || [];
+			cocktail.images = cocktail.images.filter((image) => image !== null);
+		}
+
+		console.log("Cóctel completo devuelto:", cocktail);
+		return cocktail;
 	} catch (error) {
 		await pool.query("ROLLBACK");
 		console.error("⛔ Error en el servicio de creación:", error);
