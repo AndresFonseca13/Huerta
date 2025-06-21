@@ -1,0 +1,114 @@
+const { BlobServiceClient } = require("@azure/storage-blob");
+
+const AZURE_STORAGE_CONNECTION_STRING =
+	process.env.AZURE_STORAGE_CONNECTION_STRING;
+const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const containerName = "cocktail-images";
+
+// Log para depuración (solo en desarrollo)
+if (process.env.NODE_ENV !== "production") {
+	console.log("Configuración de Azure Storage:");
+	console.log(
+		"AZURE_STORAGE_ACCOUNT_NAME:",
+		AZURE_STORAGE_ACCOUNT_NAME ? "Configurado" : "No configurado"
+	);
+	console.log(
+		"AZURE_STORAGE_CONNECTION_STRING:",
+		AZURE_STORAGE_CONNECTION_STRING ? "Configurado" : "No configurado"
+	);
+}
+
+exports.uploadImage = async (req, res) => {
+	// Verificar si se recibió un archivo
+	if (!req.file) {
+		return res.status(400).json({
+			error: true,
+			mensaje: "No se ha proporcionado ninguna imagen",
+		});
+	}
+
+	// Verificar la configuración de Azure con mensajes más específicos
+	if (!AZURE_STORAGE_CONNECTION_STRING) {
+		return res.status(500).json({
+			error: true,
+			mensaje:
+				"Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno",
+		});
+	}
+
+	if (!AZURE_STORAGE_ACCOUNT_NAME) {
+		return res.status(500).json({
+			error: true,
+			mensaje:
+				"Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno",
+		});
+	}
+
+	try {
+		const blobServiceClient = BlobServiceClient.fromConnectionString(
+			AZURE_STORAGE_CONNECTION_STRING
+		);
+		const containerClient = blobServiceClient.getContainerClient(containerName);
+
+		// Verificar si el contenedor existe, si no, crearlo con acceso público
+		const containerExists = await containerClient.exists();
+		if (!containerExists) {
+			await containerClient.create({
+				access: "blob", // Esto hace que los blobs sean accesibles públicamente
+			});
+		}
+
+		// Generar un nombre único para el archivo
+		const timestamp = Date.now();
+		const originalName = req.file.originalname.replace(/[^a-zA-Z0-9.]/g, "");
+		const blobName = `${timestamp}-${originalName}`;
+
+		const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+		// Subir el archivo
+		await blockBlobClient.uploadData(req.file.buffer, {
+			blobHTTPHeaders: {
+				blobContentType: req.file.mimetype,
+			},
+		});
+
+		// Generar URL pública
+		const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+
+		res.status(200).json({
+			error: false,
+			mensaje: "Imagen subida exitosamente",
+			data: {
+				url: publicUrl,
+				nombre: blobName,
+				tipo: req.file.mimetype,
+				tamaño: req.file.size,
+			},
+		});
+	} catch (error) {
+		console.error("Error al subir la imagen:", error);
+
+		// Manejar errores específicos
+		if (error.code === "ENOENT") {
+			return res.status(500).json({
+				error: true,
+				mensaje: "Error de conexión con Azure Storage",
+			});
+		}
+
+		// Log detallado del error en desarrollo
+		if (process.env.NODE_ENV !== "production") {
+			console.error("Detalles del error:", {
+				message: error.message,
+				code: error.code,
+				stack: error.stack,
+			});
+		}
+
+		res.status(500).json({
+			error: true,
+			mensaje: "Error al subir la imagen",
+			detalle: error.message,
+		});
+	}
+};
