@@ -1,99 +1,128 @@
-const pool = require('../../config/db');
+const pool = require("../../config/db");
 
-const updateCocktailService = async (id, name, price, description, ingredients, images, categories, user) => {
-  
-  try {
-    // 1. Verificar si existe el cóctel
-    const checkQuery = 'SELECT * FROM products WHERE id = $1';
-    const checkResult = await pool.query(checkQuery, [id]);
-    if (checkResult.rows.length === 0) {
-      throw new Error('El cóctel no existe');
-    }
+const updateCocktailService = async (cocktailId, cocktailData) => {
+	const { name, price, description, ingredients, categories, images } =
+		cocktailData;
 
-    await pool.query('BEGIN');
+	const client = await pool.connect();
 
-    // 2. Actualizar datos básicos del cóctel
-    const updateQuery = `
-        UPDATE products
-        SET name = $1, price = $2, description = $3, updated_by = $4
-        WHERE id = $5
-        RETURNING id, name, price, description
+	try {
+		await client.query("BEGIN");
+
+		// 1. Actualizar los datos básicos del producto
+		const updateProductQuery = `
+            UPDATE products
+            SET name = $1, price = $2, description = $3
+            WHERE id = $4
+            RETURNING *;
         `;
-    const updateResult = await pool.query(updateQuery, [name, price, description, user, id]);
+		const productResult = await client.query(updateProductQuery, [
+			name,
+			price,
+			description,
+			cocktailId,
+		]);
+		if (productResult.rows.length === 0) {
+			throw new Error("Cóctel no encontrado.");
+		}
 
-    // 3. Eliminar relaciones antiguas de ingredientes
-    await pool.query('DELETE FROM products_ingredients WHERE product_id = $1', [id]);
+		// --- Gestión de Ingredientes ---
+		// 2. Borrar las relaciones antiguas de ingredientes
+		await client.query(
+			"DELETE FROM products_ingredients WHERE product_id = $1",
+			[cocktailId]
+		);
 
-    // 4. Insertar o vincular nuevos ingredientes
-    const ingredientsIds = [];
-    for (const ingrediente of ingredients) {
-      const insertOrGet = `
-        INSERT INTO ingredients (name)
-        VALUES ($1)
-        ON CONFLICT (name) DO NOTHING
-        RETURNING id
-      `;
-      const insertResult = await pool.query(insertOrGet, [ingrediente]);
+		// 3. Insertar los nuevos ingredientes y sus relaciones
+		if (ingredients && ingredients.length > 0) {
+			const ingredientIds = [];
+			for (const ingredientName of ingredients) {
+				// Insertar el ingrediente si no existe (ON CONFLICT) y obtener su ID
+				let res = await client.query(
+					"INSERT INTO ingredients (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+					[ingredientName]
+				);
+				ingredientIds.push(res.rows[0].id);
+			}
 
-      let ingredienteId;
-      if (insertResult.rows.length > 0) {
-        ingredienteId = insertResult.rows[0].id;
-      } else {
-        const existing = await pool.query('SELECT id FROM ingredients WHERE name = $1', [ingrediente]);
-        ingredienteId = existing.rows[0].id;
-      }
+			// Crear las nuevas relaciones usando parámetros preparados
+			for (const ingredientId of ingredientIds) {
+				await client.query(
+					"INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)",
+					[cocktailId, ingredientId]
+				);
+			}
+		}
 
-      await pool.query('INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)', [id, ingredienteId]);
-    }
+		// --- Gestión de Categorías ---
+		// 4. Borrar las relaciones antiguas de categorías
+		await client.query(
+			"DELETE FROM products_categories WHERE product_id = $1",
+			[cocktailId]
+		);
 
-    // 5. Eliminar imágenes anteriores
-    await pool.query('DELETE FROM images WHERE product_id = $1', [id]);
+		// 5. Insertar las nuevas categorías y sus relaciones
+		if (categories && categories.length > 0) {
+			const categoryIds = [];
+			for (const category of categories) {
+				let res = await client.query(
+					"INSERT INTO categories (name, type) VALUES ($1, $2) ON CONFLICT (name, type) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+					[category.name, category.type]
+				);
+				categoryIds.push(res.rows[0].id);
+			}
 
-    // 6. Insertar nuevas imágenes
-    for (const url of images) {
-      await pool.query('INSERT INTO images (product_id, url) VALUES ($1, $2)', [id, url]);
-    }
+			// Crear las nuevas relaciones usando parámetros preparados
+			for (const categoryId of categoryIds) {
+				await client.query(
+					"INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)",
+					[cocktailId, categoryId]
+				);
+			}
+		}
 
-    await pool.query('DELETE FROM images WHERE product_id = $1', [id]);
+		// --- Gestión de Imágenes ---
+		// 6. Solo borrar las imágenes antiguas si se proporcionan nuevas
+		if (images && images.length > 0) {
+			// Borrar las imágenes antiguas solo si se van a reemplazar
+			await client.query("DELETE FROM images WHERE product_id = $1", [
+				cocktailId,
+			]);
 
-    for (const url of images) {
-      await pool.query('INSERT INTO images (product_id, url) VALUES ($1, $2)', [id, url]);
-    }
+			// 7. Insertar las nuevas imágenes
+			for (const imageUrl of images) {
+				await client.query(
+					"INSERT INTO images (product_id, url) VALUES ($1, $2)",
+					[cocktailId, imageUrl]
+				);
+			}
+		}
+		// Si no se proporcionan imágenes, mantener las existentes (no hacer nada)
 
-    await pool.query('DELETE FROM products_categories WHERE product_id = $1', [id]);
+		await client.query("COMMIT");
 
-    for (const { name: categoryName, type: categoryType } of categories) {
-      const insertCategoryQuery = `
-        INSERT INTO categories (name, type)
-        VALUES ($1, $2)
-        ON CONFLICT (name, type) DO NOTHING
-        RETURNING id;
-      `;
-      const result = await pool.query(insertCategoryQuery, [categoryName, categoryType]);
+		// Devolver el cóctel actualizado con todas sus relaciones
+		const finalCocktail = await client.query(
+			`
+            SELECT p.id, p.name, p.price, p.description,
+                   (SELECT array_agg(i.name) FROM ingredients i JOIN products_ingredients pi ON i.id = pi.ingredient_id WHERE pi.product_id = p.id) as ingredients,
+                   (SELECT array_agg(c.name) FROM categories c JOIN products_categories pc ON c.id = pc.category_id WHERE pc.product_id = p.id) as categories,
+                   (SELECT array_agg(img.url) FROM images img WHERE img.product_id = p.id) as images
+            FROM products p
+            WHERE p.id = $1
+            GROUP BY p.id;
+        `,
+			[cocktailId]
+		);
 
-      let categoryId;
-      if (result.rows.length > 0) {
-        categoryId = result.rows[0].id;
-      } else {
-        const existingQuery = 'SELECT id FROM categories WHERE name = $1 AND type = $2';
-        const existingResult = await pool.query(existingQuery, [categoryName, categoryType]);
-        categoryId = existingResult.rows[0].id;
-      }
-
-      await pool.query('INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)', [id, categoryId]);
-    }
-
-    await pool.query('COMMIT');
-
-    return {
-      ...updateResult.rows[0],
-      ingredients,
-      images,
-      categories
-    };
-  } catch (error) {
-    await pool.query('ROLLBACK');
-    throw error;
-  }
+		return finalCocktail.rows[0];
+	} catch (error) {
+		await client.query("ROLLBACK");
+		console.error("Error en el servicio de actualización:", error);
+		throw error;
+	} finally {
+		client.release();
+	}
 };
+
 module.exports = updateCocktailService;

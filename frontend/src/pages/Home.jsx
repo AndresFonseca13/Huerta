@@ -94,13 +94,11 @@ const Home = () => {
 				animate={isLoading ? "hidden" : "visible"}
 				key={currentPage} // Esto fuerza la re-animación en cada cambio de página
 			>
-				<AnimatePresence mode="wait">
-					{cocktails.map((cocktail) => (
-						<motion.div key={cocktail.id} variants={itemVariants} layout>
-							<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
-						</motion.div>
-					))}
-				</AnimatePresence>
+				{cocktails.map((cocktail) => (
+					<motion.div key={cocktail.id} variants={itemVariants} layout>
+						<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
+					</motion.div>
+				))}
 			</motion.div>
 
 			<motion.div

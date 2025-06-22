@@ -26,13 +26,14 @@ router.post(
 );
 router.put(
 	"/:id",
-	authMiddleware,
+	// authMiddleware,
 	normalizeTextFields,
 	validateBodyCocktail,
 	validateCategories,
 	validateIngredients,
 	cocktailController.updateCocktail
 );
+router.patch("/:id/status", cocktailController.updateCocktailStatus);
 router.delete("/:id", authMiddleware, cocktailController.deleteCocktail);
 
 module.exports = router;

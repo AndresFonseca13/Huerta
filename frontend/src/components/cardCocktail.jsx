@@ -5,9 +5,6 @@ import { motion } from "framer-motion";
 const CardCocktail = ({ cocktail, onClick }) => {
 	const { name, price, description, images } = cocktail;
 
-	console.log("Cocktail en CardCocktail:", cocktail);
-	console.log("Images en CardCocktail:", images);
-
 	const imageUrl =
 		images && images.length > 0 && images[0]
 			? images[0]

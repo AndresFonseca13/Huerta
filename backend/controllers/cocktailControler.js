@@ -9,6 +9,15 @@ const getAllCocktails = async (req, res) => {
 	const tipo = req.query.tipo || null;
 	const orden = req.query.orden || "name";
 
+	console.log("[DEBUG] getAllCocktails Controller - Parámetros recibidos:", {
+		pagina,
+		limite,
+		offset,
+		categoria,
+		tipo,
+		orden,
+	});
+
 	try {
 		const result = await cocktailsService.getAllCocktailsService({
 			categoria,
@@ -18,13 +27,36 @@ const getAllCocktails = async (req, res) => {
 			offset,
 		});
 
-		res.status(200).json({
+		console.log(
+			"[DEBUG] getAllCocktails Controller - Resultado del servicio:",
+			{
+				cocktailsCount: result.cocktails.length,
+				totalPages: result.pagination.totalPages,
+				totalRecords: result.pagination.totalRecords,
+				sampleCocktail: result.cocktails[0]
+					? {
+							id: result.cocktails[0].id,
+							name: result.cocktails[0].name,
+							categories: result.cocktails[0].categories,
+					  }
+					: null,
+			}
+		);
+
+		const response = {
 			pagina,
 			limite,
 			cantidad: result.cocktails.length,
 			cocteles: result.cocktails,
 			paginacion: result.pagination,
-		});
+		};
+
+		console.log(
+			"[DEBUG] getAllCocktails Controller - Respuesta enviada:",
+			response
+		);
+
+		res.status(200).json(response);
 	} catch (error) {
 		console.error("Error al obtener los cócteles:", error);
 		res.status(500).json({ mensaje: "Error al obtener los cócteles" });
@@ -87,27 +119,47 @@ const createCocktail = async (req, res) => {
 
 const updateCocktail = async (req, res) => {
 	const { id } = req.params;
-	const { name, price, description, ingredients, images, categories } =
-		req.body;
-	const user = req.user.id;
+	const cocktailData = req.body; // Un solo objeto con todos los datos
 
 	try {
 		const updatedCocktail = await cocktailsService.updateCocktailService(
 			id,
-			name,
-			price,
-			description,
-			ingredients,
-			images,
-			categories,
-			user
+			cocktailData
 		);
-		res
-			.status(200)
-			.json({ mensaje: "Cóctel actualizado exitosamente", updatedCocktail });
+		res.status(200).json({
+			mensaje: "Cóctel actualizado exitosamente",
+			cocktail: updatedCocktail,
+		});
 	} catch (error) {
+		if (error.message === "Cóctel no encontrado.") {
+			return res.status(404).json({ mensaje: error.message });
+		}
 		console.error("Error al actualizar el cóctel:", error);
-		res.status(500).json({ mensaje: "Error al actualizar el cóctel" });
+		res.status(500).json({ mensaje: "Error interno al actualizar el cóctel" });
+	}
+};
+
+const updateCocktailStatus = async (req, res) => {
+	const { id } = req.params;
+	const { is_active } = req.body;
+
+	try {
+		const updatedCocktail = await cocktailsService.updateCocktailStatusService(
+			id,
+			is_active
+		);
+		res.status(200).json({
+			mensaje: "Estado del cóctel actualizado exitosamente",
+			cocktail: updatedCocktail,
+		});
+	} catch (error) {
+		if (error.message === "Cóctel no encontrado.") {
+			return res.status(404).json({ mensaje: error.message });
+		}
+		console.error("Error al actualizar el estado del cóctel:", error);
+		res
+			.status(500)
+			.json({ mensaje: "Error interno al actualizar el estado del cóctel" });
 	}
 };
 
@@ -159,6 +211,7 @@ module.exports = {
 	getCocktailById,
 	createCocktail,
 	updateCocktail,
+	updateCocktailStatus,
 	deleteCocktail,
 	searchProducts,
 };
