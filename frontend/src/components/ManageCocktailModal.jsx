@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
 	FiX,
 	FiEye,
@@ -31,7 +31,18 @@ const ManageCocktailModal = ({
 		setError(null);
 
 		try {
-			const newStatus = !cocktail.is_active;
+			// Si is_active es null, lo tratamos como false
+			const currentStatus =
+				cocktail.is_active === null ? false : cocktail.is_active;
+			const newStatus = !currentStatus;
+
+			console.log("[DEBUG] ManageCocktailModal - Cambiando estado:", {
+				cocktailId: cocktail.id,
+				currentStatus,
+				newStatus,
+				originalIsActive: cocktail.is_active,
+			});
+
 			const result = await updateCocktailStatus(cocktail.id, newStatus);
 
 			setIsSuccess(true);
@@ -69,24 +80,9 @@ const ManageCocktailModal = ({
 		<AnimatePresence>
 			{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			{isSuccess && (
-				<motion.div
-					className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-				>
-					<motion.div
-						className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center"
-						initial={{ scale: 0.9, y: 50, opacity: 0 }}
-						animate={{ scale: 1, y: 0, opacity: 1 }}
-						exit={{ scale: 0.9, y: 50, opacity: 0 }}
-					>
-						<motion.div
-							className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-							initial={{ scale: 0 }}
-							animate={{ scale: 1 }}
-							transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-						>
+				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
+					<div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+						<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
 							<svg
 								className="w-8 h-8 text-green-600"
 								fill="none"
@@ -100,72 +96,32 @@ const ManageCocktailModal = ({
 									d="M5 13l4 4L19 7"
 								/>
 							</svg>
-						</motion.div>
-						<motion.h3
-							className="text-xl font-bold text-gray-800 mb-2"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.3 }}
-						>
+						</div>
+						<h3 className="text-xl font-bold text-gray-800 mb-2">
 							¡Estado Actualizado!
-						</motion.h3>
-						<motion.p
-							className="text-gray-600"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.4 }}
-						>
+						</h3>
+						<p className="text-gray-600">
 							El cóctel "{cocktail.name}" ha sido{" "}
 							{cocktail.is_active ? "deshabilitado" : "habilitado"}{" "}
 							exitosamente.
-						</motion.p>
-					</motion.div>
-				</motion.div>
+						</p>
+					</div>
+				</div>
 			)}
 			{showDeleteConfirm && (
-				<motion.div
-					className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-				>
-					<motion.div
-						className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center"
-						initial={{ scale: 0.9, y: 50, opacity: 0 }}
-						animate={{ scale: 1, y: 0, opacity: 1 }}
-						exit={{ scale: 0.9, y: 50, opacity: 0 }}
-					>
-						<motion.div
-							className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
-							initial={{ scale: 0 }}
-							animate={{ scale: 1 }}
-							transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-						>
+				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
+					<div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+						<div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
 							<FiAlertTriangle className="w-8 h-8 text-red-600" />
-						</motion.div>
-						<motion.h3
-							className="text-xl font-bold text-gray-800 mb-2"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.3 }}
-						>
+						</div>
+						<h3 className="text-xl font-bold text-gray-800 mb-2">
 							¿Eliminar definitivamente?
-						</motion.h3>
-						<motion.p
-							className="text-gray-600 mb-6"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.4 }}
-						>
+						</h3>
+						<p className="text-gray-600 mb-6">
 							Esta acción eliminará permanentemente el cóctel "{cocktail.name}"
 							y no se puede deshacer.
-						</motion.p>
-						<motion.div
-							className="flex space-x-4 justify-center"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ delay: 0.5 }}
-						>
+						</p>
+						<div className="flex space-x-4 justify-center">
 							<button
 								onClick={() => setShowDeleteConfirm(false)}
 								disabled={isSubmitting}
@@ -180,23 +136,17 @@ const ManageCocktailModal = ({
 							>
 								{isSubmitting ? "Eliminando..." : "Eliminar Definitivamente"}
 							</button>
-						</motion.div>
-					</motion.div>
-				</motion.div>
+						</div>
+					</div>
+				</div>
 			)}
 			{!isSuccess && !showDeleteConfirm && (
-				<motion.div
+				<div
 					className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
 					onClick={onClose}
 				>
-					<motion.div
+					<div
 						className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
-						initial={{ scale: 0.9, y: 50, opacity: 0 }}
-						animate={{ scale: 1, y: 0, opacity: 1 }}
-						exit={{ scale: 0.9, y: 50, opacity: 0 }}
 						onClick={(e) => e.stopPropagation()}
 					>
 						<button
@@ -309,8 +259,8 @@ const ManageCocktailModal = ({
 								</button>
 							</div>
 						</div>
-					</motion.div>
-				</motion.div>
+					</div>
+				</div>
 			)}
 		</AnimatePresence>
 	);

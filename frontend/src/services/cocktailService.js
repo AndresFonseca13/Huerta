@@ -1,170 +1,193 @@
 import axios from "axios";
+import { getAuthHeaders } from "./authService";
 
-const API_URL = "http://localhost:3000";
+const API_BASE_URL = "/api";
 
+// Función para obtener cócteles (pública - no requiere autenticación)
 export const getCocktails = async (
 	page = 1,
-	limit = 10,
+	limit = 12,
 	categoria = null,
-	tipo = null
+	tipo = null,
+	orden = "name"
 ) => {
-	console.log("[DEBUG] getCocktails - Parámetros enviados:", {
-		page,
-		limit,
-		categoria,
-		tipo,
-	});
-
-	const params = new URLSearchParams({
-		pagina: page,
-		limite: limit,
-	});
-
-	if (categoria) params.append("categoria", categoria);
-	if (tipo) params.append("tipo", tipo);
-
-	console.log(
-		"[DEBUG] getCocktails - URL de la petición:",
-		`${API_URL}/cocktails?${params.toString()}`
-	);
-
-	const response = await axios.get(`${API_URL}/cocktails?${params.toString()}`);
-	console.log(
-		"[DEBUG] getCocktails - Respuesta completa del backend:",
-		response.data
-	);
-	console.log(
-		"[DEBUG] getCocktails - Cocteles recibidos:",
-		response.data.cocteles
-	);
-	console.log(
-		"[DEBUG] getCocktails - Paginación recibida:",
-		response.data.paginacion
-	);
-
-	// Expect response.data = { cocteles: [...], paginacion: {...} }
-	return {
-		items: response.data.cocteles,
-		totalPages: response.data.paginacion.totalPages,
-		totalRecords: response.data.paginacion.totalRecords,
-		currentPage: response.data.paginacion.currentPage,
-	};
-};
-
-export const createCocktail = async (cocktailData) => {
 	try {
-		const response = await axios.post(`${API_URL}/cocktails`, cocktailData);
-		return response.data;
-	} catch (error) {
-		console.error(
-			"Error al crear el cóctel:",
-			error.response?.data?.mensaje || error.message
-		);
-		const errorMessage =
-			error.response?.data?.mensaje || "Ocurrió un error inesperado.";
-		throw new Error(errorMessage);
-	}
-};
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			orden: orden,
+		});
 
-export const uploadImages = async (files) => {
-	const uploadedUrls = [];
+		if (categoria) params.append("categoria", categoria);
+		if (tipo) params.append("tipo", tipo);
 
-	for (const file of files) {
-		const formData = new FormData();
-		formData.append("image", file);
-
-		try {
-			const response = await axios.post(`${API_URL}/upload/upload`, formData, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
-			console.log("Image uploaded:", response.data);
-			uploadedUrls.push(response.data.data.url);
-		} catch (error) {
-			console.error("Error uploading image:", file.name, error);
-			throw error;
-		}
-	}
-
-	return uploadedUrls;
-};
-
-// Servicio para actualizar un cóctel
-export const updateCocktail = async (id, cocktailData) => {
-	try {
-		const token = localStorage.getItem("token"); // Asumiendo que el token se guarda en localStorage
-		const response = await fetch(`${API_URL}/cocktails/${id}`, {
-			method: "PUT",
+		const response = await fetch(`${API_BASE_URL}/cocktails?${params}`, {
 			headers: {
 				"Content-Type": "application/json",
-				// 'Authorization': `Bearer ${token}` // Descomentar si la autenticación está activa
 			},
+		});
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al obtener cócteles");
+		}
+
+		return data;
+	} catch (error) {
+		console.error("Error fetching cocktails:", error);
+		throw error;
+	}
+};
+
+// Función para obtener TODOS los cócteles para admin (requiere autenticación)
+export const getCocktailsAdmin = async (
+	page = 1,
+	limit = 50,
+	categoria = null,
+	tipo = null,
+	orden = "name"
+) => {
+	try {
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			orden: orden,
+		});
+
+		if (categoria) params.append("categoria", categoria);
+		if (tipo) params.append("tipo", tipo);
+
+		const response = await fetch(
+			`${API_BASE_URL}/cocktails/admin/all?${params}`,
+			{
+				headers: getAuthHeaders(),
+			}
+		);
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al obtener cócteles");
+		}
+
+		return data;
+	} catch (error) {
+		console.error("Error fetching admin cocktails:", error);
+		throw error;
+	}
+};
+
+// Función para crear cóctel (requiere autenticación)
+export const createCocktail = async (cocktailData) => {
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails`, {
+			method: "POST",
+			headers: getAuthHeaders(),
 			body: JSON.stringify(cocktailData),
 		});
 
+		const data = await response.json();
+
 		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(
-				errorData.mensaje ||
-					`Error ${response.status}: No se pudo actualizar el cóctel`
-			);
+			throw new Error(data.mensaje || "Error al crear cóctel");
 		}
 
-		return await response.json();
+		return data;
 	} catch (error) {
-		console.error("Error en el servicio de actualización de cóctel:", error);
+		console.error("Error creating cocktail:", error);
 		throw error;
 	}
 };
 
-// Servicio para actualizar el estado de un cóctel (is_active)
+// Función para actualizar cóctel (requiere autenticación)
+export const updateCocktail = async (id, cocktailData) => {
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
+			method: "PUT",
+			headers: getAuthHeaders(),
+			body: JSON.stringify(cocktailData),
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al actualizar cóctel");
+		}
+
+		return data;
+	} catch (error) {
+		console.error("Error updating cocktail:", error);
+		throw error;
+	}
+};
+
+// Función para actualizar estado del cóctel (requiere autenticación)
 export const updateCocktailStatus = async (id, isActive) => {
 	try {
-		const response = await fetch(`${API_URL}/cocktails/${id}/status`, {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}/status`, {
 			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ is_active: isActive }),
+			headers: getAuthHeaders(),
+			body: JSON.stringify({ isActive }),
 		});
 
+		const data = await response.json();
+
 		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(
-				errorData.mensaje ||
-					`Error ${response.status}: No se pudo actualizar el estado del cóctel`
-			);
+			throw new Error(data.mensaje || "Error al actualizar estado del cóctel");
 		}
 
-		return await response.json();
+		return data;
 	} catch (error) {
-		console.error("Error en el servicio de actualización de estado:", error);
+		console.error("Error updating cocktail status:", error);
 		throw error;
 	}
 };
 
-// Servicio para eliminar un cóctel
+// Función para eliminar cóctel (requiere autenticación)
 export const deleteCocktail = async (id) => {
 	try {
-		const response = await fetch(`${API_URL}/cocktails/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
 			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			headers: getAuthHeaders(),
 		});
 
+		const data = await response.json();
+
 		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(
-				errorData.mensaje ||
-					`Error ${response.status}: No se pudo eliminar el cóctel`
-			);
+			throw new Error(data.mensaje || "Error al eliminar cóctel");
 		}
 
-		return await response.json();
+		return data;
 	} catch (error) {
-		console.error("Error en el servicio de eliminación de cóctel:", error);
+		console.error("Error deleting cocktail:", error);
+		throw error;
+	}
+};
+
+// Función para subir imágenes (requiere autenticación)
+export const uploadImages = async (files) => {
+	try {
+		const formData = new FormData();
+		Array.from(files).forEach((file) => {
+			formData.append("images", file);
+		});
+
+		const response = await fetch(`${API_BASE_URL}/upload`, {
+			method: "POST",
+			headers: {
+				Authorization: getAuthHeaders().Authorization,
+			},
+			body: formData,
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al subir imágenes");
+		}
+
+		return data.urls;
+	} catch (error) {
+		console.error("Error uploading images:", error);
 		throw error;
 	}
 };

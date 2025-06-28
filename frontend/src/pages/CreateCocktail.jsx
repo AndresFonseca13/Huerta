@@ -139,6 +139,10 @@ const CreateCocktail = () => {
 		resetForm();
 	};
 
+	const handleBackToPanel = () => {
+		navigate("/admin");
+	};
+
 	// Animaciones
 	const overlayVariants = {
 		hidden: { opacity: 0 },
@@ -234,6 +238,14 @@ const CreateCocktail = () => {
 							<motion.button
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
+								onClick={handleBackToPanel}
+								className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+							>
+								Volver al Panel
+							</motion.button>
+							<motion.button
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
 								onClick={handleCreateAnother}
 								className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
 							>
@@ -259,6 +271,14 @@ const CreateCocktail = () => {
 			>
 				{/* Header */}
 				<div className="text-center mb-8">
+					<div className="flex justify-between items-center mb-4">
+						<button
+							onClick={handleBackToPanel}
+							className="flex items-center text-green-600 hover:text-green-700 font-medium"
+						>
+							← Volver al Panel
+						</button>
+					</div>
 					<motion.div
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}

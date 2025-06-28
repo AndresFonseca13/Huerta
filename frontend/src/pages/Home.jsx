@@ -19,13 +19,13 @@ const Home = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
-				const { items, totalPages, totalRecords } = await getCocktails(
+				const { cocktails, pagination } = await getCocktails(
 					currentPage,
 					pageSize
 				);
-				setCocktails(items);
-				setTotalPages(totalPages);
-				setTotalRecords(totalRecords);
+				setCocktails(cocktails);
+				setTotalPages(pagination.totalPages);
+				setTotalRecords(pagination.totalRecords);
 			} catch (error) {
 				console.error("Error fetching cocktails:", error);
 			} finally {

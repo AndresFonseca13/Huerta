@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { loginAdmin } from "../services/authService.js";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { loginAdmin } from "../services/authService";
 
-const Login = () => {
+const AdminLogin = () => {
 	const [formData, setFormData] = useState({
 		username: "",
 		password: "",
@@ -13,6 +13,10 @@ const Login = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 	const navigate = useNavigate();
+	const location = useLocation();
+
+	// Obtener la página de destino desde el estado de la ubicación
+	const from = location.state?.from?.pathname || "/admin";
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
@@ -20,6 +24,7 @@ const Login = () => {
 			...prev,
 			[name]: value,
 		}));
+		// Limpiar error cuando el usuario empiece a escribir
 		if (error) setError("");
 	};
 
@@ -35,8 +40,8 @@ const Login = () => {
 			localStorage.setItem("adminToken", response.token);
 			localStorage.setItem("adminUsername", response.username);
 
-			// Redirigir al panel de administración
-			navigate("/admin");
+			// Redirigir a la página de destino o al panel de administración
+			navigate(from, { replace: true });
 		} catch (err) {
 			setError(err.message || "Error al iniciar sesión");
 		} finally {
@@ -68,7 +73,7 @@ const Login = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
 					>
-						Iniciar Sesión
+						Panel de Administración
 					</motion.h1>
 					<motion.p
 						className="text-gray-600 mt-2"
@@ -76,7 +81,7 @@ const Login = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.4 }}
 					>
-						Accede a tu cuenta
+						Inicia sesión para continuar
 					</motion.p>
 				</div>
 
@@ -189,19 +194,11 @@ const Login = () => {
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.6 }}
 				>
-					<p>
-						¿No tienes cuenta?{" "}
-						<a
-							href="/admin/login"
-							className="text-green-600 hover:text-green-700"
-						>
-							Acceso de administrador
-						</a>
-					</p>
+					<p>Acceso exclusivo para administradores</p>
 				</motion.div>
 			</motion.div>
 		</div>
 	);
 };
 
-export default Login;
+export default AdminLogin;

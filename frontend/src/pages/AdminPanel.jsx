@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { getCocktails } from "../services/cocktailService";
+import { AnimatePresence } from "framer-motion";
 import {
+	FiPlus,
+	FiSearch,
+	FiFilter,
+	FiEdit3,
+	FiTrash,
 	FiEye,
+	FiEyeOff,
+	FiChevronLeft,
+	FiChevronRight,
+	FiLogOut,
 	FiEdit,
 	FiTrash2,
-	FiPlus,
 	FiX,
-	FiChevronDown,
 } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
-import PreviewCardCocktail from "../components/PreviewCardCocktail";
+import { getCocktailsAdmin } from "../services/cocktailService.js";
+import { useNavigate } from "react-router-dom";
 import EditCocktailModal from "../components/EditCocktailModal";
+import ErrorModal from "../components/ErrorModal";
+import { logout } from "../services/authService";
+import PreviewCardCocktail from "../components/PreviewCardCocktail";
 import ManageCocktailModal from "../components/ManageCocktailModal";
 
 const AdminPanel = () => {
@@ -24,12 +34,13 @@ const AdminPanel = () => {
 	const [managingCocktail, setManagingCocktail] = useState(null);
 	const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 	const [expandedRowId, setExpandedRowId] = useState(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchCocktails = async () => {
 			try {
-				const { items } = await getCocktails(1, 50); // Traemos hasta 50 items
-				setCocktails(items);
+				const response = await getCocktailsAdmin(1, 50); // Traemos hasta 50 items
+				setCocktails(response.cocteles || []);
 			} catch (err) {
 				setError("No se pudieron cargar los cócteles.");
 				console.error(err);
@@ -97,6 +108,15 @@ const AdminPanel = () => {
 		handleCloseManageModal();
 	};
 
+	const handleLogout = () => {
+		logout();
+		navigate("/admin/login");
+	};
+
+	const handleCreateNew = () => {
+		navigate("/admin/create");
+	};
+
 	const toggleRow = (id) => {
 		setExpandedRowId((prevId) => (prevId === id ? null : id));
 	};
@@ -136,10 +156,22 @@ const AdminPanel = () => {
 					</h1>
 					<p className="text-gray-600">Gestión de Cócteles</p>
 				</div>
-				<button className="w-full md:w-auto flex items-center justify-center bg-green-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors">
-					<FiPlus className="mr-2" />
-					Crear Nuevo
-				</button>
+				<div className="flex flex-col sm:flex-row gap-3">
+					<button
+						onClick={handleCreateNew}
+						className="w-full sm:w-auto flex items-center justify-center bg-green-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors"
+					>
+						<FiPlus className="mr-2" />
+						Crear Nuevo
+					</button>
+					<button
+						onClick={handleLogout}
+						className="w-full sm:w-auto flex items-center justify-center bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition-colors"
+					>
+						<FiLogOut className="mr-2" />
+						Cerrar Sesión
+					</button>
+				</div>
 			</header>
 
 			<main>
@@ -158,7 +190,7 @@ const AdminPanel = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{cocktails.map((cocktail) => (
+							{(cocktails || []).map((cocktail) => (
 								<React.Fragment key={cocktail.id}>
 									<tr
 										className="border-b hover:bg-gray-50 transition-colors md:cursor-default cursor-pointer"
@@ -203,13 +235,7 @@ const AdminPanel = () => {
 									</tr>
 									<AnimatePresence>
 										{expandedRowId === cocktail.id && (
-											<motion.tr
-												className="md:hidden"
-												initial={{ opacity: 0 }}
-												animate={{ opacity: 1 }}
-												exit={{ opacity: 0 }}
-												transition={{ duration: 0.2 }}
-											>
+											<tr className="md:hidden">
 												<td colSpan={3} className="p-4 bg-gray-50">
 													<div className="sm:hidden mb-2">
 														<h4 className="font-semibold text-sm mb-1 text-black">
@@ -238,7 +264,7 @@ const AdminPanel = () => {
 														</button>
 													</div>
 												</td>
-											</motion.tr>
+											</tr>
 										)}
 									</AnimatePresence>
 								</React.Fragment>
@@ -250,21 +276,8 @@ const AdminPanel = () => {
 
 			<AnimatePresence>
 				{isViewModalOpen && selectedCocktail && (
-					<motion.div
-						className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						onClick={handleCloseModal}
-					>
-						<motion.div
-							className="relative"
-							initial={{ scale: 0.9, opacity: 0 }}
-							animate={{ scale: 1, opacity: 1 }}
-							exit={{ scale: 0.9, opacity: 0 }}
-							transition={{ duration: 0.3, ease: "easeOut" }}
-							onClick={(e) => e.stopPropagation()}
-						>
+					<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+						<div className="relative">
 							<h3 className="text-xl font-semibold text-white text-center mb-4">
 								Vista Previa de la Card
 							</h3>
@@ -276,8 +289,8 @@ const AdminPanel = () => {
 							>
 								<FiX size={20} />
 							</button>
-						</motion.div>
-					</motion.div>
+						</div>
+					</div>
 				)}
 			</AnimatePresence>
 

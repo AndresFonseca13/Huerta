@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
 	FiX,
 	FiEdit3,
@@ -191,24 +191,9 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 		<AnimatePresence>
 			{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			{isSuccess && (
-				<motion.div
-					className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-				>
-					<motion.div
-						className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center"
-						initial={{ scale: 0.9, y: 50, opacity: 0 }}
-						animate={{ scale: 1, y: 0, opacity: 1 }}
-						exit={{ scale: 0.9, y: 50, opacity: 0 }}
-					>
-						<motion.div
-							className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-							initial={{ scale: 0 }}
-							animate={{ scale: 1 }}
-							transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-						>
+				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
+					<div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+						<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
 							<svg
 								className="w-8 h-8 text-green-600"
 								fill="none"
@@ -222,47 +207,23 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									d="M5 13l4 4L19 7"
 								/>
 							</svg>
-						</motion.div>
-						<motion.h3
-							className="text-xl font-bold text-gray-800 mb-2"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.3 }}
-						>
+						</div>
+						<h3 className="text-xl font-bold text-gray-800 mb-2">
 							¡Cóctel Actualizado!
-						</motion.h3>
-						<motion.p
-							className="text-gray-600"
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.4 }}
-						>
+						</h3>
+						<p className="text-gray-600">
 							El cóctel "{name}" ha sido actualizado exitosamente.
-						</motion.p>
-						<motion.div
-							className="mt-6"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ delay: 0.5 }}
-						>
+						</p>
+						<div className="mt-6">
 							<div className="w-8 h-1 bg-green-500 rounded-full mx-auto animate-pulse"></div>
-						</motion.div>
-					</motion.div>
-				</motion.div>
+						</div>
+					</div>
+				</div>
 			)}
 			{!isSuccess && (
-				<motion.div
-					className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					onClick={onClose}
-				>
-					<motion.div
+				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+					<div
 						className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
-						initial={{ scale: 0.9, y: 50, opacity: 0 }}
-						animate={{ scale: 1, y: 0, opacity: 1 }}
-						exit={{ scale: 0.9, y: 50, opacity: 0 }}
 						onClick={(e) => e.stopPropagation()}
 					>
 						<button
@@ -562,8 +523,8 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 								</button>
 							</div>
 						</form>
-					</motion.div>
-				</motion.div>
+					</div>
+				</div>
 			)}
 		</AnimatePresence>
 	);
