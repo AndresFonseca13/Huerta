@@ -52,23 +52,23 @@ const AdminLogin = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
 			<motion.div
-				className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+				className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md mx-4"
 				initial={{ opacity: 0, y: 50 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
 				{/* Header */}
-				<div className="text-center mb-8">
+				<div className="text-center mb-6 sm:mb-8">
 					<motion.div
-						className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+						className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
 					>
-						<FiUser className="w-8 h-8 text-green-600" />
+						<FiUser className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
 					</motion.div>
 					<motion.h1
-						className="text-2xl font-bold text-gray-800"
+						className="text-sm sm:text-2xl font-bold text-gray-800 leading-tight w-full max-w-full mx-auto text-center break-words whitespace-normal"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
@@ -76,7 +76,7 @@ const AdminLogin = () => {
 						Panel de Administración
 					</motion.h1>
 					<motion.p
-						className="text-gray-600 mt-2"
+						className="text-sm sm:text-base text-gray-600 mt-2"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.4 }}
@@ -88,7 +88,7 @@ const AdminLogin = () => {
 				{/* Form */}
 				<motion.form
 					onSubmit={handleSubmit}
-					className="space-y-6"
+					className="space-y-4 sm:space-y-6"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.5 }}
@@ -103,7 +103,7 @@ const AdminLogin = () => {
 						</label>
 						<div className="relative">
 							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<FiUser className="h-5 w-5 text-gray-400" />
+								<FiUser className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
 							</div>
 							<input
 								id="username"
@@ -112,7 +112,7 @@ const AdminLogin = () => {
 								required
 								value={formData.username}
 								onChange={handleInputChange}
-								className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+								className="block w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-sm sm:text-base"
 								placeholder="Ingresa tu usuario"
 								disabled={isLoading}
 							/>
@@ -129,7 +129,7 @@ const AdminLogin = () => {
 						</label>
 						<div className="relative">
 							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<FiLock className="h-5 w-5 text-gray-400" />
+								<FiLock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
 							</div>
 							<input
 								id="password"
@@ -138,7 +138,7 @@ const AdminLogin = () => {
 								required
 								value={formData.password}
 								onChange={handleInputChange}
-								className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+								className="block w-full pl-9 sm:pl-10 pr-12 py-2.5 sm:py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors text-sm sm:text-base"
 								placeholder="Ingresa tu contraseña"
 								disabled={isLoading}
 							/>
@@ -149,9 +149,9 @@ const AdminLogin = () => {
 								disabled={isLoading}
 							>
 								{showPassword ? (
-									<FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+									<FiEyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600" />
 								) : (
-									<FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+									<FiEye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600" />
 								)}
 							</button>
 						</div>
@@ -160,7 +160,7 @@ const AdminLogin = () => {
 					{/* Error Message */}
 					{error && (
 						<motion.div
-							className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+							className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm"
 							initial={{ opacity: 0, y: -10 }}
 							animate={{ opacity: 1, y: 0 }}
 						>
@@ -172,14 +172,14 @@ const AdminLogin = () => {
 					<motion.button
 						type="submit"
 						disabled={isLoading}
-						className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						className="w-full bg-green-600 text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
 						whileHover={{ scale: 1.02 }}
 						whileTap={{ scale: 0.98 }}
 					>
 						{isLoading ? (
 							<div className="flex items-center justify-center">
-								<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-								Iniciando sesión...
+								<div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+								<span className="text-xs sm:text-sm">Iniciando sesión...</span>
 							</div>
 						) : (
 							"Iniciar Sesión"
@@ -189,7 +189,7 @@ const AdminLogin = () => {
 
 				{/* Footer */}
 				<motion.div
-					className="mt-8 text-center text-sm text-gray-500"
+					className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-500"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.6 }}

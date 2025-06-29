@@ -13,8 +13,30 @@ export const loginUser = async (username, password) => {
 		localStorage.setItem("token", token);
 		return response.data;
 	} catch (error) {
-		console.error("Error during login:", error);
-		throw error;
+		// Manejar diferentes tipos de errores con mensajes amigables
+		if (error.response) {
+			const status = error.response.status;
+			const message =
+				error.response.data?.mensaje || error.response.data?.message;
+			switch (status) {
+				case 401:
+					throw new Error("Usuario o contraseña incorrectos");
+				case 400:
+					throw new Error(message || "Datos de entrada inválidos");
+				case 404:
+					throw new Error("Usuario no encontrado");
+				case 500:
+					throw new Error("Error del servidor. Inténtalo más tarde");
+				default:
+					throw new Error(message || "Error al iniciar sesión");
+			}
+		} else if (error.request) {
+			throw new Error(
+				"No se pudo conectar con el servidor. Verifica tu conexión"
+			);
+		} else {
+			throw new Error("Error inesperado. Inténtalo nuevamente");
+		}
 	}
 };
 
@@ -30,8 +52,30 @@ export const loginAdmin = async (username, password) => {
 		localStorage.setItem("token", token);
 		return response.data;
 	} catch (error) {
-		console.error("Error during admin login:", error);
-		throw error;
+		// Manejar diferentes tipos de errores con mensajes amigables
+		if (error.response) {
+			const status = error.response.status;
+			const message =
+				error.response.data?.mensaje || error.response.data?.message;
+			switch (status) {
+				case 401:
+					throw new Error("Usuario o contraseña incorrectos");
+				case 400:
+					throw new Error(message || "Datos de entrada inválidos");
+				case 404:
+					throw new Error("Usuario no encontrado");
+				case 500:
+					throw new Error("Error del servidor. Inténtalo más tarde");
+				default:
+					throw new Error(message || "Error al iniciar sesión");
+			}
+		} else if (error.request) {
+			throw new Error(
+				"No se pudo conectar con el servidor. Verifica tu conexión"
+			);
+		} else {
+			throw new Error("Error inesperado. Inténtalo nuevamente");
+		}
 	}
 };
 
@@ -45,7 +89,30 @@ export const logout = () => {
 // Función para verificar si el usuario está autenticado
 export const isAuthenticated = () => {
 	const token = localStorage.getItem("token");
-	return !!token; // Retorna true si existe un token, false si no
+	if (!token) {
+		return false;
+	}
+
+	// Verificar si el token no está vacío
+	if (token.trim() === "") {
+		localStorage.removeItem("token");
+		return false;
+	}
+
+	// Opcional: Verificar si el token no ha expirado (si es un JWT)
+	try {
+		const payload = JSON.parse(atob(token.split(".")[1]));
+		const currentTime = Date.now() / 1000;
+		if (payload.exp && payload.exp < currentTime) {
+			localStorage.removeItem("token");
+			return false;
+		}
+	} catch {
+		// Si no es un JWT válido, asumimos que es un token simple
+		// y solo verificamos que no esté vacío
+	}
+
+	return true;
 };
 
 // Función para obtener los headers de autenticación

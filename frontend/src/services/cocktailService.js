@@ -1,4 +1,3 @@
-import axios from "axios";
 import { getAuthHeaders } from "./authService";
 
 const API_BASE_URL = "/api";
@@ -66,6 +65,14 @@ export const getCocktailsAdmin = async (
 		const data = await response.json();
 
 		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
 			throw new Error(data.mensaje || "Error al obtener cócteles");
 		}
 
@@ -88,6 +95,14 @@ export const createCocktail = async (cocktailData) => {
 		const data = await response.json();
 
 		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
 			throw new Error(data.mensaje || "Error al crear cóctel");
 		}
 
@@ -110,6 +125,14 @@ export const updateCocktail = async (id, cocktailData) => {
 		const data = await response.json();
 
 		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
 			throw new Error(data.mensaje || "Error al actualizar cóctel");
 		}
 
@@ -132,6 +155,14 @@ export const updateCocktailStatus = async (id, isActive) => {
 		const data = await response.json();
 
 		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
 			throw new Error(data.mensaje || "Error al actualizar estado del cóctel");
 		}
 
@@ -153,6 +184,14 @@ export const deleteCocktail = async (id) => {
 		const data = await response.json();
 
 		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
 			throw new Error(data.mensaje || "Error al eliminar cóctel");
 		}
 
