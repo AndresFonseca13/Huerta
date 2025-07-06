@@ -35,7 +35,16 @@ const CardCocktail = ({ cocktail, onClick }) => {
 				<h3 className="text-xl font-semibold capitalize text-black text-center mb-2">
 					{name}
 				</h3>
-				<p className="text-sm text-gray-600 mb-3 text-center capitalize">
+				<p
+					className="text-sm text-gray-600 mb-3 text-center capitalize overflow-hidden text-ellipsis"
+					style={{
+						display: "-webkit-box",
+						WebkitLineClamp: 4,
+						WebkitBoxOrient: "vertical",
+						minHeight: "5.5em",
+						maxHeight: "5.5em",
+					}}
+				>
 					{description}
 				</p>
 				<p className="text-lg font-bold text-green-600 text-center">
