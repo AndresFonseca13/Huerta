@@ -1,0 +1,92 @@
+/* Estilos personalizados para el carrusel de Swiper */
+
+/* Contenedor del carrusel */
+.swiper-container {
+	position: relative;
+}
+
+/* Flechas de navegación */
+.swiper-button-next,
+.swiper-button-prev {
+	width: 40px !important;
+	height: 40px !important;
+	background-color: rgba(
+		34,
+		197,
+		94,
+		0.9
+	) !important; /* Verde con transparencia */
+	border-radius: 50% !important;
+	color: white !important;
+	font-size: 16px !important;
+	transition: all 0.3s ease !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+	background-color: rgba(
+		34,
+		197,
+		94,
+		1
+	) !important; /* Verde sólido al hacer hover */
+	transform: scale(1.1) !important;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+	font-size: 16px !important;
+	font-weight: bold !important;
+}
+
+/* Posicionamiento de las flechas */
+.swiper-button-prev {
+	left: 10px !important;
+}
+
+.swiper-button-next {
+	right: 10px !important;
+}
+
+/* Puntos de paginación */
+.swiper-pagination-bullet {
+	width: 8px !important;
+	height: 8px !important;
+	background-color: rgba(34, 197, 94, 0.5) !important; /* Verde claro */
+	opacity: 1 !important;
+	transition: all 0.3s ease !important;
+}
+
+.swiper-pagination-bullet-active {
+	background-color: rgb(34, 197, 94) !important; /* Verde sólido */
+	transform: scale(1.2) !important;
+}
+
+.swiper-pagination-bullet:hover {
+	background-color: rgba(34, 197, 94, 0.8) !important;
+}
+
+/* Contenedor de paginación */
+.swiper-pagination {
+	bottom: 10px !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+	.swiper-button-next,
+	.swiper-button-prev {
+		width: 32px !important;
+		height: 32px !important;
+		font-size: 14px !important;
+	}
+
+	.swiper-button-next:after,
+	.swiper-button-prev:after {
+		font-size: 14px !important;
+	}
+
+	.swiper-pagination-bullet {
+		width: 6px !important;
+		height: 6px !important;
+	}
+}

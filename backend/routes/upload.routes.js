@@ -8,7 +8,7 @@ const router = express.Router();
 router.post(
 	"/upload",
 	// authMiddleware,
-	upload.single("image"),
+	upload.array("images", 5), // Permitir hasta 5 imágenes
 	handleMulterError,
 	uploadImage
 );

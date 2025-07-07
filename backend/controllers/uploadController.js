@@ -19,11 +19,11 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 exports.uploadImage = async (req, res) => {
-	// Verificar si se recibió un archivo
-	if (!req.file) {
+	// Verificar si se recibieron archivos
+	if (!req.files || req.files.length === 0) {
 		return res.status(400).json({
 			error: true,
-			mensaje: "No se ha proporcionado ninguna imagen",
+			mensaje: "No se han proporcionado imágenes",
 		});
 	}
 
@@ -58,33 +58,38 @@ exports.uploadImage = async (req, res) => {
 			});
 		}
 
-		// Generar un nombre único para el archivo
-		const timestamp = Date.now();
-		const originalName = req.file.originalname.replace(/[^a-zA-Z0-9.]/g, "");
-		const blobName = `${timestamp}-${originalName}`;
+		// Array para almacenar las URLs de las imágenes subidas
+		const uploadedUrls = [];
 
-		const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+		// Procesar cada archivo
+		for (const file of req.files) {
+			// Generar un nombre único para el archivo
+			const timestamp = Date.now();
+			const originalName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "");
+			const blobName = `${timestamp}-${originalName}`;
 
-		// Subir el archivo
-		await blockBlobClient.uploadData(req.file.buffer, {
-			blobHTTPHeaders: {
-				blobContentType: req.file.mimetype,
-			},
-		});
+			const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-		// Generar URL pública
-		const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+			// Subir el archivo
+			await blockBlobClient.uploadData(file.buffer, {
+				blobHTTPHeaders: {
+					blobContentType: file.mimetype,
+				},
+			});
 
-		res.status(200).json({
+			// Generar URL pública
+			const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+			uploadedUrls.push(publicUrl);
+		}
+
+		const response = {
 			error: false,
-			mensaje: "Imagen subida exitosamente",
-			data: {
-				url: publicUrl,
-				nombre: blobName,
-				tipo: req.file.mimetype,
-				tamaño: req.file.size,
-			},
-		});
+			mensaje: "Imágenes subidas exitosamente",
+			urls: uploadedUrls,
+		};
+
+		console.log("Respuesta del backend:", response);
+		res.status(200).json(response);
 	} catch (error) {
 		console.error("Error al subir la imagen:", error);
 

@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiList, FiDollarSign } from "react-icons/fi";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "./CocktailDetailModal.css";
 
 const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 	// Cerrar modal con ESC
@@ -19,10 +25,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 	console.log("Cocktail en modal:", cocktail);
 	console.log("Images en modal:", images);
 
-	const imageUrl =
-		images && images.length > 0 && images[0]
-			? images[0]
-			: "https://via.placeholder.com/400x300?text=Sin+Imagen";
+	const imageList =
+		images && images.length > 0
+			? images
+			: ["https://via.placeholder.com/400x300?text=Sin+Imagen"];
 
 	return (
 		<AnimatePresence>
@@ -65,18 +71,46 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 						<FiX className="text-gray-600 text-xl" />
 					</button>
 
-					{/* Imagen principal */}
+					{/* Carrusel de imágenes */}
 					<div className="relative">
-						<img
-							src={imageUrl}
-							alt={name}
-							className="w-full h-64 md:h-80 object-cover rounded-t-2xl"
-							onError={(e) => {
-								console.log("Error cargando imagen:", imageUrl);
-								e.target.src =
-									"https://via.placeholder.com/400x300?text=Error+Imagen";
-							}}
-						/>
+						{imageList.length > 1 ? (
+							<Swiper
+								modules={[Navigation, Pagination, Autoplay]}
+								navigation
+								pagination={{ clickable: true }}
+								className="w-full h-64 md:h-80 rounded-t-2xl"
+								spaceBetween={0}
+								loop={true}
+								autoplay={{
+									delay: 5000,
+									disableOnInteraction: false,
+								}}
+							>
+								{imageList.map((img, idx) => (
+									<SwiperSlide key={idx}>
+										<img
+											src={img}
+											alt={name}
+											className="w-full h-64 md:h-80 object-cover rounded-t-2xl"
+											onError={(e) => {
+												e.target.src =
+													"https://via.placeholder.com/400x300?text=Error+Imagen";
+											}}
+										/>
+									</SwiperSlide>
+								))}
+							</Swiper>
+						) : (
+							<img
+								src={imageList[0]}
+								alt={name}
+								className="w-full h-64 md:h-80 object-cover rounded-t-2xl"
+								onError={(e) => {
+									e.target.src =
+										"https://via.placeholder.com/400x300?text=Error+Imagen";
+								}}
+							/>
+						)}
 						<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-t-2xl" />
 					</div>
 

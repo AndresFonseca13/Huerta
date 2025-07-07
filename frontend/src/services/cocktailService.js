@@ -210,7 +210,7 @@ export const uploadImages = async (files) => {
 			formData.append("images", file);
 		});
 
-		const response = await fetch(`${API_BASE_URL}/upload`, {
+		const response = await fetch(`${API_BASE_URL}/upload/upload`, {
 			method: "POST",
 			headers: {
 				Authorization: getAuthHeaders().Authorization,
@@ -224,7 +224,10 @@ export const uploadImages = async (files) => {
 			throw new Error(data.mensaje || "Error al subir imágenes");
 		}
 
-		return data.urls;
+		console.log("Respuesta del backend:", data);
+		console.log("URLs recibidas:", data.urls);
+
+		return data.urls || [];
 	} catch (error) {
 		console.error("Error uploading images:", error);
 		throw error;
