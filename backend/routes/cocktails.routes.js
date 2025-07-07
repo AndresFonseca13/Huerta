@@ -14,10 +14,15 @@ router.get("/search", cocktailController.searchProducts);
 // Rutas con parámetros
 router.get("/:id", cocktailController.getCocktailById);
 
-// Rutas protegidas
+// Rutas protegidas (requieren autenticación)
+router.get(
+	"/admin/all",
+	authMiddleware,
+	cocktailController.getAllCocktailsAdmin
+);
 router.post(
 	"/",
-	// authMiddleware,
+	authMiddleware,
 	normalizeTextFields,
 	validateBodyCocktail,
 	validateCategories,
@@ -32,6 +37,11 @@ router.put(
 	validateCategories,
 	validateIngredients,
 	cocktailController.updateCocktail
+);
+router.patch(
+	"/:id/status",
+	authMiddleware,
+	cocktailController.updateCocktailStatus
 );
 router.delete("/:id", authMiddleware, cocktailController.deleteCocktail);
 

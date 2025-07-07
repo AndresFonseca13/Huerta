@@ -13,7 +13,7 @@ import {
 	FiTag,
 	FiImage,
 } from "react-icons/fi";
-import CardCocktail from "../components/CardCocktail";
+import PreviewCardCocktail from "../components/PreviewCardCocktail";
 import ErrorModal from "../components/ErrorModal";
 
 const CreateCocktail = () => {
@@ -139,6 +139,10 @@ const CreateCocktail = () => {
 		resetForm();
 	};
 
+	const handleBackToPanel = () => {
+		navigate("/admin");
+	};
+
 	// Animaciones
 	const overlayVariants = {
 		hidden: { opacity: 0 },
@@ -218,7 +222,7 @@ const CreateCocktail = () => {
 
 						{/* Card del coctel */}
 						<div className="mb-6">
-							<CardCocktail cocktail={createdCocktail} />
+							<PreviewCardCocktail cocktail={createdCocktail} />
 						</div>
 
 						{/* Botones de acción */}
@@ -230,6 +234,14 @@ const CreateCocktail = () => {
 								className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-900 transition-colors font-medium"
 							>
 								Ver Todos los Cócteles
+							</motion.button>
+							<motion.button
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
+								onClick={handleBackToPanel}
+								className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+							>
+								Volver al Panel
 							</motion.button>
 							<motion.button
 								whileHover={{ scale: 1.02 }}
@@ -259,6 +271,14 @@ const CreateCocktail = () => {
 			>
 				{/* Header */}
 				<div className="text-center mb-8">
+					<div className="flex justify-between items-center mb-4">
+						<button
+							onClick={handleBackToPanel}
+							className="flex items-center text-green-600 hover:text-green-700 font-medium"
+						>
+							← Volver al Panel
+						</button>
+					</div>
 					<motion.div
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}

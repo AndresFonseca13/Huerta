@@ -1,13 +1,13 @@
 const pool = require("../../config/db");
 
-const getAllCocktailsService = async ({
+const getAllCocktailsAdminService = async ({
 	categoria,
 	tipo,
 	orden,
 	limite,
 	offset,
 }) => {
-	console.log("[DEBUG] getAllCocktailsService - Parámetros recibidos:", {
+	console.log("[DEBUG] getAllCocktailsAdminService - Parámetros recibidos:", {
 		categoria,
 		tipo,
 		orden,
@@ -17,7 +17,7 @@ const getAllCocktailsService = async ({
 
 	const ordenValido = ["name", "price"].includes(orden) ? orden : "name";
 
-	// Consulta principal para obtener los cocteles
+	// Consulta principal para obtener TODOS los cocteles (activos e inactivos)
 	const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active,
            array_agg(DISTINCT i.name) AS ingredients,
@@ -29,8 +29,7 @@ const getAllCocktailsService = async ({
     LEFT JOIN products_categories pc ON p.id = pc.product_id
     LEFT JOIN categories c ON pc.category_id = c.id
     LEFT JOIN images img ON p.id = img.product_id
-    WHERE p.is_active = true
-      AND ($1::text IS NULL OR EXISTS (
+    WHERE ($1::text IS NULL OR EXISTS (
         SELECT 1 FROM products_categories pc2 
         JOIN categories c2 ON pc2.category_id = c2.id 
         WHERE pc2.product_id = p.id AND c2.name = $1
@@ -49,8 +48,7 @@ const getAllCocktailsService = async ({
 	const countQuery = `
     SELECT COUNT(DISTINCT p.id) as total
     FROM products p
-    WHERE p.is_active = true
-      AND ($1::text IS NULL OR EXISTS (
+    WHERE ($1::text IS NULL OR EXISTS (
         SELECT 1 FROM products_categories pc2 
         JOIN categories c2 ON pc2.category_id = c2.id 
         WHERE pc2.product_id = p.id AND c2.name = $1
@@ -66,11 +64,11 @@ const getAllCocktailsService = async ({
 	const countValues = [categoria, tipo];
 
 	console.log(
-		"[DEBUG] getAllCocktailsService - Valores de la consulta:",
+		"[DEBUG] getAllCocktailsAdminService - Valores de la consulta:",
 		values
 	);
 	console.log(
-		"[DEBUG] getAllCocktailsService - Valores del conteo:",
+		"[DEBUG] getAllCocktailsAdminService - Valores del conteo:",
 		countValues
 	);
 
@@ -80,13 +78,14 @@ const getAllCocktailsService = async ({
 		pool.query(countQuery, countValues),
 	]);
 
-	console.log("[DEBUG] getAllCocktailsService - Resultados obtenidos:", {
+	console.log("[DEBUG] getAllCocktailsAdminService - Resultados obtenidos:", {
 		cocktailsCount: result.rows.length,
 		totalCount: countResult.rows[0].total,
 		sampleCocktail: result.rows[0]
 			? {
 					id: result.rows[0].id,
 					name: result.rows[0].name,
+					is_active: result.rows[0].is_active,
 					categories: result.rows[0].categories,
 			  }
 			: null,
@@ -120,4 +119,4 @@ const getAllCocktailsService = async ({
 	};
 };
 
-module.exports = getAllCocktailsService;
+module.exports = getAllCocktailsAdminService;

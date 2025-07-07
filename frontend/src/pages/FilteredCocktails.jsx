@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
 import { getCocktails } from "../services/cocktailService";
 import CardCocktail from "../components/CardCocktail";
+import CocktailDetailModal from "../components/CocktailDetailModal";
 
 const FilteredCocktails = () => {
 	const { categoria } = useParams();
@@ -13,6 +14,8 @@ const FilteredCocktails = () => {
 	const [totalPages, setTotalPages] = useState(0);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
+	const [selectedCocktail, setSelectedCocktail] = useState(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
 	// Determinar el tipo basado en la ruta
@@ -24,17 +27,37 @@ const FilteredCocktails = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
+				console.log("[DEBUG] FilteredCocktails - Iniciando fetchData con:", {
+					currentPage,
+					pageSize,
+					categoria,
+					tipo,
+				});
+
 				const { items, totalPages, totalRecords } = await getCocktails(
 					currentPage,
 					pageSize,
 					categoria,
 					tipo
 				);
+
+				console.log("[DEBUG] FilteredCocktails - Datos recibidos:", {
+					items,
+					totalPages,
+					totalRecords,
+				});
+
 				setCocktails(items);
 				setTotalPages(totalPages);
 				setTotalRecords(totalRecords);
+
+				console.log("[DEBUG] FilteredCocktails - Estado actualizado:", {
+					cocktailsCount: items.length,
+					totalPages,
+					totalRecords,
+				});
 			} catch (error) {
-				console.error("Error fetching cocktails:", error);
+				console.error("[DEBUG] FilteredCocktails - Error:", error);
 			} finally {
 				setIsLoading(false);
 			}
@@ -50,6 +73,16 @@ const FilteredCocktails = () => {
 			behavior: "smooth",
 			block: "start",
 		});
+	};
+
+	const handleCardClick = (cocktail) => {
+		setSelectedCocktail(cocktail);
+		setIsModalOpen(true);
+	};
+
+	const handleCloseModal = () => {
+		setIsModalOpen(false);
+		setSelectedCocktail(null);
 	};
 
 	const containerVariants = {
@@ -116,13 +149,11 @@ const FilteredCocktails = () => {
 				animate={isLoading ? "hidden" : "visible"}
 				key={`${categoria}-${tipo}-${currentPage}`}
 			>
-				<AnimatePresence mode="wait">
-					{cocktails.map((cocktail) => (
-						<motion.div key={cocktail.id} variants={itemVariants} layout>
-							<CardCocktail cocktail={cocktail} />
-						</motion.div>
-					))}
-				</AnimatePresence>
+				{cocktails.map((cocktail) => (
+					<motion.div key={cocktail.id} variants={itemVariants} layout>
+						<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
+					</motion.div>
+				))}
 			</motion.div>
 
 			{totalPages > 0 && (
@@ -174,6 +205,13 @@ const FilteredCocktails = () => {
 					</div>
 				</motion.div>
 			)}
+
+			{/* Modal de detalles del cóctel */}
+			<CocktailDetailModal
+				cocktail={selectedCocktail}
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+			/>
 		</div>
 	);
 };

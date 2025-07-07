@@ -1,16 +1,19 @@
-const createCocktailService = require('./createCocktailService');
-const getAllCocktailsService = require('./getAllCocktailsService');
-const getCocktailByIdService = require('./getCocktailByIdService');
-const updateCocktailService = require('./updateCocktailService');
-const deleteCocktailService = require('./deleteCocktailService');
-const searchProductsService = require('./searchProductsService');
-
+const getAllCocktailsService = require("./getAllCocktailsService");
+const getAllCocktailsAdminService = require("./getAllCocktailsAdminService");
+const getCocktailByIdService = require("./getCocktailByIdService");
+const createCocktailService = require("./createCocktailService");
+const updateCocktailService = require("./updateCocktailService");
+const updateCocktailStatusService = require("./updateCocktailStatusService");
+const deleteCocktailService = require("./deleteCocktailService");
+const searchProductsService = require("./searchProductsService");
 
 module.exports = {
-    createCocktailService,
-    getAllCocktailsService,
-    getCocktailByIdService,
-    updateCocktailService,
-    deleteCocktailService,
-    searchProductsService
+	getAllCocktailsService,
+	getAllCocktailsAdminService,
+	getCocktailByIdService,
+	createCocktailService,
+	updateCocktailService,
+	updateCocktailStatusService,
+	deleteCocktailService,
+	searchProductsService,
 };
