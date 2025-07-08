@@ -7,6 +7,8 @@ import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import AdminPanel from "./pages/AdminPanel.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import CocktailsAdmin from "./pages/CocktailsAdmin";
+import CategoriesAdmin from "./pages/CategoriesAdmin";
 
 function App() {
 	return (
@@ -31,6 +33,22 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<AdminPanel />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/admin/cocktails"
+					element={
+						<ProtectedRoute>
+							<CocktailsAdmin />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/admin/categories"
+					element={
+						<ProtectedRoute>
+							<CategoriesAdmin />
 						</ProtectedRoute>
 					}
 				/>

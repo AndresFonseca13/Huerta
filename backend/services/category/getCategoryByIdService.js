@@ -3,7 +3,7 @@ const pool = require("../../config/db");
 const getCategoryByIdService = async (id) => {
 	try {
 		const query = `
-            SELECT c.id, c.name, c.type
+            SELECT c.id, c.name, c.type, c.is_active
             FROM categories c
             WHERE c.id = $1;
         `;
