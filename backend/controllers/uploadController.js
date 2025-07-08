@@ -1,9 +1,20 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
+const sharp = require("sharp");
 
 const AZURE_STORAGE_CONNECTION_STRING =
 	process.env.AZURE_STORAGE_CONNECTION_STRING;
 const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const containerName = "cocktail-images";
+
+function slugify(str) {
+	return str
+		.toString()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "") // quitar acentos
+		.replace(/[^a-zA-Z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "")
+		.toLowerCase();
+}
 
 // Log para depuración (solo en desarrollo)
 if (process.env.NODE_ENV !== "production") {
@@ -26,6 +37,9 @@ exports.uploadImage = async (req, res) => {
 			mensaje: "No se han proporcionado imágenes",
 		});
 	}
+
+	const cocktailNameRaw = req.body.cocktailName || "imagen-coctel";
+	const cocktailSlug = slugify(cocktailNameRaw);
 
 	// Verificar la configuración de Azure con mensajes más específicos
 	if (!AZURE_STORAGE_CONNECTION_STRING) {
@@ -62,18 +76,22 @@ exports.uploadImage = async (req, res) => {
 		const uploadedUrls = [];
 
 		// Procesar cada archivo
-		for (const file of req.files) {
-			// Generar un nombre único para el archivo
-			const timestamp = Date.now();
-			const originalName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "");
-			const blobName = `${timestamp}-${originalName}`;
+		for (const [idx, file] of req.files.entries()) {
+			// Generar un nombre único para el archivo (nombre-coctel-1.webp, etc)
+			const blobName = `${cocktailSlug}-${idx + 1}.webp`;
+
+			// Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
+			const optimizedBuffer = await sharp(file.buffer)
+				.resize({ width: 600, withoutEnlargement: true })
+				.webp({ quality: 80 })
+				.toBuffer();
 
 			const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-			// Subir el archivo
-			await blockBlobClient.uploadData(file.buffer, {
+			// Subir el archivo optimizado
+			await blockBlobClient.uploadData(optimizedBuffer, {
 				blobHTTPHeaders: {
-					blobContentType: file.mimetype,
+					blobContentType: "image/webp",
 				},
 			});
 

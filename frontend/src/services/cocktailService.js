@@ -203,12 +203,15 @@ export const deleteCocktail = async (id) => {
 };
 
 // Función para subir imágenes (requiere autenticación)
-export const uploadImages = async (files) => {
+export const uploadImages = async (files, cocktailName) => {
 	try {
 		const formData = new FormData();
 		Array.from(files).forEach((file) => {
 			formData.append("images", file);
 		});
+		if (cocktailName) {
+			formData.append("cocktailName", cocktailName);
+		}
 
 		const response = await fetch(`${API_BASE_URL}/upload/upload`, {
 			method: "POST",

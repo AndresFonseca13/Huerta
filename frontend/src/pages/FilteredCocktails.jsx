@@ -34,12 +34,12 @@ const FilteredCocktails = () => {
 					tipo,
 				});
 
-				const { items, totalPages, totalRecords } = await getCocktails(
-					currentPage,
-					pageSize,
-					categoria,
-					tipo
-				);
+				const data = await getCocktails(currentPage, pageSize, categoria, tipo);
+
+				// El backend devuelve 'cocteles' y 'paginacion'
+				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
+				const totalPages = data.paginacion?.totalPages || 0;
+				const totalRecords = data.paginacion?.totalRecords || 0;
 
 				console.log("[DEBUG] FilteredCocktails - Datos recibidos:", {
 					items,

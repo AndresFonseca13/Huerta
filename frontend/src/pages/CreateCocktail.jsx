@@ -79,7 +79,7 @@ const CreateCocktail = () => {
 
 		try {
 			// 1. Subir imágenes (solo si la validación pasó)
-			const imageUrls = await uploadImages(selectedFiles);
+			const imageUrls = await uploadImages(selectedFiles, name.trim());
 
 			// 2. Preparar objeto del cóctel
 			const cocktailData = {

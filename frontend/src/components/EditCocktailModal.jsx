@@ -147,7 +147,7 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 			let finalImageUrls = [...images];
 
 			if (newImageFiles.length > 0) {
-				const uploadedUrls = await uploadImages(newImageFiles);
+				const uploadedUrls = await uploadImages(newImageFiles, name.trim());
 				finalImageUrls = uploadedUrls;
 			}
 

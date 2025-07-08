@@ -73,7 +73,7 @@ const AdminLogin = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
 					>
-						Panel de Administración
+						Panel de Admin
 					</motion.h1>
 					<motion.p
 						className="text-sm sm:text-base text-gray-600 mt-2"

@@ -78,7 +78,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 								modules={[Navigation, Pagination, Autoplay]}
 								navigation
 								pagination={{ clickable: true }}
-								className="w-full h-64 md:h-80 rounded-t-2xl"
+								className="w-full h-80 rounded-t-2xl"
 								spaceBetween={0}
 								loop={true}
 								autoplay={{
@@ -91,7 +91,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 										<img
 											src={img}
 											alt={name}
-											className="w-full h-64 md:h-80 object-cover rounded-t-2xl"
+											className="w-full h-80 object-cover rounded-t-2xl"
 											onError={(e) => {
 												e.target.src =
 													"https://via.placeholder.com/400x300?text=Error+Imagen";
@@ -104,7 +104,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							<img
 								src={imageList[0]}
 								alt={name}
-								className="w-full h-64 md:h-80 object-cover rounded-t-2xl"
+								className="w-full h-80 object-cover rounded-t-2xl"
 								onError={(e) => {
 									e.target.src =
 										"https://via.placeholder.com/400x300?text=Error+Imagen";
@@ -143,7 +143,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							transition={{ delay: 0.3 }}
 							className="mb-6"
 						>
-							<p className="text-gray-700 text-lg leading-relaxed capitalize">
+							<p className="text-gray-700 text-lg leading-relaxed">
 								{description}
 							</p>
 						</motion.div>
