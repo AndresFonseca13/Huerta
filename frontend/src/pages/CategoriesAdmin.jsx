@@ -21,6 +21,7 @@ import {
 	deleteCategory,
 } from "../services/categoryService";
 import ConfirmModal from "../components/ErrorModal";
+import BackButton from "../components/BackButton";
 
 const CategoriesAdmin = () => {
 	const [categories, setCategories] = useState([]);
@@ -187,11 +188,18 @@ const CategoriesAdmin = () => {
 	return (
 		<div className="p-4 md:p-8 bg-gray-50 min-h-screen">
 			<header className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
-				<div className="text-center md:text-left mb-4 md:mb-0">
-					<h1 className="text-2xl md:text-4xl font-bold text-gray-800">
-						Gestión de Categorías
-					</h1>
-					<p className="text-gray-600">Administra las categorías del sistema</p>
+				<div className="flex flex-col md:flex-row md:items-center w-full">
+					<div className="mb-4 md:mb-0 md:mr-6">
+						<BackButton />
+					</div>
+					<div className="text-center md:text-left">
+						<h1 className="text-2xl md:text-4xl font-bold text-gray-800">
+							Gestión de Categorías
+						</h1>
+						<p className="text-gray-600">
+							Administra las categorías del sistema
+						</p>
+					</div>
 				</div>
 				<div className="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
 					<div className="relative w-full md:w-64">
