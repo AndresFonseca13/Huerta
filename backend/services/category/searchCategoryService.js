@@ -1,21 +1,22 @@
 const pool = require("../../config/db");
 
 const searchCategoryService = async (searchTerm) => {
-    try{
-        const query = `
+	try {
+		const query = `
         SELECT
         id,
         name,
-        type
+        type,
+        is_active
         FROM categories
-        WHERE LOWER(name) LIKE LOWER($1)
+        WHERE is_active = true AND LOWER(name) LIKE LOWER($1)
         ORDER BY name ASC;`;
-        const result = await pool.query(query, [`%${searchTerm}%`]);
-        return result.rows;
-    }catch(error){
-        console.error("Error al buscar la categoría:", error);
-        throw error;
-    }
-}
+		const result = await pool.query(query, [`%${searchTerm}%`]);
+		return result.rows;
+	} catch (error) {
+		console.error("Error al buscar la categoría:", error);
+		throw error;
+	}
+};
 
 module.exports = searchCategoryService;

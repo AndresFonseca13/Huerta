@@ -3,9 +3,13 @@ const categoryService = require("../services/category/index");
 const { v4: uuidv4 } = require("uuid");
 
 const createCategory = async (req, res) => {
-	const { name, type } = req.body;
+	const { name, type, is_active } = req.body;
 	try {
-		const category = await categoryService.createCategoryService(name, type);
+		const category = await categoryService.createCategoryService(
+			name,
+			type,
+			is_active
+		);
 		res
 			.status(201)
 			.json({ mensaje: "Categoría creada exitosamente", category });
@@ -22,21 +26,34 @@ const createCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
 	const { id } = req.params;
+	const { logical } = req.query; // ?logical=true|false
 	if (!id) {
 		return res.status(400).json({ mensaje: "ID de categoría es requerido" });
 	}
-	if (isNaN(id)) {
-		return res
-			.status(400)
-			.json({ mensaje: "ID de categoría debe ser un número" });
+	const uuidRegex =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	if (!uuidRegex.test(id)) {
+		return res.status(400).json({
+			mensaje: "ID inválido",
+			error: "El ID debe ser un UUID válido",
+			idRecibido: id,
+		});
 	}
-
 	try {
-		const deletedCategory = await categoryService.deleteCategoryService(id);
+		const deletedCategory = await categoryService.deleteCategoryService(
+			id,
+			logical !== "false"
+		);
 		if (!deletedCategory) {
 			return res.status(404).json({ mensaje: "Categoría no encontrada" });
 		}
-		res.status(200).json({ mensaje: "Categoría eliminada exitosamente" });
+		res.status(200).json({
+			mensaje:
+				logical !== "false"
+					? "Categoría deshabilitada exitosamente"
+					: "Categoría eliminada exitosamente",
+			category: deletedCategory,
+		});
 	} catch (error) {
 		if (error.message === "Categoría no encontrada") {
 			return res.status(404).json({ mensaje: error.message });
@@ -51,7 +68,8 @@ const deleteCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
 	try {
-		const categories = await categoryService.getAllCategoriesService();
+		const showAll = req.query.showAll === "true";
+		const categories = await categoryService.getAllCategoriesService(showAll);
 		res.status(200).json(categories);
 	} catch (error) {
 		console.error("Error al obtener las categorías:", error);
@@ -97,7 +115,7 @@ const getCategoryById = async (req, res) => {
 
 const updateCategory = async (req, res) => {
 	const { id } = req.params;
-	const { name, type } = req.body;
+	const { name, type, is_active } = req.body;
 	// Validación del formato UUID
 	const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -115,7 +133,8 @@ const updateCategory = async (req, res) => {
 		const updatedCategory = await categoryService.updateCategory(
 			id,
 			name,
-			type
+			type,
+			is_active
 		);
 		res.status(200).json({
 			mensaje: "Categoría actualizada exitosamente",
@@ -134,7 +153,7 @@ const updateCategory = async (req, res) => {
 };
 
 const searchCategory = async (req, res) => {
-	const {searchTerm} = req.query;
+	const { searchTerm } = req.query;
 
 	if (!searchTerm || searchTerm.trim().length === 0) {
 		return res.status(400).json({
@@ -142,22 +161,58 @@ const searchCategory = async (req, res) => {
 			error: "Debe proporcionar un término de búsqueda",
 		});
 	}
-	
-	try{
-		const categories = await categoryService.searchCategoryService(searchTerm.trim());
+
+	try {
+		const categories = await categoryService.searchCategoryService(
+			searchTerm.trim()
+		);
 		res.status(200).json({
 			message: "Categorías encontradas exitosamente",
-			categories
+			categories,
 		});
-	}catch(error){
+	} catch (error) {
 		console.error("Error al buscar la categoría:", error);
 		res.status(500).json({
 			message: "Error al buscar la categoría",
 			error: error.message,
 		});
 	}
-}
+};
 
+// Nuevo endpoint para activar/desactivar categoría
+const setCategoryActive = async (req, res) => {
+	const { id } = req.params;
+	const { is_active } = req.body;
+	if (!id) {
+		return res.status(400).json({ mensaje: "ID de categoría es requerido" });
+	}
+	if (typeof is_active !== "boolean") {
+		return res.status(400).json({ mensaje: "is_active debe ser booleano" });
+	}
+	try {
+		const updatedCategory = await categoryService.updateCategory(
+			id,
+			null,
+			null,
+			is_active
+		);
+		if (!updatedCategory) {
+			return res.status(404).json({ mensaje: "Categoría no encontrada" });
+		}
+		res.status(200).json({
+			mensaje: `Categoría ${
+				is_active ? "activada" : "desactivada"
+			} exitosamente`,
+			category: updatedCategory,
+		});
+	} catch (error) {
+		console.error("Error al cambiar estado de la categoría:", error);
+		res.status(500).json({
+			mensaje: "Error al cambiar estado de la categoría",
+			error: error.message,
+		});
+	}
+};
 
 module.exports = {
 	createCategory,
@@ -165,5 +220,6 @@ module.exports = {
 	getAllCategories,
 	getCategoryById,
 	updateCategory,
-	searchCategory
-	};
+	searchCategory,
+	setCategoryActive,
+};

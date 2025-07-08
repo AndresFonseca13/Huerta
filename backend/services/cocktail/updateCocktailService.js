@@ -1,4 +1,28 @@
 const pool = require("../../config/db");
+const { BlobServiceClient } = require("@azure/storage-blob");
+
+const AZURE_STORAGE_CONNECTION_STRING =
+	process.env.AZURE_STORAGE_CONNECTION_STRING;
+const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const containerName = "cocktail-images";
+
+async function deleteImagesFromAzure(imageUrls) {
+	if (!AZURE_STORAGE_CONNECTION_STRING || !AZURE_STORAGE_ACCOUNT_NAME) return;
+	const blobServiceClient = BlobServiceClient.fromConnectionString(
+		AZURE_STORAGE_CONNECTION_STRING
+	);
+	const containerClient = blobServiceClient.getContainerClient(containerName);
+	for (const url of imageUrls) {
+		try {
+			const parts = url.split("/");
+			const blobName = parts[parts.length - 1];
+			const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+			await blockBlobClient.deleteIfExists();
+		} catch (err) {
+			console.error("Error al borrar imagen en Azure:", url, err.message);
+		}
+	}
+}
 
 const updateCocktailService = async (cocktailId, cocktailData) => {
 	const { name, price, description, ingredients, categories, images } =
@@ -82,20 +106,34 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 		}
 
 		// --- Gestión de Imágenes ---
-		// 6. Solo borrar las imágenes antiguas si se proporcionan nuevas
 		if (images && images.length > 0) {
+			// Obtener imágenes antiguas antes de borrar
+			const oldImagesResult = await client.query(
+				"SELECT url FROM images WHERE product_id = $1",
+				[cocktailId]
+			);
+			const oldImageUrls = oldImagesResult.rows.map((row) => row.url);
+
+			// Determinar cuáles imágenes se eliminaron
+			const imagesToDelete = oldImageUrls.filter(
+				(url) => !images.includes(url)
+			);
+
 			// Borrar las imágenes antiguas solo si se van a reemplazar
 			await client.query("DELETE FROM images WHERE product_id = $1", [
 				cocktailId,
 			]);
 
-			// 7. Insertar las nuevas imágenes
+			// Insertar las nuevas imágenes
 			for (const imageUrl of images) {
 				await client.query(
 					"INSERT INTO images (product_id, url) VALUES ($1, $2)",
 					[cocktailId, imageUrl]
 				);
 			}
+
+			// Borrar en Azure solo las imágenes eliminadas
+			await deleteImagesFromAzure(imagesToDelete);
 		}
 		// Si no se proporcionan imágenes, mantener las existentes (no hacer nada)
 

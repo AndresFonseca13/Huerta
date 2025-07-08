@@ -203,14 +203,17 @@ export const deleteCocktail = async (id) => {
 };
 
 // Función para subir imágenes (requiere autenticación)
-export const uploadImages = async (files) => {
+export const uploadImages = async (files, cocktailName) => {
 	try {
 		const formData = new FormData();
 		Array.from(files).forEach((file) => {
 			formData.append("images", file);
 		});
+		if (cocktailName) {
+			formData.append("cocktailName", cocktailName);
+		}
 
-		const response = await fetch(`${API_BASE_URL}/upload`, {
+		const response = await fetch(`${API_BASE_URL}/upload/upload`, {
 			method: "POST",
 			headers: {
 				Authorization: getAuthHeaders().Authorization,
@@ -224,7 +227,10 @@ export const uploadImages = async (files) => {
 			throw new Error(data.mensaje || "Error al subir imágenes");
 		}
 
-		return data.urls;
+		console.log("Respuesta del backend:", data);
+		console.log("URLs recibidas:", data.urls);
+
+		return data.urls || [];
 	} catch (error) {
 		console.error("Error uploading images:", error);
 		throw error;

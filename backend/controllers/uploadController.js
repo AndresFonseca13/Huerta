@@ -1,9 +1,20 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
+const sharp = require("sharp");
 
 const AZURE_STORAGE_CONNECTION_STRING =
 	process.env.AZURE_STORAGE_CONNECTION_STRING;
 const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const containerName = "cocktail-images";
+
+function slugify(str) {
+	return str
+		.toString()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "") // quitar acentos
+		.replace(/[^a-zA-Z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "")
+		.toLowerCase();
+}
 
 // Log para depuración (solo en desarrollo)
 if (process.env.NODE_ENV !== "production") {
@@ -19,13 +30,16 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 exports.uploadImage = async (req, res) => {
-	// Verificar si se recibió un archivo
-	if (!req.file) {
+	// Verificar si se recibieron archivos
+	if (!req.files || req.files.length === 0) {
 		return res.status(400).json({
 			error: true,
-			mensaje: "No se ha proporcionado ninguna imagen",
+			mensaje: "No se han proporcionado imágenes",
 		});
 	}
+
+	const cocktailNameRaw = req.body.cocktailName || "imagen-coctel";
+	const cocktailSlug = slugify(cocktailNameRaw);
 
 	// Verificar la configuración de Azure con mensajes más específicos
 	if (!AZURE_STORAGE_CONNECTION_STRING) {
@@ -58,33 +72,42 @@ exports.uploadImage = async (req, res) => {
 			});
 		}
 
-		// Generar un nombre único para el archivo
-		const timestamp = Date.now();
-		const originalName = req.file.originalname.replace(/[^a-zA-Z0-9.]/g, "");
-		const blobName = `${timestamp}-${originalName}`;
+		// Array para almacenar las URLs de las imágenes subidas
+		const uploadedUrls = [];
 
-		const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+		// Procesar cada archivo
+		for (const [idx, file] of req.files.entries()) {
+			// Generar un nombre único para el archivo (nombre-coctel-1.webp, etc)
+			const blobName = `${cocktailSlug}-${idx + 1}.webp`;
 
-		// Subir el archivo
-		await blockBlobClient.uploadData(req.file.buffer, {
-			blobHTTPHeaders: {
-				blobContentType: req.file.mimetype,
-			},
-		});
+			// Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
+			const optimizedBuffer = await sharp(file.buffer)
+				.resize({ width: 600, withoutEnlargement: true })
+				.webp({ quality: 80 })
+				.toBuffer();
 
-		// Generar URL pública
-		const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+			const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-		res.status(200).json({
+			// Subir el archivo optimizado
+			await blockBlobClient.uploadData(optimizedBuffer, {
+				blobHTTPHeaders: {
+					blobContentType: "image/webp",
+				},
+			});
+
+			// Generar URL pública
+			const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+			uploadedUrls.push(publicUrl);
+		}
+
+		const response = {
 			error: false,
-			mensaje: "Imagen subida exitosamente",
-			data: {
-				url: publicUrl,
-				nombre: blobName,
-				tipo: req.file.mimetype,
-				tamaño: req.file.size,
-			},
-		});
+			mensaje: "Imágenes subidas exitosamente",
+			urls: uploadedUrls,
+		};
+
+		console.log("Respuesta del backend:", response);
+		res.status(200).json(response);
 	} catch (error) {
 		console.error("Error al subir la imagen:", error);
 

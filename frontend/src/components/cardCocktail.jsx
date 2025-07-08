@@ -27,7 +27,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 				<img
 					src={imageUrl}
 					alt={name}
-					className="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
+					className="w-full h-48 object-cover transition-transform duration-300 hover:scale-110 bg-white"
 				/>
 				<div className="absolute inset-0 hover:bg-opacity-10 transition-all duration-300" />
 			</div>
@@ -36,7 +36,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 					{name}
 				</h3>
 				<p
-					className="text-sm text-gray-600 mb-3 text-center capitalize overflow-hidden text-ellipsis"
+					className="text-sm text-gray-600 mb-3 text-center overflow-hidden text-ellipsis"
 					style={{
 						display: "-webkit-box",
 						WebkitLineClamp: 4,

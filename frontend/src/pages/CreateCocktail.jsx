@@ -79,7 +79,7 @@ const CreateCocktail = () => {
 
 		try {
 			// 1. Subir imágenes (solo si la validación pasó)
-			const imageUrls = await uploadImages(selectedFiles);
+			const imageUrls = await uploadImages(selectedFiles, name.trim());
 
 			// 2. Preparar objeto del cóctel
 			const cocktailData = {
@@ -398,7 +398,7 @@ const CreateCocktail = () => {
 								/>
 							</div>
 							{ingredientSuggestions.length > 0 && (
-								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white">
+								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white capitalize">
 									{ingredientSuggestions.map((suggestion, index) => (
 										<li
 											key={index}
@@ -459,7 +459,7 @@ const CreateCocktail = () => {
 								{ingredients.map((ingredient, index) => (
 									<div
 										key={index}
-										className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2"
+										className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2 capitalize"
 									>
 										<span>
 											{typeof ingredient === "string"
