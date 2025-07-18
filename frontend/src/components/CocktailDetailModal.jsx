@@ -128,7 +128,6 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							</h2>
 							<div className="flex items-center justify-between">
 								<div className="flex items-center text-green-600">
-									<FiDollarSign className="mr-1" />
 									<span className="text-2xl font-bold">
 										${Number(price).toLocaleString()}
 									</span>

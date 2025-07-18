@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BiDownArrow } from "react-icons/bi";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "../assets/Logo mejorado.png";
 
 // --- Componente Ayudante para el Acordeón del Menú Móvil ---
 const AccordionSection = ({ title, isOpen, onToggle, items, onSelect }) => {
@@ -177,11 +178,21 @@ const Navbar = () => {
 				{/* Logo */}
 				<motion.div
 					whileHover={{ scale: 1.05 }}
-					className="cursor-pointer"
+					className="cursor-pointer flex items-center gap-x-2"
 					onClick={() => navigate("/")}
 				>
+					<img
+						src={logo}
+						alt="Logo Huerta"
+						className="h-25 w-auto object-contain"
+						style={{
+							marginTop: "15px",
+							marginBottom: "0px",
+							marginRight: "-20px",
+						}}
+					/>
 					<h1
-						className="text-3xl font-bold tracking-wider"
+						className="text-4xl font-bold tracking-wider flex items-center"
 						style={{ fontFamily: "'Playfair Display', serif" }}
 					>
 						Huerta
