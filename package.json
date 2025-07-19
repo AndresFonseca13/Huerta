@@ -43,5 +43,8 @@
   "bugs": {
     "url": "https://github.com/tugithub/proyecto-huerta/issues"
   },
-  "homepage": "https://github.com/tugithub/proyecto-huerta#readme"
+  "homepage": "https://github.com/tugithub/proyecto-huerta#readme",
+  "dependencies": {
+    "dotenv": "^17.2.0"
+  }
 }
