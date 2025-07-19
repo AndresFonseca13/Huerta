@@ -1,16 +1,15 @@
-const createIngredient = require('./cretaeIngredientService');
-const deleteIngredient = require('./deleteIngredientService');
-const getAllIngredients = require('./getAllIngredientsService');
-const getIngredientById = require('./getIngredientByIdService');
-const updateIngredient = require('./updateIngredientService');
-const searchIngredientService = require('./searchIngredientService');
+import cretaeIngredientService from './cretaeIngredientService.js';
+import deleteIngredientService from './deleteIngredientService.js';
+import getAllIngredientsService from './getAllIngredientsService.js';
+import getIngredientByIdService from './getIngredientByIdService.js';
+import searchIngredientService from './searchIngredientService.js';
+import updateIngredientService from './updateIngredientService.js';
 
-
-module.exports = {
-    createIngredient,
-    deleteIngredient,
-    getAllIngredients,
-    getIngredientById,
-    updateIngredient,
-    searchIngredientService
-}
+export default {
+  cretaeIngredientService,
+  deleteIngredientService,
+  getAllIngredientsService,
+  getIngredientByIdService,
+  searchIngredientService,
+  updateIngredientService,
+};

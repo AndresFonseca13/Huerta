@@ -1,24 +1,25 @@
-const express = require("express");
+import express from 'express';
+import ingredientController from '../controllers/ingredientController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import normalizeTextFields from '../middleware/normalizeTextFields.js';
+
 const router = express.Router();
-const ingredientController = require("../controllers/ingredientController");
-const authMiddleware = require("../middleware/authMiddleware");
-const normalizeTextFields = require("../middleware/normalizeTextFields");
 
 router.post(
-	"/",
-	normalizeTextFields,
-	authMiddleware,
-	ingredientController.createIngredient
+  '/',
+  normalizeTextFields,
+  authMiddleware,
+  ingredientController.createIngredient,
 );
-router.delete("/:id", authMiddleware, ingredientController.deleteIngredient);
+router.delete('/:id', authMiddleware, ingredientController.deleteIngredient);
 router.put(
-	"/:id",
-	normalizeTextFields,
-	authMiddleware,
-	ingredientController.updateIngredient
+  '/:id',
+  normalizeTextFields,
+  authMiddleware,
+  ingredientController.updateIngredient,
 );
-router.get("/", ingredientController.getAllIngredients);
-router.get("/search", ingredientController.searchIngredient);
-router.get("/:id", ingredientController.getIngredientById);
+router.get('/', ingredientController.getAllIngredients);
+router.get('/search', ingredientController.searchIngredient);
+router.get('/:id', ingredientController.getIngredientById);
 
-module.exports = router;
+export default router;

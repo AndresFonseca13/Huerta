@@ -1,7 +1,7 @@
-const pool = require('../../config/db');
+import pool from '../../config/db.js';
 
-const getCocktailByIdService = async ( id ) => {
-    const query = `
+const getCocktailByIdService = async (id) => {
+  const query = `
         SELECT 
             p.id AS product_id, 
             p.name AS product_name,
@@ -19,8 +19,8 @@ const getCocktailByIdService = async ( id ) => {
         WHERE p.id = $1
         GROUP BY p.id
     `;
-    const result = await pool.query(query, [id]);
-    return result.rows[0];
-}
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
+};
 
-module.exports = getCocktailByIdService;
+export default getCocktailByIdService;

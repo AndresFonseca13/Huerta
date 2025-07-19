@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { getCocktails } from "../services/cocktailService";
 import CardCocktail from "../components/CardCocktail";
