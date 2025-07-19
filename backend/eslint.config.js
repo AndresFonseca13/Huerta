@@ -75,4 +75,22 @@ export default [
       ],
     },
   },
+  {
+    files: ['scripts/**/*.js'],
+    rules: {
+      'no-console': 'off', // Permitir console.log en scripts
+    },
+  },
+  {
+    files: ['app.js', 'config/**/*.js'],
+    rules: {
+      'no-console': 'off', // Permitir console.log en archivos principales
+    },
+  },
+  {
+    files: ['controllers/**/*.js', 'services/**/*.js'],
+    rules: {
+      'no-console': 'off', // Permitir console.log en controllers y services
+    },
+  },
 ];
