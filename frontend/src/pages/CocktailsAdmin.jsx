@@ -29,7 +29,6 @@ const CocktailsAdmin = () => {
 	const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 	const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 	const [expandedRowId, setExpandedRowId] = useState(null);
-	const [showActionsDropdown, setShowActionsDropdown] = useState(null);
 	const [sortBy, setSortBy] = useState(null);
 	const [sortOrder, setSortOrder] = useState("asc");
 	const [categoryFilter, setCategoryFilter] = useState(null);
@@ -41,7 +40,7 @@ const CocktailsAdmin = () => {
 			try {
 				const response = await getCocktailsAdmin(1, 50);
 				setCocktails(response.cocteles || []);
-			} catch (err) {
+			} catch {
 				setError("No se pudieron cargar los cócteles.");
 			} finally {
 				setLoading(false);
@@ -55,7 +54,7 @@ const CocktailsAdmin = () => {
 		try {
 			const response = await getCocktailsAdmin(1, 50);
 			setCocktails(response.cocteles || []);
-		} catch (err) {
+		} catch {
 			setError("No se pudieron cargar los cócteles.");
 		} finally {
 			setLoading(false);
@@ -86,7 +85,7 @@ const CocktailsAdmin = () => {
 		setIsDetailModalOpen(false);
 		setSelectedCocktail(null);
 	};
-	const handleUpdateSuccess = (updatedCocktail) => {
+	const handleUpdateSuccess = () => {
 		closeEditModal();
 		closeManageModal();
 		refreshCocktails();
