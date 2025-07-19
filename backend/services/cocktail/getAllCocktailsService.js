@@ -5,14 +5,14 @@ const getAllCocktailsService = async ({
   tipo,
   orden,
   limite,
-  offset
+  offset,
 }) => {
   console.log('[DEBUG] getAllCocktailsService - Parámetros recibidos:', {
     categoria,
     tipo,
     orden,
     limite,
-    offset
+    offset,
   });
 
   const ordenValido = ['name', 'price'].includes(orden) ? orden : 'name';
@@ -67,17 +67,17 @@ const getAllCocktailsService = async ({
 
   console.log(
     '[DEBUG] getAllCocktailsService - Valores de la consulta:',
-    values
+    values,
   );
   console.log(
     '[DEBUG] getAllCocktailsService - Valores del conteo:',
-    countValues
+    countValues,
   );
 
   // Ejecutar ambas consultas en paralelo
   const [result, countResult] = await Promise.all([
     pool.query(query, values),
-    pool.query(countQuery, countValues)
+    pool.query(countQuery, countValues),
   ]);
 
   console.log('[DEBUG] getAllCocktailsService - Resultados obtenidos:', {
@@ -87,19 +87,19 @@ const getAllCocktailsService = async ({
       ? {
         id: result.rows[0].id,
         name: result.rows[0].name,
-        categories: result.rows[0].categories
+        categories: result.rows[0].categories,
       }
-      : null
+      : null,
   });
 
   // Procesar los resultados para limpiar los arrays
   const processedCocktails = result.rows.map((cocktail) => {
     // Filtrar valores null de ingredientes, categorías e imágenes
     cocktail.ingredients = cocktail.ingredients.filter(
-      (ingredient) => ingredient !== null
+      (ingredient) => ingredient !== null,
     );
     cocktail.categories = cocktail.categories.filter(
-      (category) => category !== null
+      (category) => category !== null,
     );
     cocktail.images = cocktail.images.filter((image) => image !== null);
     return cocktail;
@@ -115,8 +115,8 @@ const getAllCocktailsService = async ({
       totalPages,
       currentPage: Math.floor(offset / limite) + 1,
       limit: limite,
-      offset: offset
-    }
+      offset: offset,
+    },
   };
 };
 

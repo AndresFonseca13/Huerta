@@ -8,7 +8,7 @@ const validateCategories = (req, res, next) => {
   }
 
   const categoriasUnicas = new Set(
-    categories.map((c) => `${c.name}-${c.type}`)
+    categories.map((c) => `${c.name}-${c.type}`),
   );
 
   if (categoriasUnicas.size !== categories.length) {
@@ -16,7 +16,7 @@ const validateCategories = (req, res, next) => {
       .status(400)
       .json({
         mensaje:
-          'No se permiten categorías repetidas en el cuerpo de la solicitud.'
+          'No se permiten categorías repetidas en el cuerpo de la solicitud.',
       });
   }
 

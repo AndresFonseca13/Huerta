@@ -5,7 +5,7 @@ const validateQueryGetAll = (req, res, next) => {
     return res
       .status(400)
       .json({
-        mensaje: 'El parámetro pagina debe ser un número entero mayor que 0'
+        mensaje: 'El parámetro pagina debe ser un número entero mayor que 0',
       });
   }
 
@@ -13,7 +13,7 @@ const validateQueryGetAll = (req, res, next) => {
     return res
       .status(400)
       .json({
-        mensaje: 'El parámetro limite debe ser un número entero mayor que 0'
+        mensaje: 'El parámetro limite debe ser un número entero mayor que 0',
       });
   }
 

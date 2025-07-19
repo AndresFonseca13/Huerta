@@ -3,7 +3,7 @@ import pool from '../../config/db.js';
 const updateCocktailStatusService = async (cocktailId, isActive) => {
   console.log('[DEBUG] updateCocktailStatusService - Parámetros:', {
     cocktailId,
-    isActive
+    isActive,
   });
 
   const client = await pool.connect();
@@ -21,18 +21,18 @@ const updateCocktailStatusService = async (cocktailId, isActive) => {
 
     console.log(
       '[DEBUG] updateCocktailStatusService - Ejecutando query:',
-      updateQuery
+      updateQuery,
     );
     console.log('[DEBUG] updateCocktailStatusService - Valores:', [
       isActive,
-      cocktailId
+      cocktailId,
     ]);
 
     const result = await client.query(updateQuery, [isActive, cocktailId]);
 
     console.log(
       '[DEBUG] updateCocktailStatusService - Resultado de actualización:',
-      result.rows[0]
+      result.rows[0],
     );
 
     if (result.rows.length === 0) {
@@ -61,17 +61,17 @@ const updateCocktailStatusService = async (cocktailId, isActive) => {
 		`;
 
     const completeResult = await client.query(completeCocktailQuery, [
-      cocktailId
+      cocktailId,
     ]);
 
     // Procesar los resultados para limpiar los arrays
     const cocktail = completeResult.rows[0];
     if (cocktail) {
       cocktail.ingredients = cocktail.ingredients.filter(
-        (ingredient) => ingredient !== null
+        (ingredient) => ingredient !== null,
       );
       cocktail.categories = cocktail.categories.filter(
-        (category) => category !== null
+        (category) => category !== null,
       );
       cocktail.images = cocktail.images.filter((image) => image !== null);
     }

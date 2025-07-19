@@ -19,7 +19,7 @@ router.get('/:id', cocktailController.getCocktailById);
 router.get(
   '/admin/all',
   authMiddleware,
-  cocktailController.getAllCocktailsAdmin
+  cocktailController.getAllCocktailsAdmin,
 );
 router.post(
   '/',
@@ -28,7 +28,7 @@ router.post(
   validateBodyCocktail,
   validateCategories,
   validateIngredients,
-  cocktailController.createCocktail
+  cocktailController.createCocktail,
 );
 router.put(
   '/:id',
@@ -37,12 +37,12 @@ router.put(
   validateBodyCocktail,
   validateCategories,
   validateIngredients,
-  cocktailController.updateCocktail
+  cocktailController.updateCocktail,
 );
 router.patch(
   '/:id/status',
   authMiddleware,
-  cocktailController.updateCocktailStatus
+  cocktailController.updateCocktailStatus,
 );
 router.delete('/:id', authMiddleware, cocktailController.deleteCocktail);
 

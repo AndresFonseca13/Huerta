@@ -6,13 +6,13 @@ const createIngredient = async (req, res) => {
     const newIngredient = await ingredientService.cretaeIngredientService(name);
     res.status(201).json({
       message: 'Ingrediente creado exitosamente',
-      ingredient: newIngredient
+      ingredient: newIngredient,
     });
   } catch (error) {
     console.error('Error al crear el ingrediente:', error);
     res.status(500).json({
       message: 'Error al crear el ingrediente',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -24,13 +24,13 @@ const deleteIngredient = async (req, res) => {
       await ingredientService.deleteIngredientService(id);
     res.status(200).json({
       message: 'Ingrediente eliminado exitosamente',
-      ingredient: deletedIngredient
+      ingredient: deletedIngredient,
     });
   } catch (error) {
     console.error('Error al eliminar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al eliminar el ingrediente',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -40,13 +40,13 @@ const getAllIngredients = async (req, res) => {
     const ingredients = await ingredientService.getAllIngredientsService();
     res.status(200).json({
       message: 'Ingredientes obtenidos exitosamente',
-      ingredients
+      ingredients,
     });
   } catch (error) {
     console.error('Error al obtener los ingredientes:', error);
     res.status(500).json({
       message: 'Error al obtener los ingredientes',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -57,18 +57,18 @@ const getIngredientById = async (req, res) => {
     const ingredient = await ingredientService.getIngredientByIdService(id);
     if (!ingredient) {
       return res.status(404).json({
-        message: 'Ingrediente no encontrado'
+        message: 'Ingrediente no encontrado',
       });
     }
     res.status(200).json({
       message: 'Ingrediente obtenido exitosamente',
-      ingredient
+      ingredient,
     });
   } catch (error) {
     console.error('Error al obtener el ingrediente:', error);
     res.status(500).json({
       message: 'Error al obtener el ingrediente',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -79,17 +79,17 @@ const updateIngredient = async (req, res) => {
   try {
     const updatedIngredient = await ingredientService.updateIngredientService(
       id,
-      name
+      name,
     );
     res.status(200).json({
       message: 'Ingrediente actualizado exitosamente',
-      ingredient: updatedIngredient
+      ingredient: updatedIngredient,
     });
   } catch (error) {
     console.error('Error al actualizar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al actualizar el ingrediente',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -100,23 +100,23 @@ const searchIngredient = async (req, res) => {
   if (!searchTerm || searchTerm.trim().length === 0) {
     return res.status(400).json({
       message: 'Término de búsqueda requerido',
-      error: 'Debe proporcionar un término de búsqueda'
+      error: 'Debe proporcionar un término de búsqueda',
     });
   }
 
   try {
     const ingredients = await ingredientService.searchIngredientService(
-      searchTerm.trim()
+      searchTerm.trim(),
     );
     res.status(200).json({
       message: 'Ingredientes encontrados exitosamente',
-      ingredients
+      ingredients,
     });
   } catch (error) {
     console.error('Error al buscar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al buscar el ingrediente',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -127,5 +127,5 @@ export default {
   getAllIngredients,
   getIngredientById,
   updateIngredient,
-  searchIngredient
+  searchIngredient,
 };

@@ -15,7 +15,7 @@ const createCategoryService = async (name, type, is_active = true) => {
     const categoryResult = await pool.query(insertCategoryQuery, [
       name,
       type,
-      is_active
+      is_active,
     ]);
 
     await pool.query('COMMIT');

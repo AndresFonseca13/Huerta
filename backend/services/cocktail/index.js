@@ -15,5 +15,5 @@ export default {
   updateCocktailService,
   updateCocktailStatusService,
   deleteCocktailService,
-  searchProductsService
+  searchProductsService,
 };

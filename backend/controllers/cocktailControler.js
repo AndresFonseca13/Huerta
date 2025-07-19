@@ -15,7 +15,7 @@ const getAllCocktails = async (req, res) => {
     offset,
     categoria,
     tipo,
-    orden
+    orden,
   });
 
   try {
@@ -24,7 +24,7 @@ const getAllCocktails = async (req, res) => {
       tipo,
       orden,
       limite,
-      offset
+      offset,
     });
 
     console.log(
@@ -37,10 +37,10 @@ const getAllCocktails = async (req, res) => {
           ? {
             id: result.cocktails[0].id,
             name: result.cocktails[0].name,
-            categories: result.cocktails[0].categories
+            categories: result.cocktails[0].categories,
           }
-          : null
-      }
+          : null,
+      },
     );
 
     const response = {
@@ -48,12 +48,12 @@ const getAllCocktails = async (req, res) => {
       limite,
       cantidad: result.cocktails.length,
       cocteles: result.cocktails,
-      paginacion: result.pagination
+      paginacion: result.pagination,
     };
 
     console.log(
       '[DEBUG] getAllCocktails Controller - Respuesta enviada:',
-      response
+      response,
     );
 
     res.status(200).json(response);
@@ -80,8 +80,8 @@ const getAllCocktailsAdmin = async (req, res) => {
       offset,
       categoria,
       tipo,
-      orden
-    }
+      orden,
+    },
   );
 
   try {
@@ -90,7 +90,7 @@ const getAllCocktailsAdmin = async (req, res) => {
       tipo,
       orden,
       limite,
-      offset
+      offset,
     });
 
     console.log(
@@ -104,10 +104,10 @@ const getAllCocktailsAdmin = async (req, res) => {
             id: result.cocktails[0].id,
             name: result.cocktails[0].name,
             is_active: result.cocktails[0].is_active,
-            categories: result.cocktails[0].categories
+            categories: result.cocktails[0].categories,
           }
-          : null
-      }
+          : null,
+      },
     );
 
     const response = {
@@ -115,12 +115,12 @@ const getAllCocktailsAdmin = async (req, res) => {
       limite,
       cantidad: result.cocktails.length,
       cocteles: result.cocktails,
-      paginacion: result.pagination
+      paginacion: result.pagination,
     };
 
     console.log(
       '[DEBUG] getAllCocktailsAdmin Controller - Respuesta enviada:',
-      response
+      response,
     );
 
     res.status(200).json(response);
@@ -140,7 +140,7 @@ const getCocktailById = async (req, res) => {
     return res.status(400).json({
       mensaje: 'ID inválido',
       error: 'El ID debe ser un UUID válido',
-      idRecibido: id
+      idRecibido: id,
     });
   }
   try {
@@ -168,7 +168,7 @@ const createCocktail = async (req, res) => {
       ingredients,
       images,
       categories,
-      user
+      user,
     );
     res.status(201).json({ mensaje: 'Cóctel creado exitosamente', cocktail });
   } catch (error) {
@@ -190,11 +190,11 @@ const updateCocktail = async (req, res) => {
   try {
     const updatedCocktail = await cocktailsService.updateCocktailService(
       id,
-      cocktailData
+      cocktailData,
     );
     res.status(200).json({
       mensaje: 'Cóctel actualizado exitosamente',
-      cocktail: updatedCocktail
+      cocktail: updatedCocktail,
     });
   } catch (error) {
     if (error.message === 'Cóctel no encontrado.') {
@@ -212,17 +212,17 @@ const updateCocktailStatus = async (req, res) => {
   console.log('[DEBUG] updateCocktailStatus Controller - Parámetros:', {
     id,
     isActive,
-    body: req.body
+    body: req.body,
   });
 
   try {
     const updatedCocktail = await cocktailsService.updateCocktailStatusService(
       id,
-      isActive
+      isActive,
     );
     res.status(200).json({
       mensaje: 'Estado del cóctel actualizado exitosamente',
-      cocktail: updatedCocktail
+      cocktail: updatedCocktail,
     });
   } catch (error) {
     if (error.message === 'Cóctel no encontrado.') {
@@ -256,24 +256,24 @@ const searchProducts = async (req, res) => {
   if (!searchTerm || searchTerm.trim().length === 0) {
     return res.status(400).json({
       mensaje: 'Término de búsqueda requerido',
-      error: 'Debe proporcionar un término de búsqueda'
+      error: 'Debe proporcionar un término de búsqueda',
     });
   }
 
   try {
     const products = await cocktailsService.searchProductsService(
-      searchTerm.trim()
+      searchTerm.trim(),
     );
     res.status(200).json({
       mensaje: 'Búsqueda realizada exitosamente',
       productos: products,
-      total: products.length
+      total: products.length,
     });
   } catch (error) {
     console.error('Error al buscar productos:', error);
     res.status(500).json({
       mensaje: 'Error al buscar productos',
-      error: 'Error interno del servidor'
+      error: 'Error interno del servidor',
     });
   }
 };
@@ -286,5 +286,5 @@ export default {
   updateCocktail,
   updateCocktailStatus,
   deleteCocktail,
-  searchProducts
+  searchProducts,
 };

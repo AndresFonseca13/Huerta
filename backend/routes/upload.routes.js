@@ -9,7 +9,7 @@ router.post(
   // authMiddleware,
   upload.array('images', 5), // Permitir hasta 5 imágenes
   handleMulterError,
-  uploadImage
+  uploadImage,
 );
 
 export default router;

@@ -8,7 +8,7 @@ const validateIngredients = (req, res, next) => {
   }
 
   const ingredientesUnicos = new Set(
-    ingredients.map((i) => i.trim().toLowerCase())
+    ingredients.map((i) => i.trim().toLowerCase()),
   );
 
   if (ingredientesUnicos.size !== ingredients.length) {
@@ -16,7 +16,7 @@ const validateIngredients = (req, res, next) => {
       .status(400)
       .json({
         mensaje:
-          'No se permiten ingredientes duplicados en el cuerpo de la solicitud.'
+          'No se permiten ingredientes duplicados en el cuerpo de la solicitud.',
       });
   }
 

@@ -7,7 +7,7 @@ const createCategory = async (req, res) => {
     const category = await categoryService.createCategoryService(
       name,
       type,
-      is_active
+      is_active,
     );
     res
       .status(201)
@@ -35,13 +35,13 @@ const deleteCategory = async (req, res) => {
     return res.status(400).json({
       mensaje: 'ID inválido',
       error: 'El ID debe ser un UUID válido',
-      idRecibido: id
+      idRecibido: id,
     });
   }
   try {
     const deletedCategory = await categoryService.deleteCategoryService(
       id,
-      logical !== 'false'
+      logical !== 'false',
     );
     if (!deletedCategory) {
       return res.status(404).json({ mensaje: 'Categoría no encontrada' });
@@ -51,7 +51,7 @@ const deleteCategory = async (req, res) => {
         logical !== 'false'
           ? 'Categoría deshabilitada exitosamente'
           : 'Categoría eliminada exitosamente',
-      category: deletedCategory
+      category: deletedCategory,
     });
   } catch (error) {
     if (error.message === 'Categoría no encontrada') {
@@ -60,7 +60,7 @@ const deleteCategory = async (req, res) => {
     console.error('Error al eliminar la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al eliminar la categoría',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -74,7 +74,7 @@ const getAllCategories = async (req, res) => {
     console.error('Error al obtener las categorías:', error);
     res.status(500).json({
       mensaje: 'Error al obtener las categorías',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -89,7 +89,7 @@ const getCategoryById = async (req, res) => {
     return res.status(400).json({
       mensaje: 'ID inválido',
       error: 'El ID debe ser un UUID válido',
-      idRecibido: id
+      idRecibido: id,
     });
   }
 
@@ -98,7 +98,7 @@ const getCategoryById = async (req, res) => {
     if (!category) {
       return res.status(404).json({
         mensaje: 'Categoría no encontrada',
-        id: id
+        id: id,
       });
     }
     res.status(200).json(category);
@@ -107,7 +107,7 @@ const getCategoryById = async (req, res) => {
     res.status(500).json({
       mensaje: 'Error al obtener la categoría',
       error: 'Error interno del servidor',
-      id: id
+      id: id,
     });
   }
 };
@@ -122,7 +122,7 @@ const updateCategory = async (req, res) => {
     return res.status(400).json({
       mensaje: 'ID inválido',
       error: 'El ID debe ser un UUID válido',
-      idRecibido: id
+      idRecibido: id,
     });
   }
   if (!name || !type) {
@@ -133,11 +133,11 @@ const updateCategory = async (req, res) => {
       id,
       name,
       type,
-      is_active
+      is_active,
     );
     res.status(200).json({
       mensaje: 'Categoría actualizada exitosamente',
-      category: updatedCategory
+      category: updatedCategory,
     });
   } catch (error) {
     if (error.message === 'Categoría no encontrada') {
@@ -146,7 +146,7 @@ const updateCategory = async (req, res) => {
     console.error('Error al actualizar la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al actualizar la categoría',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -157,23 +157,23 @@ const searchCategory = async (req, res) => {
   if (!searchTerm || searchTerm.trim().length === 0) {
     return res.status(400).json({
       message: 'Término de búsqueda requerido',
-      error: 'Debe proporcionar un término de búsqueda'
+      error: 'Debe proporcionar un término de búsqueda',
     });
   }
 
   try {
     const categories = await categoryService.searchCategoryService(
-      searchTerm.trim()
+      searchTerm.trim(),
     );
     res.status(200).json({
       message: 'Categorías encontradas exitosamente',
-      categories
+      categories,
     });
   } catch (error) {
     console.error('Error al buscar la categoría:', error);
     res.status(500).json({
       message: 'Error al buscar la categoría',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -193,7 +193,7 @@ const setCategoryActive = async (req, res) => {
       id,
       null,
       null,
-      is_active
+      is_active,
     );
     if (!updatedCategory) {
       return res.status(404).json({ mensaje: 'Categoría no encontrada' });
@@ -202,13 +202,13 @@ const setCategoryActive = async (req, res) => {
       mensaje: `Categoría ${
         is_active ? 'activada' : 'desactivada'
       } exitosamente`,
-      category: updatedCategory
+      category: updatedCategory,
     });
   } catch (error) {
     console.error('Error al cambiar estado de la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al cambiar estado de la categoría',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -220,5 +220,5 @@ export {
   getCategoryById,
   updateCategory,
   searchCategory,
-  setCategoryActive
+  setCategoryActive,
 };

@@ -11,5 +11,5 @@ export {
   getAllCategoriesService,
   getCategoryByIdService,
   updateCategory,
-  searchCategoryService
+  searchCategoryService,
 };

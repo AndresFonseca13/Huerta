@@ -21,11 +21,11 @@ if (process.env.NODE_ENV !== 'production') {
   console.log('Configuración de Azure Storage:');
   console.log(
     'AZURE_STORAGE_ACCOUNT_NAME:',
-    AZURE_STORAGE_ACCOUNT_NAME ? 'Configurado' : 'No configurado'
+    AZURE_STORAGE_ACCOUNT_NAME ? 'Configurado' : 'No configurado',
   );
   console.log(
     'AZURE_STORAGE_CONNECTION_STRING:',
-    AZURE_STORAGE_CONNECTION_STRING ? 'Configurado' : 'No configurado'
+    AZURE_STORAGE_CONNECTION_STRING ? 'Configurado' : 'No configurado',
   );
 }
 
@@ -34,7 +34,7 @@ export const uploadImage = async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({
       error: true,
-      mensaje: 'No se han proporcionado imágenes'
+      mensaje: 'No se han proporcionado imágenes',
     });
   }
 
@@ -46,7 +46,7 @@ export const uploadImage = async (req, res) => {
     return res.status(500).json({
       error: true,
       mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno'
+        'Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno',
     });
   }
 
@@ -54,13 +54,13 @@ export const uploadImage = async (req, res) => {
     return res.status(500).json({
       error: true,
       mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno'
+        'Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno',
     });
   }
 
   try {
     const blobServiceClient = BlobServiceClient.fromConnectionString(
-      AZURE_STORAGE_CONNECTION_STRING
+      AZURE_STORAGE_CONNECTION_STRING,
     );
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
@@ -68,7 +68,7 @@ export const uploadImage = async (req, res) => {
     const containerExists = await containerClient.exists();
     if (!containerExists) {
       await containerClient.create({
-        access: 'blob' // Esto hace que los blobs sean accesibles públicamente
+        access: 'blob', // Esto hace que los blobs sean accesibles públicamente
       });
     }
 
@@ -91,8 +91,8 @@ export const uploadImage = async (req, res) => {
       // Subir el archivo optimizado
       await blockBlobClient.uploadData(optimizedBuffer, {
         blobHTTPHeaders: {
-          blobContentType: 'image/webp'
-        }
+          blobContentType: 'image/webp',
+        },
       });
 
       // Generar URL pública
@@ -103,7 +103,7 @@ export const uploadImage = async (req, res) => {
     const response = {
       error: false,
       mensaje: 'Imágenes subidas exitosamente',
-      urls: uploadedUrls
+      urls: uploadedUrls,
     };
 
     console.log('Respuesta del backend:', response);
@@ -115,7 +115,7 @@ export const uploadImage = async (req, res) => {
     if (error.code === 'ENOENT') {
       return res.status(500).json({
         error: true,
-        mensaje: 'Error de conexión con Azure Storage'
+        mensaje: 'Error de conexión con Azure Storage',
       });
     }
 
@@ -124,14 +124,14 @@ export const uploadImage = async (req, res) => {
       console.error('Detalles del error:', {
         message: error.message,
         code: error.code,
-        stack: error.stack
+        stack: error.stack,
       });
     }
 
     res.status(500).json({
       error: true,
       mensaje: 'Error al subir la imagen',
-      detalle: error.message
+      detalle: error.message,
     });
   }
 };

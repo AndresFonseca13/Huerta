@@ -9,7 +9,7 @@ const containerName = 'cocktail-images';
 async function deleteImagesFromAzure(imageUrls) {
   if (!AZURE_STORAGE_CONNECTION_STRING || !AZURE_STORAGE_ACCOUNT_NAME) return;
   const blobServiceClient = BlobServiceClient.fromConnectionString(
-    AZURE_STORAGE_CONNECTION_STRING
+    AZURE_STORAGE_CONNECTION_STRING,
   );
   const containerClient = blobServiceClient.getContainerClient(containerName);
   for (const url of imageUrls) {
@@ -44,7 +44,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
       name,
       price,
       description,
-      cocktailId
+      cocktailId,
     ]);
     if (productResult.rows.length === 0) {
       throw new Error('Cóctel no encontrado.');
@@ -54,7 +54,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
     // 2. Borrar las relaciones antiguas de ingredientes
     await client.query(
       'DELETE FROM products_ingredients WHERE product_id = $1',
-      [cocktailId]
+      [cocktailId],
     );
 
     // 3. Insertar los nuevos ingredientes y sus relaciones
@@ -64,7 +64,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
         // Insertar el ingrediente si no existe (ON CONFLICT) y obtener su ID
         let res = await client.query(
           'INSERT INTO ingredients (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id',
-          [ingredientName]
+          [ingredientName],
         );
         ingredientIds.push(res.rows[0].id);
       }
@@ -73,7 +73,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
       for (const ingredientId of ingredientIds) {
         await client.query(
           'INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)',
-          [cocktailId, ingredientId]
+          [cocktailId, ingredientId],
         );
       }
     }
@@ -82,7 +82,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
     // 4. Borrar las relaciones antiguas de categorías
     await client.query(
       'DELETE FROM products_categories WHERE product_id = $1',
-      [cocktailId]
+      [cocktailId],
     );
 
     // 5. Insertar las nuevas categorías y sus relaciones
@@ -91,7 +91,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
       for (const category of categories) {
         let res = await client.query(
           'INSERT INTO categories (name, type) VALUES ($1, $2) ON CONFLICT (name, type) DO UPDATE SET name=EXCLUDED.name RETURNING id',
-          [category.name, category.type]
+          [category.name, category.type],
         );
         categoryIds.push(res.rows[0].id);
       }
@@ -100,7 +100,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
       for (const categoryId of categoryIds) {
         await client.query(
           'INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)',
-          [cocktailId, categoryId]
+          [cocktailId, categoryId],
         );
       }
     }
@@ -110,25 +110,25 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
       // Obtener imágenes antiguas antes de borrar
       const oldImagesResult = await client.query(
         'SELECT url FROM images WHERE product_id = $1',
-        [cocktailId]
+        [cocktailId],
       );
       const oldImageUrls = oldImagesResult.rows.map((row) => row.url);
 
       // Determinar cuáles imágenes se eliminaron
       const imagesToDelete = oldImageUrls.filter(
-        (url) => !images.includes(url)
+        (url) => !images.includes(url),
       );
 
       // Borrar las imágenes antiguas solo si se van a reemplazar
       await client.query('DELETE FROM images WHERE product_id = $1', [
-        cocktailId
+        cocktailId,
       ]);
 
       // Insertar las nuevas imágenes
       for (const imageUrl of images) {
         await client.query(
           'INSERT INTO images (product_id, url) VALUES ($1, $2)',
-          [cocktailId, imageUrl]
+          [cocktailId, imageUrl],
         );
       }
 
@@ -150,7 +150,7 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
             WHERE p.id = $1
             GROUP BY p.id;
         `,
-      [cocktailId]
+      [cocktailId],
     );
 
     return finalCocktail.rows[0];

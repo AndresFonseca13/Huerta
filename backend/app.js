@@ -35,13 +35,13 @@ app.listen(port, () => {
     console.log('Variables de entorno cargadas:');
     console.log(
       'AZURE_STORAGE_ACCOUNT_NAME:',
-      process.env.AZURE_STORAGE_ACCOUNT_NAME ? 'Configurado' : 'No configurado'
+      process.env.AZURE_STORAGE_ACCOUNT_NAME ? 'Configurado' : 'No configurado',
     );
     console.log(
       'AZURE_STORAGE_CONNECTION_STRING:',
       process.env.AZURE_STORAGE_CONNECTION_STRING
         ? 'Configurado'
-        : 'No configurado'
+        : 'No configurado',
     );
   }
 });

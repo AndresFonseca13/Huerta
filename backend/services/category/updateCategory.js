@@ -21,7 +21,7 @@ const updateCategory = async (id, name, type, is_active) => {
         newName,
         newType,
         is_active,
-        id
+        id,
       ]);
     } else {
       updateCategoryQuery =

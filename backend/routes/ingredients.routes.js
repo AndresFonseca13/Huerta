@@ -9,14 +9,14 @@ router.post(
   '/',
   normalizeTextFields,
   authMiddleware,
-  ingredientController.createIngredient
+  ingredientController.createIngredient,
 );
 router.delete('/:id', authMiddleware, ingredientController.deleteIngredient);
 router.put(
   '/:id',
   normalizeTextFields,
   authMiddleware,
-  ingredientController.updateIngredient
+  ingredientController.updateIngredient,
 );
 router.get('/', ingredientController.getAllIngredients);
 router.get('/search', ingredientController.searchIngredient);

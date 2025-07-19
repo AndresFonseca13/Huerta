@@ -18,7 +18,7 @@ const validateBodyCocktail = (req, res, next) => {
     categories.length === 0
   ) {
     return res.status(400).json({
-      mensaje: 'Datos inválidos o faltantes en el cuerpo del cóctel.'
+      mensaje: 'Datos inválidos o faltantes en el cuerpo del cóctel.',
     });
   }
 

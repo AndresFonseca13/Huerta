@@ -45,7 +45,7 @@ const searchProductsService = async (searchTerm) => {
     const products = result.rows.map((product) => ({
       ...product,
       categories: product.categories[0] === null ? [] : product.categories,
-      images: product.images[0] === null ? [] : product.images
+      images: product.images[0] === null ? [] : product.images,
     }));
 
     return products;

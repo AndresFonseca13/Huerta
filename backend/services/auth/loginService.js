@@ -5,7 +5,7 @@ import pool from '../../config/db.js';
 const loginService = async (username, password) => {
   const userResult = await pool.query(
     'SELECT * FROM users WHERE username = $1',
-    [username]
+    [username],
   );
   if (userResult.rows.length === 0) {
     throw new Error('Usuario o contraseña incorrectos');
@@ -19,11 +19,11 @@ const loginService = async (username, password) => {
   const token = jwt.sign(
     { id: user.id, username: user.username },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' }
+    { expiresIn: '1h' },
   );
   return {
     token,
-    username: user.username
+    username: user.username,
   };
 };
 

@@ -8,7 +8,7 @@ const createCocktailService = async (
   ingredients,
   images,
   categories,
-  userid
+  userid,
 ) => {
   // Validación de campos obligatorios
   if (
@@ -35,7 +35,7 @@ const createCocktailService = async (
       name,
       price,
       description,
-      userid
+      userid,
     ]);
     const cocktailId = cocktailResult.rows[0].id;
 
@@ -58,7 +58,7 @@ const createCocktailService = async (
           'SELECT id FROM ingredients WHERE name = $1';
         const existingIngredientResult = await pool.query(
           existingIngredientQuery,
-          [ingredient]
+          [ingredient],
         );
         ingredientsIds.push(existingIngredientResult.rows[0].id);
       }
@@ -80,7 +80,7 @@ const createCocktailService = async (
           `;
       const result = await pool.query(insertCategoryQuery, [
         categoryName,
-        categoryType
+        categoryType,
       ]);
 
       let categoryId;
@@ -91,14 +91,14 @@ const createCocktailService = async (
           'SELECT id FROM categories WHERE name = $1 AND type = $2';
         const existingResult = await pool.query(existingQuery, [
           categoryName,
-          categoryType
+          categoryType,
         ]);
         categoryId = existingResult.rows[0].id;
       }
 
       await pool.query(
         'INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)',
-        [cocktailId, categoryId]
+        [cocktailId, categoryId],
       );
     }
 
@@ -134,7 +134,7 @@ const createCocktailService = async (
 		`;
 
     const completeResult = await pool.query(completeCocktailQuery, [
-      cocktailId
+      cocktailId,
     ]);
 
     // Procesar los resultados para limpiar los arrays
@@ -142,7 +142,7 @@ const createCocktailService = async (
     if (cocktail) {
       // Filtrar valores null de ingredientes y categorías
       cocktail.ingredients = cocktail.ingredients.filter(
-        (ingredient) => ingredient !== null
+        (ingredient) => ingredient !== null,
       );
       // No filtrar categorías por ahora para debug
       cocktail.categories = cocktail.categories || [];

@@ -3,7 +3,7 @@ import multer from 'multer';
 // Configuración de multer con límites y filtros
 const upload = multer({
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB límite
+    fileSize: 5 * 1024 * 1024, // 5MB límite
   },
   fileFilter: (req, file, cb) => {
     // Validar tipos de archivo permitidos
@@ -11,13 +11,13 @@ const upload = multer({
     if (!allowedTypes.includes(file.mimetype)) {
       return cb(
         new Error(
-          'Tipo de archivo no permitido. Solo se permiten imágenes JPEG, PNG y WebP.'
+          'Tipo de archivo no permitido. Solo se permiten imágenes JPEG, PNG y WebP.',
         ),
-        false
+        false,
       );
     }
     cb(null, true);
-  }
+  },
 });
 
 // Middleware para manejar errores de multer
@@ -27,12 +27,12 @@ const handleMulterError = (error, req, res, next) => {
       return res.status(400).json({
         error: true,
         mensaje:
-					'El archivo es demasiado grande. El tamaño máximo permitido es 5MB'
+					'El archivo es demasiado grande. El tamaño máximo permitido es 5MB',
       });
     }
     return res.status(400).json({
       error: true,
-      mensaje: error.message
+      mensaje: error.message,
     });
   }
   next(error);

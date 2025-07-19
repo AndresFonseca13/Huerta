@@ -22,7 +22,7 @@ const normalizeTextFields = (req, res, next) => {
   if (req.body.categories) {
     req.body.categories = req.body.categories.map((c) => ({
       name: cleanText(c.name),
-      type: cleanText(c.type)
+      type: cleanText(c.type),
     }));
   }
 

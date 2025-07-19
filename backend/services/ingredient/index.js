@@ -11,5 +11,5 @@ export default {
   getAllIngredientsService,
   getIngredientByIdService,
   searchIngredientService,
-  updateIngredientService
+  updateIngredientService,
 };

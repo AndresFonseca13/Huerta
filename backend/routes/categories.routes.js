@@ -9,14 +9,14 @@ router.post(
   '/',
   normalizeTextFields,
   authMiddleware,
-  categoryController.createCategory
+  categoryController.createCategory,
 );
 router.delete('/:id', authMiddleware, categoryController.deleteCategory);
 router.put(
   '/:id',
   normalizeTextFields,
   authMiddleware,
-  categoryController.updateCategory
+  categoryController.updateCategory,
 );
 router.get('/', categoryController.getAllCategories);
 router.get('/search', categoryController.searchCategory);
@@ -24,7 +24,7 @@ router.get('/:id', categoryController.getCategoryById);
 router.patch(
   '/:id/active',
   authMiddleware,
-  categoryController.setCategoryActive
+  categoryController.setCategoryActive,
 );
 
 export default router;

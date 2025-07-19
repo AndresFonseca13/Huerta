@@ -9,7 +9,7 @@ const containerName = 'cocktail-images';
 async function deleteImagesFromAzure(imageUrls) {
   if (!AZURE_STORAGE_CONNECTION_STRING || !AZURE_STORAGE_ACCOUNT_NAME) return;
   const blobServiceClient = BlobServiceClient.fromConnectionString(
-    AZURE_STORAGE_CONNECTION_STRING
+    AZURE_STORAGE_CONNECTION_STRING,
   );
   const containerClient = blobServiceClient.getContainerClient(containerName);
   for (const url of imageUrls) {
@@ -43,7 +43,7 @@ const deleteCocktailService = async (id) => {
 
     // Eliminar relaciones con ingredientes
     await pool.query('DELETE FROM products_ingredients WHERE product_id = $1', [
-      id
+      id,
     ]);
 
     // Eliminar imágenes asociadas (en la base de datos)
