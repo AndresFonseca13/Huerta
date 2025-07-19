@@ -1,6 +1,6 @@
 // components/CardCocktail.jsx
 import React from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 const CardCocktail = ({ cocktail, onClick }) => {
 	const { name, price, description, images } = cocktail;
@@ -11,7 +11,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 			: "https://via.placeholder.com/300x200?text=Sin+Imagen";
 
 	return (
-		<motion.div
+		<Motion.div
 			className="w-80 bg-white shadow-md rounded-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:shadow-xl hover:scale-105"
 			onClick={() => onClick && onClick(cocktail)}
 			whileHover={{
@@ -54,7 +54,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 					<span className="text-xs text-gray-400">Click para ver detalles</span>
 				</div>
 			</div>
-		</motion.div>
+		</Motion.div>
 	);
 };
 

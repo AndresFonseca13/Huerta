@@ -3,7 +3,7 @@ import { getAllCategories } from "../services/categoryService.js";
 import { useNavigate } from "react-router-dom";
 import { BiDownArrow } from "react-icons/bi";
 import { FiMenu, FiX } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/Logo mejorado.png";
 
 // --- Componente Ayudante para el Acordeón del Menú Móvil ---
@@ -33,7 +33,7 @@ const AccordionSection = ({ title, isOpen, onToggle, items, onSelect }) => {
 			</button>
 			<AnimatePresence>
 				{isOpen && (
-					<motion.div
+					<Motion.div
 						initial="collapsed"
 						animate="open"
 						exit="collapsed"
@@ -50,7 +50,7 @@ const AccordionSection = ({ title, isOpen, onToggle, items, onSelect }) => {
 								{cat.name}
 							</button>
 						))}
-					</motion.div>
+					</Motion.div>
 				)}
 			</AnimatePresence>
 		</div>
@@ -176,7 +176,7 @@ const Navbar = () => {
 		<header className="bg-green-900 text-white shadow-lg sticky top-0 z-40">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
 				{/* Logo */}
-				<motion.div
+				<Motion.div
 					whileHover={{ scale: 1.05 }}
 					className="cursor-pointer flex items-center gap-x-2"
 					onClick={() => navigate("/")}
@@ -197,12 +197,12 @@ const Navbar = () => {
 					>
 						Huerta
 					</h1>
-				</motion.div>
+				</Motion.div>
 
 				{/* Menú de Escritorio */}
 				<div className="hidden md:flex items-center space-x-8">
 					<div className="relative" ref={destiladosRef}>
-						<motion.button
+						<Motion.button
 							whileHover={{ y: -2 }}
 							className="flex items-center text-lg font-medium hover:text-green-200 transition-colors"
 							onClick={() => setIsDesktopDestiladosOpen((prev) => !prev)}
@@ -213,10 +213,10 @@ const Navbar = () => {
 									isDesktopDestiladosOpen ? "rotate-180" : ""
 								}`}
 							/>
-						</motion.button>
+						</Motion.button>
 						<AnimatePresence>
 							{isDesktopDestiladosOpen && (
-								<motion.div
+								<Motion.div
 									variants={dropdownVariants}
 									initial="hidden"
 									animate="visible"
@@ -236,13 +236,13 @@ const Navbar = () => {
 											</button>
 										))}
 									</div>
-								</motion.div>
+								</Motion.div>
 							)}
 						</AnimatePresence>
 					</div>
 
 					<div className="relative" ref={clasificacionesRef}>
-						<motion.button
+						<Motion.button
 							whileHover={{ y: -2 }}
 							className="flex items-center text-lg font-medium hover:text-green-200 transition-colors"
 							onClick={() => setIsDesktopClasificacionesOpen((prev) => !prev)}
@@ -253,10 +253,10 @@ const Navbar = () => {
 									isDesktopClasificacionesOpen ? "rotate-180" : ""
 								}`}
 							/>
-						</motion.button>
+						</Motion.button>
 						<AnimatePresence>
 							{isDesktopClasificacionesOpen && (
-								<motion.div
+								<Motion.div
 									variants={dropdownVariants}
 									initial="hidden"
 									animate="visible"
@@ -276,7 +276,7 @@ const Navbar = () => {
 											</button>
 										))}
 									</div>
-								</motion.div>
+								</Motion.div>
 							)}
 						</AnimatePresence>
 					</div>
@@ -296,7 +296,7 @@ const Navbar = () => {
 			{/* Panel del Menú Móvil */}
 			<AnimatePresence>
 				{isMobileMenuOpen && (
-					<motion.div
+					<Motion.div
 						key="mobile-menu-overlay"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
@@ -304,7 +304,7 @@ const Navbar = () => {
 						className="fixed inset-0 bg-black bg-opacity-60 z-50"
 						onClick={() => setIsMobileMenuOpen(false)}
 					>
-						<motion.div
+						<Motion.div
 							key="mobile-menu-panel"
 							variants={mobileMenuVariants}
 							initial="hidden"
@@ -347,8 +347,8 @@ const Navbar = () => {
 									}
 								/>
 							</nav>
-						</motion.div>
-					</motion.div>
+											</Motion.div>
+				</Motion.div>
 				)}
 			</AnimatePresence>
 		</header>

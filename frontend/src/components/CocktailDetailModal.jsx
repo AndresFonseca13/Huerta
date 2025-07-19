@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import { FiX, FiList, FiDollarSign } from "react-icons/fi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -32,7 +32,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 
 	return (
 		<AnimatePresence>
-			<motion.div
+			<Motion.div
 				className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
@@ -40,7 +40,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 				transition={{ duration: 0.3 }}
 				onClick={onClose}
 			>
-				<motion.div
+				<Motion.div
 					className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
 					initial={{
 						opacity: 0,
@@ -117,7 +117,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					{/* Contenido */}
 					<div className="p-6">
 						{/* Header */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.2 }}
@@ -133,10 +133,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 									</span>
 								</div>
 							</div>
-						</motion.div>
+						</Motion.div>
 
 						{/* Descripción */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.3 }}
@@ -145,11 +145,11 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							<p className="text-gray-700 text-lg leading-relaxed">
 								{description}
 							</p>
-						</motion.div>
+						</Motion.div>
 
 						{/* Ingredientes */}
 						{ingredients && ingredients.length > 0 && (
-							<motion.div
+							<Motion.div
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.4 }}
@@ -173,11 +173,11 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 										</span>
 									))}
 								</div>
-							</motion.div>
+							</Motion.div>
 						)}
 
 						{/* Botón de acción */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.6 }}
@@ -189,10 +189,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							>
 								Cerrar
 							</button>
-						</motion.div>
+						</Motion.div>
 					</div>
-				</motion.div>
-			</motion.div>
+				</Motion.div>
+			</Motion.div>
 		</AnimatePresence>
 	);
 };
