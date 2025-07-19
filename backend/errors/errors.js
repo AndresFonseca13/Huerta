@@ -1,18 +1,15 @@
 class ValidationError extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "ValidationError";
-	}
+  constructor(message) {
+    super(message);
+    this.name = 'ValidationError';
+  }
 }
 
 class ConflictError extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "ConflictError";
-	}
+  constructor(message) {
+    super(message);
+    this.name = 'ConflictError';
+  }
 }
 
-module.exports = {
-	ValidationError,
-	ConflictError,
-};
+export { ValidationError, ConflictError };

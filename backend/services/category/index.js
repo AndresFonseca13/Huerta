@@ -1,15 +1,15 @@
-const createCategoryService = require('./createCategoryService');
-const deleteCategoryService = require('./deleteCategoryService');
-const getAllCategoriesService = require('./getAllCategoriesService');
-const getCategoryByIdService = require('./getCategoryByIdService');
-const updateCategory = require('./updateCategory');
-const searchCategoryService = require('./searchCategoryService');
+import createCategoryService from './createCategoryService.js';
+import deleteCategoryService from './deleteCategoryService.js';
+import getAllCategoriesService from './getAllCategoriesService.js';
+import getCategoryByIdService from './getCategoryByIdService.js';
+import updateCategory from './updateCategory.js';
+import searchCategoryService from './searchCategoryService.js';
 
-module.exports = {
-    createCategoryService,
-    deleteCategoryService,
-    getAllCategoriesService,
-    getCategoryByIdService,
-    updateCategory,
-    searchCategoryService
+export {
+  createCategoryService,
+  deleteCategoryService,
+  getAllCategoriesService,
+  getCategoryByIdService,
+  updateCategory,
+  searchCategoryService
 };

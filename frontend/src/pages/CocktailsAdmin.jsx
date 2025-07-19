@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getCocktailsAdmin } from "../services/cocktailService.js";
 import BackButton from "../components/BackButton";
 import EditCocktailModal from "../components/EditCocktailModal";
@@ -15,9 +16,11 @@ import {
 	FiX,
 	FiChevronUp,
 	FiChevronDown,
+	FiPlus,
 } from "react-icons/fi";
 
 const CocktailsAdmin = () => {
+	const navigate = useNavigate();
 	const [cocktails, setCocktails] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -196,11 +199,26 @@ const CocktailsAdmin = () => {
 				<div className="mb-4 md:mb-0 md:mr-6">
 					<BackButton />
 				</div>
-				<div>
-					<h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2">
-						Gestión de Cócteles
-					</h1>
-					<p className="text-gray-600">Administra los cócteles del sistema</p>
+				<div className="flex-1">
+					<div className="flex flex-col md:flex-row md:items-center md:justify-between">
+						<div>
+							<h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2">
+								Gestión de Cócteles
+							</h1>
+							<p className="text-gray-600">
+								Administra los cócteles del sistema
+							</p>
+						</div>
+						<div className="mt-4 md:mt-0">
+							<button
+								onClick={() => navigate("/admin/create")}
+								className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+							>
+								<FiPlus className="mr-2" />
+								Crear Cóctel
+							</button>
+						</div>
+					</div>
 					{/* Filtro de categorías solo en mobile, debajo del título */}
 					<div className="sm:hidden mt-4">
 						<div className="relative w-full">

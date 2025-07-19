@@ -11,50 +11,50 @@ import CocktailsAdmin from "./pages/CocktailsAdmin";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
 
 function App() {
-	return (
-		<>
-			<ConditionalNavbar />
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/login" element={<Login />} />
-				<Route
-					path="/admin/create"
-					element={
-						<ProtectedRoute>
-							<CreateCocktail />
-						</ProtectedRoute>
-					}
-				/>
-				<Route path="/cocteles/:categoria" element={<FilteredCocktails />} />
-				<Route path="/comida/:categoria" element={<FilteredCocktails />} />
-				<Route path="/admin/login" element={<AdminLogin />} />
-				<Route
-					path="/admin"
-					element={
-						<ProtectedRoute>
-							<AdminPanel />
-						</ProtectedRoute>
-					}
-				/>
-				<Route
-					path="/admin/cocktails"
-					element={
-						<ProtectedRoute>
-							<CocktailsAdmin />
-						</ProtectedRoute>
-					}
-				/>
-				<Route
-					path="/admin/categories"
-					element={
-						<ProtectedRoute>
-							<CategoriesAdmin />
-						</ProtectedRoute>
-					}
-				/>
-			</Routes>
-		</>
-	);
+  return (
+    <>
+      <ConditionalNavbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin/create"
+          element={
+            <ProtectedRoute>
+              <CreateCocktail />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/cocteles/:categoria" element={<FilteredCocktails />} />
+        <Route path="/comida/:categoria" element={<FilteredCocktails />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/cocktails"
+          element={
+            <ProtectedRoute>
+              <CocktailsAdmin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories"
+          element={
+            <ProtectedRoute>
+              <CategoriesAdmin />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
+  );
 }
 
 export default App;

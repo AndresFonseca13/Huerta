@@ -153,4 +153,3 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 - Tailwind CSS
 - Framer Motion
 - Express.js
- 

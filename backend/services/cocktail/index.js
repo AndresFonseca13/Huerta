@@ -1,19 +1,19 @@
-const getAllCocktailsService = require("./getAllCocktailsService");
-const getAllCocktailsAdminService = require("./getAllCocktailsAdminService");
-const getCocktailByIdService = require("./getCocktailByIdService");
-const createCocktailService = require("./createCocktailService");
-const updateCocktailService = require("./updateCocktailService");
-const updateCocktailStatusService = require("./updateCocktailStatusService");
-const deleteCocktailService = require("./deleteCocktailService");
-const searchProductsService = require("./searchProductsService");
+import getAllCocktailsService from './getAllCocktailsService.js';
+import getAllCocktailsAdminService from './getAllCocktailsAdminService.js';
+import getCocktailByIdService from './getCocktailByIdService.js';
+import createCocktailService from './createCocktailService.js';
+import updateCocktailService from './updateCocktailService.js';
+import updateCocktailStatusService from './updateCocktailStatusService.js';
+import deleteCocktailService from './deleteCocktailService.js';
+import searchProductsService from './searchProductsService.js';
 
-module.exports = {
-	getAllCocktailsService,
-	getAllCocktailsAdminService,
-	getCocktailByIdService,
-	createCocktailService,
-	updateCocktailService,
-	updateCocktailStatusService,
-	deleteCocktailService,
-	searchProductsService,
+export default {
+  getAllCocktailsService,
+  getAllCocktailsAdminService,
+  getCocktailByIdService,
+  createCocktailService,
+  updateCocktailService,
+  updateCocktailStatusService,
+  deleteCocktailService,
+  searchProductsService
 };
