@@ -18,10 +18,11 @@ const getAllCocktailsService = async ({
 		: "";
 
 	const query = `
-    SELECT p.id, p.name, p.price, p.description, p.is_active,
+    SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
            array_agg(DISTINCT c.name) AS categories,
-           array_agg(DISTINCT img.url) AS images
+            array_agg(DISTINCT img.url) AS images,
+            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
