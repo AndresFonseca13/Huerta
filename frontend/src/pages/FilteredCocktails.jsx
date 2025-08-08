@@ -5,6 +5,7 @@ import { useParams, useLocation } from "react-router-dom";
 import { getCocktails } from "../services/cocktailService";
 import CardCocktail from "../components/CardCocktail";
 import CocktailDetailModal from "../components/CocktailDetailModal";
+import CategoryFilterBar from "../components/CategoryFilterBar.jsx";
 
 const FilteredCocktails = () => {
 	const { categoria } = useParams();
@@ -19,8 +20,8 @@ const FilteredCocktails = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
-	// Determinar el tipo basado en la ruta
-	const tipo = location.pathname.startsWith("/cocteles/")
+	// Determinar el tipo basado en la ruta (soporta "/cocteles" y "/cocteles/:categoria")
+	const tipo = location.pathname.startsWith("/cocteles")
 		? "destilado"
 		: "clasificacion";
 
@@ -114,6 +115,9 @@ const FilteredCocktails = () => {
 	};
 
 	const getFilterTitle = () => {
+		if (!categoria) {
+			return tipo === "destilado" ? "Todos los cocteles" : "Toda la comida";
+		}
 		if (tipo === "destilado") {
 			return `Cocteles de ${categoria}`;
 		} else if (tipo === "clasificacion") {
@@ -125,6 +129,7 @@ const FilteredCocktails = () => {
 	return (
 		<div className="py-8">
 			<div ref={topRef} />
+			<CategoryFilterBar />
 			<motion.div
 				className="text-center mb-6 px-4"
 				initial={{ opacity: 0, y: -20 }}

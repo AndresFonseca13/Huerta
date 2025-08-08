@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import CreateCocktail from "./pages/CreateCocktail";
@@ -14,15 +14,10 @@ import Footer from "./components/Footer.jsx";
 function App() {
 	const location = useLocation();
 	// Rutas donde SÍ debe aparecer el Footer
-	const showFooter = [
-		"/",
-		"/login",
-		"/cocteles/:categoria",
-		"/comida/:categoria",
-	].some((path) => {
-		if (path.includes(":categoria")) {
-			// Coincidencia parcial para rutas dinámicas
+	const showFooter = ["/", "/login", "/cocteles", "/comida"].some((path) => {
+		if (path === "/cocteles" || path === "/comida") {
 			return (
+				location.pathname === path ||
 				location.pathname.startsWith("/cocteles/") ||
 				location.pathname.startsWith("/comida/")
 			);
@@ -34,7 +29,7 @@ function App() {
 		<>
 			<ConditionalNavbar />
 			<Routes>
-				<Route path="/" element={<Home />} />
+				<Route path="/" element={<Navigate to="/cocteles" replace />} />
 				<Route path="/login" element={<Login />} />
 				<Route
 					path="/admin/create"
@@ -44,7 +39,9 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
+				<Route path="/cocteles" element={<FilteredCocktails />} />
 				<Route path="/cocteles/:categoria" element={<FilteredCocktails />} />
+				<Route path="/comida" element={<FilteredCocktails />} />
 				<Route path="/comida/:categoria" element={<FilteredCocktails />} />
 				<Route path="/admin/login" element={<AdminLogin />} />
 				<Route

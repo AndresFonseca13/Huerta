@@ -4,235 +4,235 @@ const API_BASE_URL = "/api";
 
 // Función para obtener cócteles (pública - no requiere autenticación)
 export const getCocktails = async (
-  page = 1,
-  limit = 12,
-  categoria = null,
-  tipo = null,
-  orden = "name",
+	page = 1,
+	limit = 12,
+	categoria = null,
+	tipo = null,
+	orden = "name"
 ) => {
-  try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      orden: orden,
-    });
+	try {
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			orden: orden,
+		});
 
-    if (categoria) params.append("categoria", categoria);
-    if (tipo) params.append("tipo", tipo);
+		if (categoria) params.append("categoria", categoria);
+		if (tipo) params.append("tipo", tipo);
 
-    const response = await fetch(`${API_BASE_URL}/cocktails?${params}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
+		const response = await fetch(`${API_BASE_URL}/cocktails?${params}`, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.mensaje || "Error al obtener cócteles");
-    }
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al obtener cócteles");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching cocktails:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error fetching cocktails:", error);
+		throw error;
+	}
 };
 
 // Función para obtener TODOS los cócteles para admin (requiere autenticación)
 export const getCocktailsAdmin = async (
-  page = 1,
-  limit = 50,
-  categoria = null,
-  tipo = null,
-  orden = "name",
+	page = 1,
+	limit = 50,
+	categoria = null,
+	tipo = null,
+	orden = "name"
 ) => {
-  try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      orden: orden,
-    });
+	try {
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			orden: orden,
+		});
 
-    if (categoria) params.append("categoria", categoria);
-    if (tipo) params.append("tipo", tipo);
+		if (categoria) params.append("categoria", categoria);
+		if (tipo) params.append("tipo", tipo);
 
-    const response = await fetch(
-      `${API_BASE_URL}/cocktails/admin/all?${params}`,
-      {
-        headers: getAuthHeaders(),
-      },
-    );
-    const data = await response.json();
+		const response = await fetch(
+			`${API_BASE_URL}/cocktails/admin/all?${params}`,
+			{
+				headers: getAuthHeaders(),
+			}
+		);
+		const data = await response.json();
 
-    if (!response.ok) {
-      // Si es un error 401 (Unauthorized), limpiar token y redirigir
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/admin/login";
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente.",
-        );
-      }
-      throw new Error(data.mensaje || "Error al obtener cócteles");
-    }
+		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
+			throw new Error(data.mensaje || "Error al obtener cócteles");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching admin cocktails:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error fetching admin cocktails:", error);
+		throw error;
+	}
 };
 
 // Función para crear cóctel (requiere autenticación)
 export const createCocktail = async (cocktailData) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/cocktails`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(cocktailData),
-    });
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails`, {
+			method: "POST",
+			headers: getAuthHeaders(),
+			body: JSON.stringify(cocktailData),
+		});
 
-    const data = await response.json();
+		const data = await response.json();
 
-    if (!response.ok) {
-      // Si es un error 401 (Unauthorized), limpiar token y redirigir
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/admin/login";
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente.",
-        );
-      }
-      throw new Error(data.mensaje || "Error al crear cóctel");
-    }
+		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
+			throw new Error(data.mensaje || "Error al crear cóctel");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error creating cocktail:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error creating cocktail:", error);
+		throw error;
+	}
 };
 
 // Función para actualizar cóctel (requiere autenticación)
 export const updateCocktail = async (id, cocktailData) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(cocktailData),
-    });
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
+			method: "PUT",
+			headers: getAuthHeaders(),
+			body: JSON.stringify(cocktailData),
+		});
 
-    const data = await response.json();
+		const data = await response.json();
 
-    if (!response.ok) {
-      // Si es un error 401 (Unauthorized), limpiar token y redirigir
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/admin/login";
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente.",
-        );
-      }
-      throw new Error(data.mensaje || "Error al actualizar cóctel");
-    }
+		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
+			throw new Error(data.mensaje || "Error al actualizar cóctel");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error updating cocktail:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error updating cocktail:", error);
+		throw error;
+	}
 };
 
 // Función para actualizar estado del cóctel (requiere autenticación)
 export const updateCocktailStatus = async (id, isActive) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/cocktails/${id}/status`, {
-      method: "PATCH",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ isActive }),
-    });
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}/status`, {
+			method: "PATCH",
+			headers: getAuthHeaders(),
+			body: JSON.stringify({ isActive }),
+		});
 
-    const data = await response.json();
+		const data = await response.json();
 
-    if (!response.ok) {
-      // Si es un error 401 (Unauthorized), limpiar token y redirigir
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/admin/login";
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente.",
-        );
-      }
-      throw new Error(data.mensaje || "Error al actualizar estado del cóctel");
-    }
+		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
+			throw new Error(data.mensaje || "Error al actualizar estado del cóctel");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error updating cocktail status:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error updating cocktail status:", error);
+		throw error;
+	}
 };
 
 // Función para eliminar cóctel (requiere autenticación)
 export const deleteCocktail = async (id) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
+	try {
+		const response = await fetch(`${API_BASE_URL}/cocktails/${id}`, {
+			method: "DELETE",
+			headers: getAuthHeaders(),
+		});
 
-    const data = await response.json();
+		const data = await response.json();
 
-    if (!response.ok) {
-      // Si es un error 401 (Unauthorized), limpiar token y redirigir
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/admin/login";
-        throw new Error(
-          "Sesión expirada. Por favor, inicia sesión nuevamente.",
-        );
-      }
-      throw new Error(data.mensaje || "Error al eliminar cóctel");
-    }
+		if (!response.ok) {
+			// Si es un error 401 (Unauthorized), limpiar token y redirigir
+			if (response.status === 401) {
+				localStorage.removeItem("token");
+				window.location.href = "/admin/login";
+				throw new Error(
+					"Sesión expirada. Por favor, inicia sesión nuevamente."
+				);
+			}
+			throw new Error(data.mensaje || "Error al eliminar cóctel");
+		}
 
-    return data;
-  } catch (error) {
-    console.error("Error deleting cocktail:", error);
-    throw error;
-  }
+		return data;
+	} catch (error) {
+		console.error("Error deleting cocktail:", error);
+		throw error;
+	}
 };
 
 // Función para subir imágenes (requiere autenticación)
 export const uploadImages = async (files, cocktailName) => {
-  try {
-    const formData = new FormData();
-    Array.from(files).forEach((file) => {
-      formData.append("images", file);
-    });
-    if (cocktailName) {
-      formData.append("cocktailName", cocktailName);
-    }
+	try {
+		const formData = new FormData();
+		Array.from(files).forEach((file) => {
+			formData.append("images", file);
+		});
+		if (cocktailName) {
+			formData.append("cocktailName", cocktailName);
+		}
 
-    const response = await fetch(`${API_BASE_URL}/upload/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: getAuthHeaders().Authorization,
-      },
-      body: formData,
-    });
+		const response = await fetch(`${API_BASE_URL}/upload/upload`, {
+			method: "POST",
+			headers: {
+				Authorization: getAuthHeaders().Authorization,
+			},
+			body: formData,
+		});
 
-    const data = await response.json();
+		const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.mensaje || "Error al subir imágenes");
-    }
+		if (!response.ok) {
+			throw new Error(data.mensaje || "Error al subir imágenes");
+		}
 
-    console.log("Respuesta del backend:", data);
-    console.log("URLs recibidas:", data.urls);
+		console.log("Respuesta del backend:", data);
+		console.log("URLs recibidas:", data.urls);
 
-    return data.urls || [];
-  } catch (error) {
-    console.error("Error uploading images:", error);
-    throw error;
-  }
+		return data.urls || [];
+	} catch (error) {
+		console.error("Error uploading images:", error);
+		throw error;
+	}
 };

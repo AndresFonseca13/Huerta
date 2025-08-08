@@ -20,10 +20,9 @@ const Home = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
-				const { cocteles, paginacion } = await getCocktails(
-					currentPage,
-					pageSize
-				);
+				const response = await getCocktails(currentPage, pageSize);
+				const { cocteles, paginacion } = response;
+
 				setCocktails(cocteles);
 				setTotalPages(paginacion.totalPages);
 				setTotalRecords(paginacion.totalRecords);
@@ -82,8 +81,6 @@ const Home = () => {
 			},
 		},
 	};
-
-	console.log("Cocktails en Home:", cocktails);
 
 	return (
 		<>

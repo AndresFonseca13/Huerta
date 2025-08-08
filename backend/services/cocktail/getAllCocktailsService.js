@@ -1,24 +1,23 @@
-import pool from '../../config/db.js';
+import pool from "../../config/db.js";
 
 const getAllCocktailsService = async ({
-  categoria,
-  tipo,
-  orden,
-  limite,
-  offset,
+	categoria,
+	tipo,
+	orden,
+	limite,
+	offset,
 }) => {
-  console.log('[DEBUG] getAllCocktailsService - Parámetros recibidos:', {
-    categoria,
-    tipo,
-    orden,
-    limite,
-    offset,
-  });
+	// Construir la consulta base con interpolación directa
+	const tipoFiltro = tipo
+		? `AND p.id IN (
+      SELECT pc3.product_id
+      FROM products_categories pc3
+      JOIN categories c3 ON pc3.category_id = c3.id
+      WHERE c3.type = '${tipo}'
+    )`
+		: "";
 
-  const ordenValido = ['name', 'price'].includes(orden) ? orden : 'name';
-
-  // Consulta principal para obtener los cocteles
-  const query = `
+	const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active,
            array_agg(DISTINCT i.name) AS ingredients,
            array_agg(DISTINCT c.name) AS categories,
@@ -30,94 +29,70 @@ const getAllCocktailsService = async ({
     LEFT JOIN categories c ON pc.category_id = c.id
     LEFT JOIN images img ON p.id = img.product_id
     WHERE p.is_active = true
-      AND ($1::text IS NULL OR EXISTS (
-        SELECT 1 FROM products_categories pc2 
-        JOIN categories c2 ON pc2.category_id = c2.id 
-        WHERE pc2.product_id = p.id AND c2.name = $1
-    ))
-      AND ($2::text IS NULL OR EXISTS (
-        SELECT 1 FROM products_categories pc3 
-        JOIN categories c3 ON pc3.category_id = c3.id 
-        WHERE pc3.product_id = p.id AND c3.type = $2
-      ))
+    ${
+			categoria
+				? `AND p.id IN (
+      SELECT pc2.product_id
+      FROM products_categories pc2
+      JOIN categories c2 ON pc2.category_id = c2.id
+      WHERE c2.name = '${categoria}'
+    )`
+				: ""
+		}
+    ${tipoFiltro}
     GROUP BY p.id, p.name, p.price, p.description, p.is_active
-    ORDER BY p."${ordenValido}"
-    LIMIT $3 OFFSET $4
+    ORDER BY p.name
+    LIMIT ${limite} OFFSET ${offset}
   `;
 
-  // Consulta para contar el total de registros
-  const countQuery = `
+	const countQuery = `
     SELECT COUNT(DISTINCT p.id) as total
     FROM products p
     WHERE p.is_active = true
-      AND ($1::text IS NULL OR EXISTS (
-        SELECT 1 FROM products_categories pc2 
-        JOIN categories c2 ON pc2.category_id = c2.id 
-        WHERE pc2.product_id = p.id AND c2.name = $1
-    ))
-      AND ($2::text IS NULL OR EXISTS (
-        SELECT 1 FROM products_categories pc3 
-        JOIN categories c3 ON pc3.category_id = c3.id 
-        WHERE pc3.product_id = p.id AND c3.type = $2
-      ))
+    ${
+			categoria
+				? `AND p.id IN (
+      SELECT pc2.product_id
+      FROM products_categories pc2
+      JOIN categories c2 ON pc2.category_id = c2.id
+      WHERE c2.name = '${categoria}'
+    )`
+				: ""
+		}
+    ${tipoFiltro}
   `;
 
-  const values = [categoria, tipo, limite, offset];
-  const countValues = [categoria, tipo];
+	// Ejecutar ambas consultas en paralelo
+	const [result, countResult] = await Promise.all([
+		pool.query(query),
+		pool.query(countQuery),
+	]);
 
-  console.log(
-    '[DEBUG] getAllCocktailsService - Valores de la consulta:',
-    values,
-  );
-  console.log(
-    '[DEBUG] getAllCocktailsService - Valores del conteo:',
-    countValues,
-  );
+	// Procesar los resultados para limpiar los arrays
+	const processedCocktails = result.rows.map((cocktail) => {
+		cocktail.ingredients = cocktail.ingredients.filter(
+			(ingredient) => ingredient !== null
+		);
+		cocktail.categories = cocktail.categories.filter(
+			(category) => category !== null
+		);
+		cocktail.images = cocktail.images.filter((image) => image !== null);
+		return cocktail;
+	});
 
-  // Ejecutar ambas consultas en paralelo
-  const [result, countResult] = await Promise.all([
-    pool.query(query, values),
-    pool.query(countQuery, countValues),
-  ]);
+	const totalRecords = parseInt(countResult.rows[0].total);
+	const totalPages = Math.ceil(totalRecords / limite);
 
-  console.log('[DEBUG] getAllCocktailsService - Resultados obtenidos:', {
-    cocktailsCount: result.rows.length,
-    totalCount: countResult.rows[0].total,
-    sampleCocktail: result.rows[0]
-      ? {
-        id: result.rows[0].id,
-        name: result.rows[0].name,
-        categories: result.rows[0].categories,
-      }
-      : null,
-  });
-
-  // Procesar los resultados para limpiar los arrays
-  const processedCocktails = result.rows.map((cocktail) => {
-    // Filtrar valores null de ingredientes, categorías e imágenes
-    cocktail.ingredients = cocktail.ingredients.filter(
-      (ingredient) => ingredient !== null,
-    );
-    cocktail.categories = cocktail.categories.filter(
-      (category) => category !== null,
-    );
-    cocktail.images = cocktail.images.filter((image) => image !== null);
-    return cocktail;
-  });
-
-  const totalRecords = parseInt(countResult.rows[0].total);
-  const totalPages = Math.ceil(totalRecords / limite);
-
-  return {
-    cocktails: processedCocktails,
-    pagination: {
-      totalRecords,
-      totalPages,
-      currentPage: Math.floor(offset / limite) + 1,
-      limit: limite,
-      offset: offset,
-    },
-  };
+	return {
+		cocktails: processedCocktails,
+		pagination: {
+			totalRecords,
+			totalPages,
+			currentPage: Math.floor(offset / limite) + 1,
+			limit: limite,
+			offset: offset,
+		},
+	};
 };
 
 export default getAllCocktailsService;
