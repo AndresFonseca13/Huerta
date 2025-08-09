@@ -4,3 +4,4 @@ ADD COLUMN IF NOT EXISTS alcohol_percentage NUMERIC(5,2) CHECK (alcohol_percenta
 
 -- No default. Los registros existentes quedarán en NULL.
 
+

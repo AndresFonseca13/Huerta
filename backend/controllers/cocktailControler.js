@@ -66,6 +66,38 @@ const getAllCocktailsAdmin = async (req, res) => {
 	}
 };
 
+// Nuevo: Solo productos que tienen la categoría 'comida'
+const getFoodProducts = async (req, res) => {
+	const pagina = parseInt(req.query.page || req.query.pagina) || 1;
+	const limite = parseInt(req.query.limit || req.query.limite) || 10;
+	const offset = (pagina - 1) * limite;
+
+	const categoria = req.query.categoria || null; // categoría adicional específica
+	const orden = req.query.orden || "name";
+
+	try {
+		const result = await cocktailsService.getFoodProductsService({
+			categoria,
+			limite,
+			offset,
+			orden,
+		});
+
+		const response = {
+			pagina,
+			limite,
+			cantidad: result.cocktails.length,
+			cocteles: result.cocktails,
+			paginacion: result.pagination,
+		};
+
+		res.status(200).json(response);
+	} catch (error) {
+		console.error("Error al obtener la comida:", error);
+		res.status(500).json({ mensaje: "Error al obtener la comida" });
+	}
+};
+
 const getCocktailById = async (req, res) => {
 	const { id } = req.params;
 
@@ -217,4 +249,5 @@ export default {
 	updateCocktailStatus,
 	deleteCocktail,
 	searchProducts,
+	getFoodProducts,
 };

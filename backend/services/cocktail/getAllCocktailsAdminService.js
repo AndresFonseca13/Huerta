@@ -23,7 +23,8 @@ const getAllCocktailsAdminService = async ({
             array_agg(DISTINCT i.name) AS ingredients,
             array_agg(DISTINCT c.name) AS categories,
             array_agg(DISTINCT img.url) AS images,
-            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name
+            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
+            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
@@ -38,7 +39,7 @@ const getAllCocktailsAdminService = async ({
       AND ($2::text IS NULL OR EXISTS (
         SELECT 1 FROM products_categories pc3 
         JOIN categories c3 ON pc3.category_id = c3.id 
-        WHERE pc3.product_id = p.id AND c3.type = $2
+        WHERE pc3.product_id = p.id AND c3.type = CASE WHEN $2 = 'clasificacion' THEN 'clasificacion comida' ELSE $2 END
       ))
     GROUP BY p.id, p.name, p.price, p.description, p.is_active
     ORDER BY p."${ordenValido}"
@@ -57,7 +58,7 @@ const getAllCocktailsAdminService = async ({
       AND ($2::text IS NULL OR EXISTS (
         SELECT 1 FROM products_categories pc3 
         JOIN categories c3 ON pc3.category_id = c3.id 
-        WHERE pc3.product_id = p.id AND c3.type = $2
+        WHERE pc3.product_id = p.id AND c3.type = CASE WHEN $2 = 'clasificacion' THEN 'clasificacion comida' ELSE $2 END
       ))
   `;
 

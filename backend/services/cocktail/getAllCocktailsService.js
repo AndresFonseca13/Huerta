@@ -13,7 +13,9 @@ const getAllCocktailsService = async ({
       SELECT pc3.product_id
       FROM products_categories pc3
       JOIN categories c3 ON pc3.category_id = c3.id
-      WHERE c3.type = '${tipo}'
+      WHERE c3.type = '${
+				tipo === "clasificacion" ? "clasificacion comida" : tipo
+			}'
     )`
 		: "";
 
@@ -22,7 +24,8 @@ const getAllCocktailsService = async ({
            array_agg(DISTINCT i.name) AS ingredients,
            array_agg(DISTINCT c.name) AS categories,
             array_agg(DISTINCT img.url) AS images,
-            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name
+            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
+            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
