@@ -22,6 +22,19 @@ export const getAllCategories = async (showAll = false) => {
 	}
 };
 
+// Obtener solo categorías de comida (type=clasificacion) asociadas a productos de comida
+export const getFoodCategories = async () => {
+	try {
+		const response = await axios.get(
+			`${API_BASE_URL}/categories?onlyFood=true`
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching food categories:", error);
+		throw error;
+	}
+};
+
 export const createCategory = async (data) => {
 	try {
 		const token = localStorage.getItem("token");

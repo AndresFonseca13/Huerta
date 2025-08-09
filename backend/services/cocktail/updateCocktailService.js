@@ -59,57 +59,59 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 		}
 
 		// --- Gestión de Ingredientes ---
-		// 2. Borrar las relaciones antiguas de ingredientes
-		await client.query(
-			"DELETE FROM products_ingredients WHERE product_id = $1",
-			[cocktailId]
-		);
+		// Si "ingredients" viene en el payload, reemplazamos; si no viene, mantenemos
+		if (typeof ingredients !== "undefined") {
+			await client.query(
+				"DELETE FROM products_ingredients WHERE product_id = $1",
+				[cocktailId]
+			);
 
-		// 3. Insertar los nuevos ingredientes y sus relaciones
-		if (ingredients && ingredients.length > 0) {
-			const ingredientIds = [];
-			for (const ingredientName of ingredients) {
-				// Insertar el ingrediente si no existe (ON CONFLICT) y obtener su ID
-				let res = await client.query(
-					"INSERT INTO ingredients (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
-					[ingredientName]
-				);
-				ingredientIds.push(res.rows[0].id);
-			}
+			if (Array.isArray(ingredients) && ingredients.length > 0) {
+				const ingredientIds = [];
+				for (const ingredientName of ingredients) {
+					// Insertar el ingrediente si no existe (ON CONFLICT) y obtener su ID
+					const res = await client.query(
+						"INSERT INTO ingredients (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+						[ingredientName]
+					);
+					ingredientIds.push(res.rows[0].id);
+				}
 
-			// Crear las nuevas relaciones usando parámetros preparados
-			for (const ingredientId of ingredientIds) {
-				await client.query(
-					"INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)",
-					[cocktailId, ingredientId]
-				);
+				// Crear las nuevas relaciones usando parámetros preparados
+				for (const ingredientId of ingredientIds) {
+					await client.query(
+						"INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)",
+						[cocktailId, ingredientId]
+					);
+				}
 			}
 		}
 
 		// --- Gestión de Categorías ---
-		// 4. Borrar las relaciones antiguas de categorías
-		await client.query(
-			"DELETE FROM products_categories WHERE product_id = $1",
-			[cocktailId]
-		);
+		// Si "categories" viene en el payload, reemplazamos; si no viene, mantenemos
+		if (typeof categories !== "undefined") {
+			await client.query(
+				"DELETE FROM products_categories WHERE product_id = $1",
+				[cocktailId]
+			);
 
-		// 5. Insertar las nuevas categorías y sus relaciones
-		if (categories && categories.length > 0) {
-			const categoryIds = [];
-			for (const category of categories) {
-				let res = await client.query(
-					"INSERT INTO categories (name, type) VALUES ($1, $2) ON CONFLICT (name, type) DO UPDATE SET name=EXCLUDED.name RETURNING id",
-					[category.name, category.type]
-				);
-				categoryIds.push(res.rows[0].id);
-			}
+			if (Array.isArray(categories) && categories.length > 0) {
+				const categoryIds = [];
+				for (const category of categories) {
+					const res = await client.query(
+						"INSERT INTO categories (name, type) VALUES ($1, $2) ON CONFLICT (name, type) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+						[category.name, category.type]
+					);
+					categoryIds.push(res.rows[0].id);
+				}
 
-			// Crear las nuevas relaciones usando parámetros preparados
-			for (const categoryId of categoryIds) {
-				await client.query(
-					"INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)",
-					[cocktailId, categoryId]
-				);
+				// Crear las nuevas relaciones usando parámetros preparados
+				for (const categoryId of categoryIds) {
+					await client.query(
+						"INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)",
+						[cocktailId, categoryId]
+					);
+				}
 			}
 		}
 
@@ -151,9 +153,17 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 		const finalCocktail = await client.query(
 			`
             SELECT p.id, p.name, p.price, p.description, p.alcohol_percentage,
-                   (SELECT array_agg(i.name) FROM ingredients i JOIN products_ingredients pi ON i.id = pi.ingredient_id WHERE pi.product_id = p.id) as ingredients,
-                   (SELECT array_agg(c.name) FROM categories c JOIN products_categories pc ON c.id = pc.category_id WHERE pc.product_id = p.id) as categories,
-                   (SELECT array_agg(img.url) FROM images img WHERE img.product_id = p.id) as images
+                   (SELECT array_agg(i.name)
+                      FROM ingredients i
+                      JOIN products_ingredients pi ON i.id = pi.ingredient_id
+                     WHERE pi.product_id = p.id) AS ingredients,
+                   (SELECT array_agg(jsonb_build_object('name', c.name, 'type', c.type))
+                      FROM categories c
+                      JOIN products_categories pc ON c.id = pc.category_id
+                     WHERE pc.product_id = p.id) AS categories,
+                   (SELECT array_agg(img.url)
+                      FROM images img
+                     WHERE img.product_id = p.id) AS images
             FROM products p
             WHERE p.id = $1
             GROUP BY p.id;

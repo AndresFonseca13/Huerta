@@ -18,9 +18,14 @@ export const getCocktails = async (
 		});
 
 		if (categoria) params.append("categoria", categoria);
-		if (tipo) params.append("tipo", tipo);
 
-		const response = await fetch(`${API_BASE_URL}/cocktails?${params}`, {
+		// Para comida, usamos el endpoint dedicado /cocktails/food
+		const endpoint =
+			tipo === "clasificacion" ? "/cocktails/food" : "/cocktails";
+
+		if (tipo && endpoint === "/cocktails") params.append("tipo", tipo);
+
+		const response = await fetch(`${API_BASE_URL}${endpoint}?${params}`, {
 			headers: {
 				"Content-Type": "application/json",
 			},

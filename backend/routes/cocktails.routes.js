@@ -35,7 +35,6 @@ router.put(
 	"/:id",
 	authMiddleware,
 	normalizeTextFields,
-	validateBodyCocktail,
 	validateCategories,
 	validateIngredients,
 	cocktailController.updateCocktail
