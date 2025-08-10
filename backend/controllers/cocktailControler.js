@@ -126,6 +126,10 @@ const getCocktailById = async (req, res) => {
 const createCocktail = async (req, res) => {
 	const { name, price, description, ingredients, images, categories } =
 		req.body;
+	const alcoholPercentage =
+		typeof req.body.alcohol_percentage !== "undefined"
+			? req.body.alcohol_percentage
+			: req.body.alcoholPercentage ?? null;
 	const user = req.user.id;
 
 	try {
@@ -136,7 +140,8 @@ const createCocktail = async (req, res) => {
 			ingredients,
 			images,
 			categories,
-			user
+			user,
+			alcoholPercentage
 		);
 		res.status(201).json({ mensaje: "Cóctel creado exitosamente", cocktail });
 	} catch (error) {
