@@ -2,8 +2,6 @@ import pool from "../../config/db.js";
 
 const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
 	const safeOrder = ["name", "price"].includes(orden) ? orden : "name";
-
-	// Consideramos como "comida" todo producto que tenga alguna categoría de tipo 'clasificacion comida'
 	const baseFilterComida = `EXISTS (
       SELECT 1 FROM products_categories pcx
       JOIN categories cx ON pcx.category_id = cx.id
@@ -61,18 +59,18 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
 		pool.query(countQuery, values),
 	]);
 
-	const processedCocktails = result.rows.map((row) => {
-		row.ingredients = (row.ingredients || []).filter((x) => x !== null);
-		row.categories = (row.categories || []).filter((x) => x !== null);
-		row.images = (row.images || []).filter((x) => x !== null);
-		return row;
-	});
+	const processed = result.rows.map((row) => ({
+		...row,
+		ingredients: (row.ingredients || []).filter((x) => x !== null),
+		categories: (row.categories || []).filter((x) => x !== null),
+		images: (row.images || []).filter((x) => x !== null),
+	}));
 
 	const totalRecords = parseInt(countResult.rows[0]?.total || 0);
 	const totalPages = Math.ceil(totalRecords / limite);
 
 	return {
-		cocktails: processedCocktails,
+		cocktails: processed,
 		pagination: {
 			totalRecords,
 			totalPages,

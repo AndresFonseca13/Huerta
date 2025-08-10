@@ -1,6 +1,6 @@
 import pool from "../../config/db.js";
 
-const getCocktailByIdService = async (id) => {
+const getProductByIdService = async (id) => {
 	const query = `
         SELECT 
             p.id AS product_id, 
@@ -26,4 +26,4 @@ const getCocktailByIdService = async (id) => {
 	return result.rows[0];
 };
 
-export default getCocktailByIdService;
+export default getProductByIdService;

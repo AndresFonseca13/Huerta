@@ -1,13 +1,12 @@
 import pool from "../../config/db.js";
 
-const getAllCocktailsService = async ({
+const getAllProductsService = async ({
 	categoria,
 	tipo,
 	orden,
 	limite,
 	offset,
 }) => {
-	// Construir la consulta base con interpolación directa
 	const tipoFiltro = tipo
 		? `AND p.id IN (
       SELECT pc3.product_id
@@ -23,9 +22,9 @@ const getAllCocktailsService = async ({
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
            array_agg(DISTINCT c.name) AS categories,
-            array_agg(DISTINCT img.url) AS images,
-            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
-            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
+           array_agg(DISTINCT img.url) AS images,
+           MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
+           MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
@@ -66,37 +65,31 @@ const getAllCocktailsService = async ({
     ${tipoFiltro}
   `;
 
-	// Ejecutar ambas consultas en paralelo
 	const [result, countResult] = await Promise.all([
 		pool.query(query),
 		pool.query(countQuery),
 	]);
 
-	// Procesar los resultados para limpiar los arrays
-	const processedCocktails = result.rows.map((cocktail) => {
-		cocktail.ingredients = cocktail.ingredients.filter(
-			(ingredient) => ingredient !== null
-		);
-		cocktail.categories = cocktail.categories.filter(
-			(category) => category !== null
-		);
-		cocktail.images = cocktail.images.filter((image) => image !== null);
-		return cocktail;
-	});
+	const processed = result.rows.map((row) => ({
+		...row,
+		ingredients: (row.ingredients || []).filter((x) => x !== null),
+		categories: (row.categories || []).filter((x) => x !== null),
+		images: (row.images || []).filter((x) => x !== null),
+	}));
 
 	const totalRecords = parseInt(countResult.rows[0].total);
 	const totalPages = Math.ceil(totalRecords / limite);
 
 	return {
-		cocktails: processedCocktails,
+		cocktails: processed,
 		pagination: {
 			totalRecords,
 			totalPages,
 			currentPage: Math.floor(offset / limite) + 1,
 			limit: limite,
-			offset: offset,
+			offset,
 		},
 	};
 };
 
-export default getAllCocktailsService;
+export default getAllProductsService;

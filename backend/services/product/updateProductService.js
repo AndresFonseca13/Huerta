@@ -24,7 +24,7 @@ async function deleteImagesFromAzure(imageUrls) {
 	}
 }
 
-const updateCocktailService = async (cocktailId, cocktailData) => {
+const updateProductService = async (productId, productData) => {
 	const {
 		name,
 		price,
@@ -33,68 +33,56 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 		categories,
 		images,
 		alcohol_percentage,
-	} = cocktailData;
-
+	} = productData;
 	const client = await pool.connect();
-
 	try {
 		await client.query("BEGIN");
 
-		// 1. Actualizar los datos básicos del producto
 		const updateProductQuery = `
-            UPDATE products
-            SET name = $1, price = $2, description = $3, alcohol_percentage = $4
-            WHERE id = $5
-            RETURNING *;
-        `;
+      UPDATE products
+      SET name = $1, price = $2, description = $3, alcohol_percentage = $4
+      WHERE id = $5
+      RETURNING *;
+    `;
 		const productResult = await client.query(updateProductQuery, [
 			name,
 			price,
 			description,
 			alcohol_percentage ?? null,
-			cocktailId,
+			productId,
 		]);
 		if (productResult.rows.length === 0) {
 			throw new Error("Cóctel no encontrado.");
 		}
 
-		// --- Gestión de Ingredientes ---
-		// Si "ingredients" viene en el payload, reemplazamos; si no viene, mantenemos
 		if (typeof ingredients !== "undefined") {
 			await client.query(
 				"DELETE FROM products_ingredients WHERE product_id = $1",
-				[cocktailId]
+				[productId]
 			);
-
 			if (Array.isArray(ingredients) && ingredients.length > 0) {
 				const ingredientIds = [];
 				for (const ingredientName of ingredients) {
-					// Insertar el ingrediente si no existe (ON CONFLICT) y obtener su ID
 					const res = await client.query(
 						"INSERT INTO ingredients (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
 						[ingredientName]
 					);
 					ingredientIds.push(res.rows[0].id);
 				}
-
-				// Crear las nuevas relaciones usando parámetros preparados
 				for (const ingredientId of ingredientIds) {
 					await client.query(
 						"INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)",
-						[cocktailId, ingredientId]
+						[productId, ingredientId]
 					);
 				}
 			}
 		}
 
-		// --- Gestión de Categorías ---
-		// Si "categories" viene en el payload, reemplazamos; si no viene, mantenemos
 		if (typeof categories !== "undefined") {
 			await client.query(
 				"DELETE FROM products_categories WHERE product_id = $1",
-				[cocktailId]
+				[productId]
 			);
-
 			if (Array.isArray(categories) && categories.length > 0) {
 				const categoryIds = [];
 				for (const category of categories) {
@@ -104,74 +92,60 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 					);
 					categoryIds.push(res.rows[0].id);
 				}
-
-				// Crear las nuevas relaciones usando parámetros preparados
 				for (const categoryId of categoryIds) {
 					await client.query(
 						"INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)",
-						[cocktailId, categoryId]
+						[productId, categoryId]
 					);
 				}
 			}
 		}
 
-		// --- Gestión de Imágenes ---
 		if (images && images.length > 0) {
-			// Obtener imágenes antiguas antes de borrar
 			const oldImagesResult = await client.query(
 				"SELECT url FROM images WHERE product_id = $1",
-				[cocktailId]
+				[productId]
 			);
 			const oldImageUrls = oldImagesResult.rows.map((row) => row.url);
-
-			// Determinar cuáles imágenes se eliminaron
 			const imagesToDelete = oldImageUrls.filter(
 				(url) => !images.includes(url)
 			);
-
-			// Borrar las imágenes antiguas solo si se van a reemplazar
 			await client.query("DELETE FROM images WHERE product_id = $1", [
-				cocktailId,
+				productId,
 			]);
-
-			// Insertar las nuevas imágenes
 			for (const imageUrl of images) {
 				await client.query(
 					"INSERT INTO images (product_id, url) VALUES ($1, $2)",
-					[cocktailId, imageUrl]
+					[productId, imageUrl]
 				);
 			}
-
-			// Borrar en Azure solo las imágenes eliminadas
 			await deleteImagesFromAzure(imagesToDelete);
 		}
-		// Si no se proporcionan imágenes, mantener las existentes (no hacer nada)
 
 		await client.query("COMMIT");
 
-		// Devolver el cóctel actualizado con todas sus relaciones
-		const finalCocktail = await client.query(
+		const finalProduct = await client.query(
 			`
-            SELECT p.id, p.name, p.price, p.description, p.alcohol_percentage,
-                   (SELECT array_agg(i.name)
-                      FROM ingredients i
-                      JOIN products_ingredients pi ON i.id = pi.ingredient_id
-                     WHERE pi.product_id = p.id) AS ingredients,
-                   (SELECT array_agg(jsonb_build_object('name', c.name, 'type', c.type))
-                      FROM categories c
-                      JOIN products_categories pc ON c.id = pc.category_id
-                     WHERE pc.product_id = p.id) AS categories,
-                   (SELECT array_agg(img.url)
-                      FROM images img
-                     WHERE img.product_id = p.id) AS images
-            FROM products p
-            WHERE p.id = $1
-            GROUP BY p.id;
-        `,
-			[cocktailId]
+        SELECT p.id, p.name, p.price, p.description, p.alcohol_percentage,
+               (SELECT array_agg(i.name)
+                  FROM ingredients i
+                  JOIN products_ingredients pi ON i.id = pi.ingredient_id
+                 WHERE pi.product_id = p.id) AS ingredients,
+               (SELECT array_agg(jsonb_build_object('name', c.name, 'type', c.type))
+                  FROM categories c
+                  JOIN products_categories pc ON c.id = pc.category_id
+                 WHERE pc.product_id = p.id) AS categories,
+               (SELECT array_agg(img.url)
+                  FROM images img
+                 WHERE img.product_id = p.id) AS images
+        FROM products p
+        WHERE p.id = $1
+        GROUP BY p.id;
+      `,
+			[productId]
 		);
 
-		return finalCocktail.rows[0];
+		return finalProduct.rows[0];
 	} catch (error) {
 		await client.query("ROLLBACK");
 		console.error("Error en el servicio de actualización:", error);
@@ -181,4 +155,4 @@ const updateCocktailService = async (cocktailId, cocktailData) => {
 	}
 };
 
-export default updateCocktailService;
+export default updateProductService;

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import coctelesRoutes from "./routes/cocktails.routes.js";
+import productsRoutes from "./routes/products.routes.js";
 import categoriesRoutes from "./routes/categories.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import ingredientRoutes from "./routes/ingredients.routes.js";
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 // app.use('/api/...') etc
 
-app.use("/api/cocktails", coctelesRoutes);
+app.use("/api/products", productsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/ingredient", ingredientRoutes);
