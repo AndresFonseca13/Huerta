@@ -263,7 +263,7 @@ const CategoriesAdmin = () => {
 			</header>
 			<main>
 				{/* Buscador y filtros */}
-				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+				<div className="flex flex-col gap-4 mb-4">
 					<div className="relative w-full sm:w-80">
 						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 						<input
@@ -274,8 +274,8 @@ const CategoriesAdmin = () => {
 							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
 						/>
 					</div>
-					{/* KPIs */}
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 mb-2 w-full">
+					{/* KPIs: ocupar ancho completo en desktop para evitar estrechamiento */}
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-2 w-full">
 						<Motion.div
 							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
 								statusFilter === "all" ? "ring-2 ring-green-200" : ""
@@ -318,7 +318,7 @@ const CategoriesAdmin = () => {
 					</div>
 
 					{/* Píldoras de tipo */}
-					<div className="w-full sm:flex-1">
+					<div className="w-full">
 						<div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
 							<button
 								onClick={() => handleTypeSelect(null)}

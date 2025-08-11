@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { FiGrid, FiCoffee, FiTag, FiUsers, FiTrendingUp } from "react-icons/fi";
@@ -37,6 +37,13 @@ const AdminLayout = () => {
 		logout();
 		navigate("/admin/login");
 	};
+
+	useEffect(() => {
+		// Asegura que cada navegación dentro del admin empiece arriba
+		if (typeof window !== "undefined") {
+			window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+		}
+	}, [location.pathname]);
 
 	return (
 		<div className="bg-gray-50 min-h-screen">

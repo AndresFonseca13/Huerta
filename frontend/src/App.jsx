@@ -10,6 +10,7 @@ import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import CocktailsAdmin from "./pages/CocktailsAdmin";
 import FoodAdmin from "./pages/FoodAdmin.jsx";
+import CreateFood from "./pages/CreateFood.jsx";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
 import Footer from "./components/Footer.jsx";
 
@@ -59,6 +60,7 @@ function App() {
 					<Route path="categories" element={<CategoriesAdmin />} />
 					<Route path="food" element={<FoodAdmin />} />
 					<Route path="create" element={<CreateCocktail />} />
+					<Route path="food/create" element={<CreateFood />} />
 				</Route>
 			</Routes>
 			{showFooter && <Footer />}

@@ -11,8 +11,8 @@ import {
 	FiPlus,
 } from "react-icons/fi";
 import { getProductsAdmin } from "../services/productService";
-import EditCocktailModal from "../components/EditCocktailModal";
-import ManageCocktailModal from "../components/ManageCocktailModal";
+import EditFoodModal from "../components/EditFoodModal";
+import ManageFoodModal from "../components/ManageFoodModal";
 import CocktailDetailModal from "../components/CocktailDetailModal";
 
 const FoodAdmin = () => {
@@ -196,10 +196,10 @@ const FoodAdmin = () => {
 						</Motion.div>
 						<div className="mt-4 md:mt-0">
 							<button
-								onClick={() => navigate("/admin/create")}
+								onClick={() => navigate("/admin/food/create")}
 								className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
 							>
-								<FiPlus className="mr-2" /> Crear Producto
+								<FiPlus className="mr-2" /> Crear Plato
 							</button>
 						</div>
 					</div>
@@ -320,11 +320,13 @@ const FoodAdmin = () => {
 										<h3 className="text-lg font-semibold text-gray-900 capitalize">
 											{it.name}
 										</h3>
-										{(it.clasificacion_name ||
+										{(it.food_classification_name ||
+											it.clasificacion_name ||
 											it.classification ||
 											it.food_classification) && (
 											<span className="inline-flex text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full capitalize mt-1 mr-2">
-												{it.clasificacion_name ||
+												{it.food_classification_name ||
+													it.clasificacion_name ||
 													it.classification ||
 													it.food_classification}
 											</span>
@@ -437,15 +439,15 @@ const FoodAdmin = () => {
 				)}
 			</main>
 
-			{/* Modales reutilizados */}
-			<EditCocktailModal
-				cocktail={selected}
+			{/* Modales de comida */}
+			<EditFoodModal
+				item={selected}
 				isOpen={isEditModalOpen}
 				onClose={closeEditModal}
 				onUpdateSuccess={handleUpdateSuccess}
 			/>
-			<ManageCocktailModal
-				cocktail={selected}
+			<ManageFoodModal
+				item={selected}
 				isOpen={isManageModalOpen}
 				onClose={closeManageModal}
 				onUpdateSuccess={handleUpdateSuccess}

@@ -3,6 +3,8 @@ import { motion as Motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 // icons y logout ya no se usan aquí; sidebar vive en AdminLayout
 import { getProductsAdmin } from "../services/productService";
+import { getAllCategories } from "../services/categoryService";
+import { FiPlus, FiTag, FiUserPlus, FiGift, FiCoffee } from "react-icons/fi";
 // Bottom nav vive en el layout; no lo dupliquemos aquí
 
 const AdminPanel = () => {
@@ -10,40 +12,33 @@ const AdminPanel = () => {
 	const [loading, setLoading] = useState(true);
 	const [totalCocktails, setTotalCocktails] = useState(0);
 	const [activeCocktails, setActiveCocktails] = useState(0);
-	const [categoriesCount, setCategoriesCount] = useState(0);
 	const [totalFood, setTotalFood] = useState(0);
 	const [activeFood, setActiveFood] = useState(0);
-	const [foodClassifications, setFoodClassifications] = useState(0);
+	const [totalCategoriesDash, setTotalCategoriesDash] = useState(0);
+	const [activeCategoriesDash, setActiveCategoriesDash] = useState(0);
 
 	useEffect(() => {
 		const fetch = async () => {
 			try {
-				const [resCocktails, resFood] = await Promise.all([
+				const [resCocktails, resFood, resCats] = await Promise.all([
 					getProductsAdmin(1, 200, null, "destilado"),
 					getProductsAdmin(1, 200, null, "clasificacion"),
+					getAllCategories(true),
 				]);
 				const cocktails = resCocktails.cocteles || [];
 				setTotalCocktails(cocktails.length);
 				setActiveCocktails(cocktails.filter((c) => c.is_active).length);
-				const cats = new Set(
-					cocktails.flatMap((c) =>
-						(c.categories || []).map((cat) =>
-							typeof cat === "string" ? cat : cat.name
-						)
-					)
-				);
-				setCategoriesCount(cats.size);
 
 				const food = resFood.cocteles || [];
 				setTotalFood(food.length);
 				setActiveFood(food.filter((c) => c.is_active).length);
-				const classifs = new Set(
-					food
-						.map((f) => f.food_classification_name)
-						.filter((v) => typeof v === "string" && v.trim().length > 0)
-				);
-				setFoodClassifications(classifs.size);
-			} catch (e) {
+				// No mostramos clasificaciones en dashboard; solo disponibles e inhabilitados
+
+				// Categorías (dashboard)
+				const catsApi = Array.isArray(resCats) ? resCats : [];
+				setTotalCategoriesDash(catsApi.length);
+				setActiveCategoriesDash(catsApi.filter((c) => c.is_active).length);
+			} catch (_e) {
 				// silent, we can add a toast later
 			} finally {
 				setLoading(false);
@@ -54,42 +49,42 @@ const AdminPanel = () => {
 
 	return (
 		<>
-			{/* Main sólo contenido - la navegación vive en AdminLayout */}
+			{/* Main solo contenido - la navegación vive en AdminLayout */}
 			<main>
 				<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
 					<h2 className="text-2xl font-bold text-gray-900">
-						Welcome back, Admin! 👋
+						¡Bienvenido de nuevo! 👋
 					</h2>
 					<p className="text-gray-600 mt-1">
-						Here's what's happening with your restaurant today
+						Resumen del estado de tu restaurante
 					</p>
 				</div>
 
 				{/* Cards grid */}
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					{/* Food */}
+					{/* Comida */}
 					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold text-gray-900">Food Items</h3>
+							<h3 className="font-semibold text-gray-900">Comida</h3>
 							<span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
-								Live
+								Activa
 							</span>
 						</div>
 						<div className="mt-4 space-y-2 text-sm text-gray-700">
 							<SkeletonRow
 								loading={loading}
-								label="Total Items"
+								label="Total de platos"
 								value={totalFood}
 							/>
 							<SkeletonRow
 								loading={loading}
-								label="Available"
+								label="Disponibles"
 								value={activeFood}
 							/>
 							<SkeletonRow
 								loading={loading}
-								label="Classifications"
-								value={foodClassifications}
+								label="No disponibles"
+								value={Math.max(0, totalFood - activeFood)}
 							/>
 						</div>
 						<div className="mt-4">
@@ -97,30 +92,30 @@ const AdminPanel = () => {
 								onClick={() => navigate("/admin/food")}
 								className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 							>
-								Go to Food
+								Ir a Comida
 							</button>
 						</div>
 					</div>
 
-					{/* Users */}
+					{/* Usuarios */}
 					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold text-gray-900">Users</h3>
+							<h3 className="font-semibold text-gray-900">Usuarios</h3>
 							<span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
 								+3%
 							</span>
 						</div>
 						<div className="mt-4 space-y-2 text-sm text-gray-700">
-							<SkeletonRow loading={true} label="Total Users" value="3" />
-							<SkeletonRow loading={true} label="Active" value="2" />
+							<SkeletonRow loading={true} label="Total usuarios" value="3" />
+							<SkeletonRow loading={true} label="Activos" value="2" />
 							<SkeletonRow loading={true} label="Admins" value="1" />
 						</div>
 					</div>
 
-					{/* Cocktails */}
+					{/* Bebidas */}
 					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold text-gray-900">Cocktails</h3>
+							<h3 className="font-semibold text-gray-900">Bebidas</h3>
 							<span className="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full">
 								+8%
 							</span>
@@ -128,18 +123,18 @@ const AdminPanel = () => {
 						<div className="mt-4 space-y-2 text-sm text-gray-700">
 							<SkeletonRow
 								loading={loading}
-								label="Total Cocktails"
+								label="Total bebidas"
 								value={totalCocktails}
 							/>
 							<SkeletonRow
 								loading={loading}
-								label="Available"
+								label="Disponibles"
 								value={activeCocktails}
 							/>
 							<SkeletonRow
 								loading={loading}
-								label="Categories"
-								value={categoriesCount}
+								label="No disponibles"
+								value={Math.max(0, totalCocktails - activeCocktails)}
 							/>
 						</div>
 						<div className="mt-4">
@@ -147,27 +142,109 @@ const AdminPanel = () => {
 								onClick={() => navigate("/admin/cocktails")}
 								className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 							>
-								Go to Cocktails
+								Ir a Bebidas
 							</button>
 						</div>
 					</div>
 
-					{/* Promotions (design only) */}
+					{/* Categorías */}
 					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
 						<div className="flex items-center justify-between">
-							<h3 className="font-semibold text-gray-900">Promotions</h3>
+							<h3 className="font-semibold text-gray-900">Categorías</h3>
+						</div>
+						<div className="mt-4 space-y-2 text-sm text-gray-700">
+							<SkeletonRow
+								loading={loading}
+								label="Total categorías"
+								value={totalCategoriesDash}
+							/>
+							<SkeletonRow
+								loading={loading}
+								label="Activas"
+								value={activeCategoriesDash}
+							/>
+						</div>
+						<div className="mt-4">
+							<button
+								onClick={() => navigate("/admin/categories")}
+								className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+							>
+								Ir a Categorías
+							</button>
+						</div>
+					</div>
+
+					{/* Promociones (solo diseño por ahora) */}
+					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+						<div className="flex items-center justify-between">
+							<h3 className="font-semibold text-gray-900">Promociones</h3>
 							<span className="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
-								Soon
+								Pronto
 							</span>
 						</div>
 						<div className="mt-4 space-y-2 text-sm text-gray-700">
-							<SkeletonRow loading={true} label="Total Promos" value="3" />
-							<SkeletonRow loading={true} label="Active" value="2" />
-							<SkeletonRow loading={true} label="Total Usage" value="338" />
+							<SkeletonRow loading={true} label="Total promos" value="3" />
+							<SkeletonRow loading={true} label="Activas" value="2" />
+							<SkeletonRow loading={true} label="Usos totales" value="338" />
 						</div>
 					</div>
 				</div>
 			</main>
+			<section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+				<div className="flex items-center gap-2 mb-4">
+					<FiPlus className="text-gray-500" />
+					<h3 className="font-semibold text-gray-900">Atajos rápidos</h3>
+				</div>
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+					<button
+						onClick={() => navigate("/admin/food/create")}
+						className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 hover:bg-green-50 transition-colors"
+					>
+						<FiPlus className="text-red-500" />
+						<span className="text-sm font-medium text-gray-800">
+							Nuevo plato
+						</span>
+					</button>
+					<button
+						onClick={() => navigate("/admin/create")}
+						className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 hover:bg-green-50 transition-colors"
+					>
+						<FiCoffee className="text-amber-600" />
+						<span className="text-sm font-medium text-gray-800">
+							Nueva bebida
+						</span>
+					</button>
+					<button
+						onClick={() => {}}
+						disabled
+						className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 opacity-60 cursor-not-allowed"
+					>
+						<FiUserPlus className="text-emerald-600" />
+						<span className="text-sm font-medium text-gray-800">
+							Nuevo usuario
+						</span>
+					</button>
+					<button
+						onClick={() => navigate("/admin/categories")}
+						className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 hover:bg-green-50 transition-colors"
+					>
+						<FiTag className="text-purple-600" />
+						<span className="text-sm font-medium text-gray-800">
+							Nueva categoría
+						</span>
+					</button>
+					<button
+						onClick={() => {}}
+						disabled
+						className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 opacity-60 cursor-not-allowed"
+					>
+						<FiGift className="text-pink-600" />
+						<span className="text-sm font-medium text-gray-800">
+							Nueva promoción
+						</span>
+					</button>
+				</div>
+			</section>
 		</>
 	);
 };
