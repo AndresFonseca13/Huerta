@@ -5,6 +5,7 @@ import CreateCocktail from "./pages/CreateCocktail";
 import FilteredCocktails from "./pages/FilteredCocktails";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import AdminPanel from "./pages/AdminPanel.jsx";
+import AdminLayout from "./layouts/AdminLayout.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import CocktailsAdmin from "./pages/CocktailsAdmin";
@@ -48,26 +49,15 @@ function App() {
 					path="/admin"
 					element={
 						<ProtectedRoute>
-							<AdminPanel />
+							<AdminLayout />
 						</ProtectedRoute>
 					}
-				/>
-				<Route
-					path="/admin/cocktails"
-					element={
-						<ProtectedRoute>
-							<CocktailsAdmin />
-						</ProtectedRoute>
-					}
-				/>
-				<Route
-					path="/admin/categories"
-					element={
-						<ProtectedRoute>
-							<CategoriesAdmin />
-						</ProtectedRoute>
-					}
-				/>
+				>
+					<Route index element={<AdminPanel />} />
+					<Route path="cocktails" element={<CocktailsAdmin />} />
+					<Route path="categories" element={<CategoriesAdmin />} />
+					<Route path="create" element={<CreateCocktail />} />
+				</Route>
 			</Routes>
 			{showFooter && <Footer />}
 		</>

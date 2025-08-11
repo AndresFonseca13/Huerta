@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
-import { FiX, FiList, FiDollarSign } from "react-icons/fi";
+import { FiX, FiList, FiDollarSign, FiTag } from "react-icons/fi";
+import { FaWineBottle } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -21,6 +22,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 	if (!isOpen || !cocktail) return null;
 
 	const { name, price, description, images, ingredients } = cocktail;
+	const alcoholPct =
+		cocktail.alcohol_percentage ?? cocktail.alcoholPercentage ?? null;
+	const destilado = cocktail.destilado_name || null;
+	const foodClass = cocktail.food_classification_name || null;
 
 	console.log("Cocktail en modal:", cocktail);
 	console.log("Images en modal:", images);
@@ -112,6 +117,18 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							/>
 						)}
 						<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-t-2xl" />
+						{/* Badges superpuestos */}
+						{(destilado || foodClass) && (
+							<div className="absolute top-3 left-3 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full capitalize">
+								{foodClass || destilado}
+							</div>
+						)}
+						{alcoholPct !== null && (
+							<div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+								<FaWineBottle className="opacity-90" />
+								{Number(alcoholPct).toFixed(0)}%
+							</div>
+						)}
 					</div>
 
 					{/* Contenido */}
@@ -132,6 +149,19 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 										${Number(price).toLocaleString()}
 									</span>
 								</div>
+							</div>
+							{/* Etiquetas secundarias */}
+							<div className="mt-3 flex flex-wrap gap-2">
+								{(foodClass || destilado) && (
+									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium capitalize">
+										<FiTag /> {foodClass || destilado}
+									</span>
+								)}
+								{alcoholPct !== null && (
+									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+										<FaWineBottle /> {Number(alcoholPct).toFixed(0)}%
+									</span>
+								)}
 							</div>
 						</Motion.div>
 

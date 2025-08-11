@@ -1,10 +1,10 @@
 import React from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiAlertTriangle } from "react-icons/fi";
 
-const ConfirmModal = ({ isOpen, onClose, onConfirm, message }) => {
-	if (!isOpen) return null;
+// Modal de error simple: si message existe, se muestra; si no, no renderiza
+const ErrorModal = ({ message, onClose }) => {
+	if (!message) return null;
 	return (
 		<AnimatePresence>
 			<motion.div
@@ -28,25 +28,11 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, message }) => {
 						<FiX size={20} />
 					</button>
 					<div className="flex flex-col items-center">
-						<FiAlertTriangle className="text-yellow-500 text-4xl mb-2" />
+						<FiAlertTriangle className="text-red-500 text-4xl mb-2" />
 						<h2 className="text-lg font-bold text-gray-800 mb-2 text-center">
-							Confirmar acción
+							Ocurrió un error
 						</h2>
-						<p className="text-gray-700 text-center mb-4">{message}</p>
-						<div className="flex gap-4 mt-2">
-							<button
-								onClick={onClose}
-								className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-							>
-								Cancelar
-							</button>
-							<button
-								onClick={onConfirm}
-								className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-							>
-								Confirmar
-							</button>
-						</div>
+						<p className="text-gray-700 text-center mb-2">{message}</p>
 					</div>
 				</motion.div>
 			</motion.div>
@@ -54,4 +40,4 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, message }) => {
 	);
 };
 
-export default ConfirmModal;
+export default ErrorModal;

@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { searchIngredients } from "../services/ingredientService.js";
 import { searchCategories } from "../services/categoryService.js";
-import { createCocktail, uploadImages } from "../services/cocktailService.js";
+import { uploadImages } from "../services/uploadService.js";
+import { createProduct } from "../services/productService.js";
 import {
 	FiTrash,
 	FiPlus,
@@ -20,6 +21,7 @@ import ErrorModal from "../components/ErrorModal";
 const CreateCocktail = () => {
 	const [name, setName] = useState("");
 	const [price, setPrice] = useState("");
+	const [alcoholPercentage, setAlcoholPercentage] = useState("");
 	const [description, setDescription] = useState("");
 	// Ingredientes
 	const [ingredients, setIngredients] = useState([]);
@@ -36,11 +38,13 @@ const CreateCocktail = () => {
 	const [createdCocktail, setCreatedCocktail] = useState(null);
 	const [isCreating, setIsCreating] = useState(false);
 	const [error, setError] = useState(null);
+	const [showValidation, setShowValidation] = useState(false);
 
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log("[CreateCocktail] submit clicked");
 		setIsCreating(true);
 		setError(null);
 
@@ -71,16 +75,38 @@ const CreateCocktail = () => {
 			validationErrors.push("Debes seleccionar al menos una imagen");
 		}
 
+		// Validación de alcohol si fue diligenciado
+		if (alcoholPercentage !== "") {
+			const ap = Number(alcoholPercentage);
+			if (isNaN(ap) || ap < 0 || ap > 100) {
+				validationErrors.push(
+					"El porcentaje de alcohol debe estar entre 0 y 100"
+				);
+			}
+		}
+
 		// Si hay errores de validación, mostrarlos y no continuar
 		if (validationErrors.length > 0) {
 			setError(validationErrors.join(". "));
+			setShowValidation(true);
+			// Llevar el foco/scroll arriba para que el usuario vea el error
+			try {
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			} catch (_err) {
+				// ignore scroll errors
+			}
 			setIsCreating(false);
 			return;
 		}
 
 		try {
+			console.log(
+				"[CreateCocktail] starting uploadImages",
+				selectedFiles.length
+			);
 			// 1. Subir imágenes (solo si la validación pasó)
 			const imageUrls = await uploadImages(selectedFiles, name.trim());
+			console.log("[CreateCocktail] uploadImages OK", imageUrls);
 
 			// 2. Preparar objeto del cóctel
 			const cocktailData = {
@@ -95,24 +121,30 @@ const CreateCocktail = () => {
 					name: cat.name,
 					type: cat.type,
 				})),
+				// Enviar solo si aplica
+				...(alcoholPercentage !== "" && {
+					alcohol_percentage: Number(alcoholPercentage),
+				}),
 			};
 
 			console.log("Datos del cóctel:", cocktailData);
 
 			// 3. Crear cóctel
-			const result = await createCocktail(cocktailData);
+			console.log("[CreateCocktail] creating product...");
+			const result = await createProduct(cocktailData);
+			console.log("[CreateCocktail] createProduct OK", result);
 
 			// 4. Mostrar el coctel creado
 			setCreatedCocktail({
-				...result.cocktail,
+				...result.product,
 				images: imageUrls,
 			});
 
 			// 5. Limpiar el formulario
 			resetForm();
 		} catch (error) {
-			console.error("Error al crear el cóctel:", error.message);
-			setError(error.message);
+			console.error("[CreateCocktail] Error:", error);
+			setError(error.message || "Error inesperado al crear el cóctel");
 		} finally {
 			setIsCreating(false);
 		}
@@ -333,6 +365,24 @@ const CreateCocktail = () => {
 									onChange={(e) => setPrice(e.target.value)}
 									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
 									placeholder="Ej. 8.50"
+								/>
+							</div>
+
+							{/* Porcentaje de alcohol (opcional) */}
+							<div className="space-y-2">
+								<label className="flex items-center text-gray-700 font-semibold">
+									<span className="mr-2 text-green-600">%</span>
+									Porcentaje de Alcohol (opcional)
+								</label>
+								<input
+									type="number"
+									min="0"
+									max="100"
+									step="0.1"
+									value={alcoholPercentage}
+									onChange={(e) => setAlcoholPercentage(e.target.value)}
+									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									placeholder="Ej. 40"
 								/>
 							</div>
 						</div>
@@ -587,10 +637,17 @@ const CreateCocktail = () => {
 								<FiImage className="mr-2 text-green-600" />
 								Imágenes
 							</label>
-							<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+							<div
+								className={`border-2 border-dashed rounded-lg p-6 text-center ${
+									showValidation && selectedFiles.length === 0
+										? "border-red-400 bg-red-50"
+										: "border-gray-300"
+								}`}
+							>
 								<input
 									type="file"
 									multiple
+									accept="image/*"
 									onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
 									className="hidden"
 									id="file-upload"
@@ -603,6 +660,11 @@ const CreateCocktail = () => {
 									<span>Selecciona o arrastra las imágenes aquí</span>
 								</label>
 							</div>
+							{showValidation && selectedFiles.length === 0 && (
+								<p className="text-sm text-red-600 mt-1">
+									Debes seleccionar al menos una imagen.
+								</p>
+							)}
 							<div className="grid grid-cols-3 gap-4 mt-4">
 								{selectedFiles.map((file, index) => (
 									<div key={index} className="relative">

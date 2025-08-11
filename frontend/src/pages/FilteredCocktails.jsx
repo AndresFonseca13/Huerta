@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
-import { getCocktails } from "../services/cocktailService";
+import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
 import CocktailDetailModal from "../components/CocktailDetailModal";
 import CategoryFilterBar from "../components/CategoryFilterBar.jsx";
@@ -36,7 +36,7 @@ const FilteredCocktails = () => {
 					tipo,
 				});
 
-				const data = await getCocktails(currentPage, pageSize, categoria, tipo);
+				const data = await getProducts(currentPage, pageSize, categoria, tipo);
 
 				// El backend devuelve 'cocteles' y 'paginacion'
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];

@@ -10,7 +10,8 @@ import {
 } from "react-icons/fi";
 import { searchIngredients } from "../services/ingredientService.js";
 import { searchCategories } from "../services/categoryService.js";
-import { updateCocktail, uploadImages } from "../services/cocktailService.js";
+import { updateProduct } from "../services/productService.js";
+import { uploadImages } from "../services/uploadService.js";
 import ErrorModal from "./ErrorModal";
 
 const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
@@ -24,6 +25,7 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
 	const [images, setImages] = useState([]);
+	const [alcoholPercentage, setAlcoholPercentage] = useState("");
 	const [newImageFiles, setNewImageFiles] = useState([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState(null);
@@ -49,6 +51,9 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 					: []
 			);
 			setImages(cocktail.images || []);
+			setAlcoholPercentage(
+				cocktail.alcohol_percentage ?? cocktail.alcoholPercentage ?? ""
+			);
 			setNewImageFiles([]);
 		}
 	}, [cocktail]);
@@ -159,9 +164,12 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 					type: cat.type || "destilado",
 				})),
 				images: finalImageUrls,
+				...(alcoholPercentage !== "" && {
+					alcohol_percentage: Number(alcoholPercentage),
+				}),
 			};
 
-			const result = await updateCocktail(cocktail.id, updatedData);
+			const result = await updateProduct(cocktail.id, updatedData);
 			setIsSuccess(true);
 
 			setTimeout(() => {
@@ -232,9 +240,13 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 							<FiX size={24} />
 						</button>
 
-						<h2 className="text-2xl font-bold text-gray-800 mb-6">
+						<h2 className="text-2xl font-bold text-gray-800 mb-2">
 							Editar Cóctel
 						</h2>
+						<p className="text-gray-500 mb-4">
+							Actualiza la información del cóctel. Los campos no enviados se
+							mantienen.
+						</p>
 
 						<form
 							onSubmit={handleSubmit}
@@ -268,6 +280,21 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									value={price}
 									onChange={(e) => setPrice(e.target.value)}
 									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-gray-700">
+									% Porcentaje de Alcohol (opcional)
+								</label>
+								<input
+									type="number"
+									min="0"
+									max="100"
+									step="0.1"
+									value={alcoholPercentage}
+									onChange={(e) => setAlcoholPercentage(e.target.value)}
+									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									placeholder="Ej. 40"
 								/>
 							</div>
 							<div>
