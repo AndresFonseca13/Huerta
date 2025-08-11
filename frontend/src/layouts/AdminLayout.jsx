@@ -4,6 +4,7 @@ import { motion as Motion } from "framer-motion";
 import { FiGrid, FiCoffee, FiTag, FiUsers, FiTrendingUp } from "react-icons/fi";
 import AdminBottomNav from "../components/AdminBottomNav";
 import { logout } from "../services/authService";
+import logo from "../assets/Logo-naranja.png";
 
 const SidebarItem = ({ active, icon: Icon, label, onClick }) => (
 	<div className="relative">
@@ -20,7 +21,7 @@ const SidebarItem = ({ active, icon: Icon, label, onClick }) => (
 				active ? "text-green-800" : "hover:bg-gray-100"
 			}`}
 		>
-			<Icon /> {label}
+			{Icon && <Icon />} {label}
 		</button>
 	</div>
 );
@@ -47,6 +48,22 @@ const AdminLayout = () => {
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
+			{/* Navbar estético del panel admin */}
+			<div className="bg-green-900">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+					<img
+						src={logo}
+						alt="Logo Huerta"
+						className="h-15 w-auto object-contain mr-3"
+					/>
+					<span
+						className="text-4xl sm:text-3xl font-bold text-white tracking-wide"
+						style={{ fontFamily: "'Playfair Display', serif" }}
+					>
+						Huerta
+					</span>
+				</div>
+			</div>
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 sm:pb-6">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 					{/* Sidebar Desktop persistente */}

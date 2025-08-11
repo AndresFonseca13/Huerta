@@ -28,10 +28,14 @@ const CreateCocktail = () => {
 	const [ingredientInput, setIngredientInput] = useState("");
 	const [ingredientSuggestions, setIngredientSuggestions] = useState([]);
 	// Categorías
-	const [categories, setCategories] = useState([]);
+	// Tipo por defecto para bebidas
+	const [categoryType] = useState("clasificacion");
+	// Incluir automáticamente la categoría base "bebida"
+	const [categories, setCategories] = useState([
+		{ name: "bebida", type: "clasificacion" },
+	]);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
-	const [categoryType] = useState("clasificacion");
 	// Imágenes
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	// Estado para mostrar el coctel creado
@@ -52,7 +56,7 @@ const CreateCocktail = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log("[CreateCocktail] submit clicked");
+		console.log("[CreateBeverage] submit clicked");
 		setIsCreating(true);
 		setError(null);
 
@@ -109,14 +113,14 @@ const CreateCocktail = () => {
 
 		try {
 			console.log(
-				"[CreateCocktail] starting uploadImages",
+				"[CreateBeverage] starting uploadImages",
 				selectedFiles.length
 			);
 			// 1. Subir imágenes (solo si la validación pasó)
 			const imageUrls = await uploadImages(selectedFiles, name.trim());
-			console.log("[CreateCocktail] uploadImages OK", imageUrls);
+			console.log("[CreateBeverage] uploadImages OK", imageUrls);
 
-			// 2. Preparar objeto del cóctel
+			// 2. Preparar objeto de la bebida
 			const cocktailData = {
 				name: name.trim(),
 				price: parseFloat(price),
@@ -135,12 +139,12 @@ const CreateCocktail = () => {
 				}),
 			};
 
-			console.log("Datos del cóctel:", cocktailData);
+			console.log("Datos de la bebida:", cocktailData);
 
 			// 3. Crear cóctel
-			console.log("[CreateCocktail] creating product...");
+			console.log("[CreateBeverage] creating product...");
 			const result = await createProduct(cocktailData);
-			console.log("[CreateCocktail] createProduct OK", result);
+			console.log("[CreateBeverage] createProduct OK", result);
 
 			// 4. Mostrar el coctel creado
 			setCreatedCocktail({
@@ -151,7 +155,7 @@ const CreateCocktail = () => {
 			// 5. Limpiar el formulario
 			resetForm();
 		} catch (error) {
-			console.error("[CreateCocktail] Error:", error);
+			console.error("[CreateBeverage] Error:", error);
 			setError(error.message || "Error inesperado al crear el cóctel");
 		} finally {
 			setIsCreating(false);
@@ -163,7 +167,7 @@ const CreateCocktail = () => {
 		setPrice("");
 		setDescription("");
 		setIngredients([]);
-		setCategories([]);
+		setCategories([{ name: "bebida", type: "clasificacion" }]);
 		setSelectedFiles([]);
 		setIngredientInput("");
 		setCategoryInput("");
@@ -219,7 +223,7 @@ const CreateCocktail = () => {
 		},
 	};
 
-	// Si se creó un coctel, mostrar la card
+	// Si se creó una bebida, mostrar la card
 	if (createdCocktail) {
 		return (
 			<div className="max-w-4xl mx-auto p-6">
@@ -254,14 +258,14 @@ const CreateCocktail = () => {
 								<span className="text-green-600 text-2xl">✓</span>
 							</motion.div>
 							<h2 className="text-2xl font-bold text-green-900 mb-2">
-								¡Cóctel Creado!
+								¡Bebida Creada!
 							</h2>
 							<p className="text-gray-600">
-								Tu cóctel ha sido creado exitosamente
+								Tu bebida ha sido creada exitosamente
 							</p>
 						</div>
 
-						{/* Card del coctel */}
+						{/* Card de la bebida */}
 						<div className="mb-6">
 							<PreviewCardCocktail cocktail={createdCocktail} />
 						</div>
@@ -274,7 +278,7 @@ const CreateCocktail = () => {
 								onClick={handleViewCocktails}
 								className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-900 transition-colors font-medium"
 							>
-								Ver Todos los Cócteles
+								Ver Todas las Bebidas
 							</motion.button>
 							<motion.button
 								whileHover={{ scale: 1.02 }}
@@ -290,7 +294,7 @@ const CreateCocktail = () => {
 								onClick={handleCreateAnother}
 								className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
 							>
-								Crear Otro Cóctel
+								Crear Otra Bebida
 							</motion.button>
 						</div>
 					</motion.div>
@@ -329,10 +333,10 @@ const CreateCocktail = () => {
 						<FiEdit3 className="text-green-600 text-3xl" />
 					</motion.div>
 					<h1 className="text-4xl font-bold text-green-900 mb-2">
-						Crear Nuevo Cóctel
+						Crear Nueva Bebida
 					</h1>
 					<p className="text-gray-600 text-lg">
-						Completa la información para crear tu cóctel personalizado
+						Completa la información para crear tu bebida
 					</p>
 				</div>
 
@@ -350,7 +354,7 @@ const CreateCocktail = () => {
 							<div className="space-y-2">
 								<label className="flex items-center text-gray-700 font-semibold">
 									<FiEdit3 className="mr-2 text-green-600" />
-									Nombre del Cóctel
+									Nombre de la Bebida
 								</label>
 								<input
 									type="text"

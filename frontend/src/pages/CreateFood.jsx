@@ -24,7 +24,10 @@ const CreateFood = () => {
 	const [ingredients, setIngredients] = useState([]);
 	const [ingredientInput, setIngredientInput] = useState("");
 	const [ingredientSuggestions, setIngredientSuggestions] = useState([]);
-	const [categories, setCategories] = useState([]);
+	// Incluye automáticamente la clasificación base para comida
+	const [categories, setCategories] = useState([
+		{ name: "comida", type: "clasificacion comida" },
+	]);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
 	const [categoryType] = useState("clasificacion comida");
@@ -59,7 +62,7 @@ const CreateFood = () => {
 		setPrice("");
 		setDescription("");
 		setIngredients([]);
-		setCategories([]);
+		setCategories([{ name: "comida", type: "clasificacion comida" }]);
 		setSelectedFiles([]);
 		setIngredientInput("");
 		setCategoryInput("");

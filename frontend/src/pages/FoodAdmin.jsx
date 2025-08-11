@@ -310,107 +310,133 @@ const FoodAdmin = () => {
 						transition={{ duration: 0.2 }}
 						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
 					>
-						{paginated.map((it) => (
-							<div
-								key={it.id}
-								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
-							>
-								<div className="flex items-start justify-between gap-2">
-									<div>
-										<h3 className="text-lg font-semibold text-gray-900 capitalize">
-											{it.name}
-										</h3>
-										{(it.food_classification_name ||
-											it.clasificacion_name ||
-											it.classification ||
-											it.food_classification) && (
-											<span className="inline-flex text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full capitalize mt-1 mr-2">
-												{it.food_classification_name ||
-													it.clasificacion_name ||
-													it.classification ||
-													it.food_classification}
-											</span>
-										)}
-										{Array.isArray(it.categories) && it.categories[0] && (
-											<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize mt-1">
-												{typeof it.categories[0] === "string"
-													? it.categories[0]
-													: it.categories[0].name}
-											</span>
-										)}
-									</div>
-									<span
-										className={`text-xs px-2 py-1 rounded-full ${
-											it.is_active
-												? "bg-green-100 text-green-700"
-												: "bg-red-100 text-red-700"
-										}`}
-									>
-										{it.is_active ? "Activo" : "Inactivo"}
-									</span>
-								</div>
+						{paginated.map((it) => {
+							const classification =
+								it.food_classification_name ||
+								it.clasificacion_name ||
+								it.classification ||
+								it.food_classification ||
+								"";
+							const rawCats = Array.isArray(it.categories)
+								? it.categories.map((c) => (typeof c === "string" ? c : c.name))
+								: [];
+							const filteredCats = rawCats.filter(
+								(n) =>
+									n && n.toLowerCase() !== String(classification).toLowerCase()
+							);
+							const visibleCats = filteredCats.slice(0, 2);
+							const remainingCats = Math.max(
+								0,
+								filteredCats.length - visibleCats.length
+							);
 
-								<div className="flex items-center justify-between mt-3">
-									<div className="text-sm text-gray-800 font-semibold">
-										${Number(it.price).toLocaleString("es-CO")}
-									</div>
-								</div>
-								{Array.isArray(it.ingredients) && it.ingredients.length > 0 && (
-									<div className="mt-3">
-										<div className="text-xs text-gray-500 mb-1">
-											Ingredientes:
-										</div>
-										<div className="flex flex-wrap gap-1">
-											{it.ingredients.slice(0, 3).map((ing, idx) => (
-												<span
-													key={idx}
-													className="text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize"
-												>
-													{typeof ing === "string" ? ing : ing.name}
+							return (
+								<div
+									key={it.id}
+									className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+								>
+									<div className="flex items-start justify-between gap-2">
+										<div>
+											<h3 className="text-lg font-semibold text-gray-900 capitalize">
+												{it.name}
+											</h3>
+											{classification && (
+												<span className="inline-flex text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full capitalize mt-1 mr-2">
+													{classification}
 												</span>
-											))}
-											{it.ingredients.length > 3 && (
-												<span className="text-[11px] text-gray-500">
-													+{it.ingredients.length - 3} más
+											)}
+											{visibleCats.length > 0 && (
+												<span className="inline-flex flex-wrap gap-1 mt-1">
+													{visibleCats.map((c) => (
+														<span
+															key={c}
+															className="text-[11px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full capitalize"
+														>
+															{c}
+														</span>
+													))}
+													{remainingCats > 0 && (
+														<span className="text-[11px] text-gray-500">
+															+{remainingCats} más
+														</span>
+													)}
 												</span>
 											)}
 										</div>
-									</div>
-								)}
-
-								<div className="flex items-center justify-between mt-4">
-									<button
-										onClick={() => openDetailModal(it)}
-										className="inline-flex items-center text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium px-3 py-1.5 rounded-full"
-									>
-										<FiSearch className="mr-1" /> Ver
-									</button>
-									<div className="flex items-center gap-2">
-										<button
-											onClick={() => openEditModal(it)}
-											className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
-										>
-											<FiEdit className="mr-1" /> Editar
-										</button>
-										<button
-											onClick={() => openManageModal(it)}
-											className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
+										<span
+											className={`text-xs px-2 py-1 rounded-full ${
 												it.is_active
-													? "text-red-700 bg-red-50 hover:bg-red-100"
-													: "text-green-800 bg-green-50 hover:bg-green-100"
+													? "bg-green-100 text-green-700"
+													: "bg-red-100 text-red-700"
 											}`}
 										>
-											{it.is_active ? (
-												<FiEyeOff className="mr-1" />
-											) : (
-												<FiEye className="mr-1" />
-											)}{" "}
-											{it.is_active ? "Desactivar" : "Activar"}
+											{it.is_active ? "Activo" : "Inactivo"}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between mt-3">
+										<div className="text-base text-gray-900 font-semibold">
+											${Number(it.price).toLocaleString("es-CO")}
+										</div>
+									</div>
+									{Array.isArray(it.ingredients) &&
+										it.ingredients.length > 0 && (
+											<div className="mt-3">
+												<div className="text-xs text-gray-500 mb-1">
+													Ingredientes:
+												</div>
+												<div className="flex flex-wrap gap-1">
+													{it.ingredients.slice(0, 3).map((ing, idx) => (
+														<span
+															key={idx}
+															className="text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize"
+														>
+															{typeof ing === "string" ? ing : ing.name}
+														</span>
+													))}
+													{it.ingredients.length > 3 && (
+														<span className="text-[11px] text-gray-500">
+															+{it.ingredients.length - 3} más
+														</span>
+													)}
+												</div>
+											</div>
+										)}
+
+									<div className="flex items-center justify-between mt-4">
+										<button
+											onClick={() => openDetailModal(it)}
+											className="inline-flex items-center text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium px-3 py-1.5 rounded-full"
+										>
+											<FiSearch className="mr-1" /> Ver
 										</button>
+										<div className="flex items-center gap-2">
+											<button
+												onClick={() => openEditModal(it)}
+												className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+											>
+												<FiEdit className="mr-1" /> Editar
+											</button>
+											<button
+												onClick={() => openManageModal(it)}
+												className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
+													it.is_active
+														? "text-red-700 bg-red-50 hover:bg-red-100"
+														: "text-green-800 bg-green-50 hover:bg-green-100"
+												}`}
+											>
+												{it.is_active ? (
+													<FiEyeOff className="mr-1" />
+												) : (
+													<FiEye className="mr-1" />
+												)}{" "}
+												{it.is_active ? "Desactivar" : "Activar"}
+											</button>
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</Motion.div>
 				)}
 
