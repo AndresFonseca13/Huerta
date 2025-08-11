@@ -11,22 +11,38 @@ const AdminPanel = () => {
 	const [totalCocktails, setTotalCocktails] = useState(0);
 	const [activeCocktails, setActiveCocktails] = useState(0);
 	const [categoriesCount, setCategoriesCount] = useState(0);
+	const [totalFood, setTotalFood] = useState(0);
+	const [activeFood, setActiveFood] = useState(0);
+	const [foodClassifications, setFoodClassifications] = useState(0);
 
 	useEffect(() => {
 		const fetch = async () => {
 			try {
-				const res = await getProductsAdmin(1, 200, null, "destilado");
-				const list = res.cocteles || [];
-				setTotalCocktails(list.length);
-				setActiveCocktails(list.filter((c) => c.is_active).length);
+				const [resCocktails, resFood] = await Promise.all([
+					getProductsAdmin(1, 200, null, "destilado"),
+					getProductsAdmin(1, 200, null, "clasificacion"),
+				]);
+				const cocktails = resCocktails.cocteles || [];
+				setTotalCocktails(cocktails.length);
+				setActiveCocktails(cocktails.filter((c) => c.is_active).length);
 				const cats = new Set(
-					list.flatMap((c) =>
+					cocktails.flatMap((c) =>
 						(c.categories || []).map((cat) =>
 							typeof cat === "string" ? cat : cat.name
 						)
 					)
 				);
 				setCategoriesCount(cats.size);
+
+				const food = resFood.cocteles || [];
+				setTotalFood(food.length);
+				setActiveFood(food.filter((c) => c.is_active).length);
+				const classifs = new Set(
+					food
+						.map((f) => f.food_classification_name)
+						.filter((v) => typeof v === "string" && v.trim().length > 0)
+				);
+				setFoodClassifications(classifs.size);
 			} catch (e) {
 				// silent, we can add a toast later
 			} finally {
@@ -55,14 +71,34 @@ const AdminPanel = () => {
 					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
 						<div className="flex items-center justify-between">
 							<h3 className="font-semibold text-gray-900">Food Items</h3>
-							<span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full">
-								Soon
+							<span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
+								Live
 							</span>
 						</div>
 						<div className="mt-4 space-y-2 text-sm text-gray-700">
-							<SkeletonRow loading={true} label="Total Items" value="3" />
-							<SkeletonRow loading={true} label="Available" value="2" />
-							<SkeletonRow loading={true} label="Vegetarian" value="2" />
+							<SkeletonRow
+								loading={loading}
+								label="Total Items"
+								value={totalFood}
+							/>
+							<SkeletonRow
+								loading={loading}
+								label="Available"
+								value={activeFood}
+							/>
+							<SkeletonRow
+								loading={loading}
+								label="Classifications"
+								value={foodClassifications}
+							/>
+						</div>
+						<div className="mt-4">
+							<button
+								onClick={() => navigate("/admin/food")}
+								className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+							>
+								Go to Food
+							</button>
 						</div>
 					</div>
 

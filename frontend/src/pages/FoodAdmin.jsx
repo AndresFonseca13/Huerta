@@ -1,179 +1,139 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getProductsAdmin } from "../services/productService.js";
-// Quitamos BackButton: navegación persiste en el layout
+import { motion as Motion } from "framer-motion";
+import {
+	FiEdit,
+	FiSearch,
+	FiTrash2,
+	FiCheckCircle,
+	FiEye,
+	FiEyeOff,
+	FiPlus,
+} from "react-icons/fi";
+import { getProductsAdmin } from "../services/productService";
 import EditCocktailModal from "../components/EditCocktailModal";
 import ManageCocktailModal from "../components/ManageCocktailModal";
 import CocktailDetailModal from "../components/CocktailDetailModal";
-import PreviewCardCocktail from "../components/PreviewCardCocktail";
-import { motion as Motion, AnimatePresence } from "framer-motion";
-import {
-	FiEdit,
-	FiTrash2,
-	FiEye,
-	FiEyeOff,
-	FiMoreVertical,
-	FiSearch,
-	FiX,
-	FiChevronUp,
-	FiChevronDown,
-	FiPlus,
-} from "react-icons/fi";
 
-const CocktailsAdmin = () => {
+const FoodAdmin = () => {
 	const navigate = useNavigate();
-	const [cocktails, setCocktails] = useState([]);
+
+	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [selectedCocktail, setSelectedCocktail] = useState(null);
+	const [selected, setSelected] = useState(null);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 	const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-	// const [expandedRowId, setExpandedRowId] = useState(null);
-	const [sortBy] = useState(null);
-	const [sortOrder] = useState("asc");
+
 	const [categoryFilter, setCategoryFilter] = useState(null);
 	const [statusFilter, setStatusFilter] = useState(null); // 'active' | 'inactive' | null
 	const [searchTerm, setSearchTerm] = useState("");
+
 	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 12;
 	const listTopRef = useRef(null);
 
 	useEffect(() => {
-		const fetchCocktails = async () => {
+		const fetchFood = async () => {
 			try {
-				const response = await getProductsAdmin(1, 50, null, "destilado");
-				setCocktails(response.cocteles || []);
+				const response = await getProductsAdmin(1, 100, null, "clasificacion");
+				setItems(response.cocteles || []); // backend mantiene clave 'cocteles'
 			} catch {
-				setError("No se pudieron cargar los cócteles.");
+				setError("No se pudieron cargar los productos de comida.");
 			} finally {
 				setLoading(false);
 			}
 		};
-		fetchCocktails();
+		fetchFood();
 	}, []);
 
-	const refreshCocktails = async () => {
+	const refresh = async () => {
 		setLoading(true);
 		try {
-			const response = await getProductsAdmin(1, 50, null, "destilado");
-			setCocktails(response.cocteles || []);
+			const response = await getProductsAdmin(1, 100, null, "clasificacion");
+			setItems(response.cocteles || []);
 		} catch {
-			setError("No se pudieron cargar los cócteles.");
+			setError("No se pudieron cargar los productos de comida.");
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const openEditModal = (cocktail) => {
-		setSelectedCocktail(cocktail);
+	const openEditModal = (it) => {
+		setSelected(it);
 		setIsEditModalOpen(true);
 	};
 	const closeEditModal = () => {
 		setIsEditModalOpen(false);
-		setSelectedCocktail(null);
+		setSelected(null);
 	};
-	const openManageModal = (cocktail) => {
-		setSelectedCocktail(cocktail);
+	const openManageModal = (it) => {
+		setSelected(it);
 		setIsManageModalOpen(true);
 	};
 	const closeManageModal = () => {
 		setIsManageModalOpen(false);
-		setSelectedCocktail(null);
+		setSelected(null);
 	};
-	const openDetailModal = (cocktail) => {
-		setSelectedCocktail(cocktail);
+	const openDetailModal = (it) => {
+		setSelected(it);
 		setIsDetailModalOpen(true);
 	};
 	const closeDetailModal = () => {
 		setIsDetailModalOpen(false);
-		setSelectedCocktail(null);
+		setSelected(null);
 	};
 	const handleUpdateSuccess = () => {
 		closeEditModal();
 		closeManageModal();
-		refreshCocktails();
+		refresh();
 	};
-	// const toggleRow = (id) => {
-	//     setExpandedRowId((prevId) => (prevId === id ? null : id));
-	// };
 
-	// Siempre calcular hooks antes de cualquier return condicional
-	// Obtener categorías únicas (solo destilado)
-	const uniqueCategories = useMemo(() => {
+	// Clasificaciones únicas (Entrada, Postre, Fuerte, ...)
+	const uniqueClassifications = useMemo(() => {
 		return Array.from(
 			new Set(
-				cocktails.flatMap((c) =>
-					(c.categories || []).map((cat) =>
-						typeof cat === "string" ? cat : cat.name
-					)
-				)
+				items
+					.map((c) => c.food_classification_name)
+					.filter((v) => typeof v === "string" && v.trim().length > 0)
 			)
 		);
-	}, [cocktails]);
+	}, [items]);
 
-	// const formatCategories = (categories) => {
-	//     if (!categories || categories.length === 0) {
-	//         return <span className="text-gray-400">Sin categorías</span>;
-	//     }
-	//     return categories.map((cat, index) => {
-	//         const categoryName = typeof cat === "string" ? cat : cat.name;
-	//         return (
-	//             <span
-	//                 key={index}
-	//                 className="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full"
-	//             >
-	//                 {categoryName}
-	//             </span>
-	//         );
-	//     });
-	// };
+	// KPIs
+	const total = items.length;
+	const activos = items.filter((c) => c.is_active).length;
+	const inactivos = total - activos;
 
-	// Función para filtrar por letras en cualquier orden
-	function matchesAllLetters(name, search) {
+	// Filtrado
+	const matchesAllLetters = (name, search) => {
 		if (!search) return true;
-		const nameLower = name.toLowerCase();
+		const nameLower = (name || "").toLowerCase();
 		return search
 			.toLowerCase()
 			.split("")
-			.every((char) => nameLower.includes(char));
-	}
+			.every((ch) => nameLower.includes(ch));
+	};
 
-	// Lógica de filtrado y ordenamiento
-	let filtered = [...cocktails];
+	let filtered = [...items];
 	if (categoryFilter)
-		filtered = filtered.filter((cocktail) =>
-			(cocktail.categories || []).some(
+		filtered = filtered.filter((it) => {
+			const byClassification =
+				(it.food_classification_name || "").toLowerCase() ===
+				String(categoryFilter).toLowerCase();
+			const byCategory = (it.categories || []).some(
 				(cat) => (typeof cat === "string" ? cat : cat.name) === categoryFilter
-			)
-		);
-	if (statusFilter === "active") {
-		filtered = filtered.filter((c) => c.is_active);
-	} else if (statusFilter === "inactive") {
+			);
+			return byClassification || byCategory;
+		});
+	if (statusFilter === "active") filtered = filtered.filter((c) => c.is_active);
+	else if (statusFilter === "inactive")
 		filtered = filtered.filter((c) => !c.is_active);
-	}
 	if (searchTerm)
-		filtered = filtered.filter((cocktail) =>
-			matchesAllLetters(cocktail.name, searchTerm)
-		);
-	if (sortBy === "name") {
-		filtered.sort((a, b) => {
-			if (a.name.toLowerCase() < b.name.toLowerCase())
-				return sortOrder === "asc" ? -1 : 1;
-			if (a.name.toLowerCase() > b.name.toLowerCase())
-				return sortOrder === "asc" ? 1 : -1;
-			return 0;
-		});
-	}
-	if (sortBy === "price") {
-		filtered.sort((a, b) => {
-			if (a.price < b.price) return sortOrder === "asc" ? -1 : 1;
-			if (a.price > b.price) return sortOrder === "asc" ? 1 : -1;
-			return 0;
-		});
-	}
+		filtered = filtered.filter((it) => matchesAllLetters(it.name, searchTerm));
 
-	// Paginación cliente
+	// Paginación
 	const totalItems = filtered.length;
 	const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 	const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -181,7 +141,6 @@ const CocktailsAdmin = () => {
 	const endIdx = startIdx + pageSize;
 	const paginated = filtered.slice(startIdx, endIdx);
 
-	// Scroll al top al cambiar página
 	useEffect(() => {
 		if (listTopRef.current) {
 			try {
@@ -216,32 +175,7 @@ const CocktailsAdmin = () => {
 		);
 	}
 
-	if (error) {
-		return <div className="p-8 text-center text-red-500">{error}</div>;
-	}
-
-	// Handlers de encabezados
-	// const handleSortByName = () => {
-	//     if (sortBy !== "name") {
-	//         setSortBy("name");
-	//         setSortOrder("asc");
-	//     } else {
-	//         setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-	//     }
-	// };
-	// const handleSortByPrice = () => {
-	//     if (sortBy !== "price") {
-	//         setSortBy("price");
-	//         setSortOrder("asc");
-	//     } else {
-	//         setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-	//     }
-	// };
-
-	// KPIs simples
-	const total = cocktails.length;
-	const activos = cocktails.filter((c) => c.is_active).length;
-	const inactivos = total - activos;
+	if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
 	return (
 		<div className="p-4 md:p-8 bg-gray-50 min-h-screen">
@@ -254,10 +188,10 @@ const CocktailsAdmin = () => {
 							transition={{ duration: 0.35 }}
 						>
 							<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
-								Gestión de Cócteles
+								Gestión de Comida
 							</h1>
 							<p className="text-gray-600">
-								Administra los cócteles del sistema
+								Administra los productos de comida
 							</p>
 						</Motion.div>
 						<div className="mt-4 md:mt-0">
@@ -265,8 +199,7 @@ const CocktailsAdmin = () => {
 								onClick={() => navigate("/admin/create")}
 								className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
 							>
-								<FiPlus className="mr-2" />
-								Crear Cóctel
+								<FiPlus className="mr-2" /> Crear Producto
 							</button>
 						</div>
 					</div>
@@ -315,9 +248,9 @@ const CocktailsAdmin = () => {
 							</div>
 						</Motion.div>
 					</div>
-					{/* Eliminamos dropdown móvil; ahora usamos píldoras con scroll arriba */}
 				</div>
 			</header>
+
 			<main>
 				{/* Buscador y filtros */}
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -327,11 +260,11 @@ const CocktailsAdmin = () => {
 							type="text"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							placeholder="Buscar cóctel..."
+							placeholder="Buscar producto..."
 							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
 						/>
 					</div>
-					{/* Píldoras de categorías (desktop y mobile) */}
+					{/* Píldoras de clasificación/categorías */}
 					<div className="w-full sm:flex-1">
 						<div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
 							<button
@@ -344,7 +277,7 @@ const CocktailsAdmin = () => {
 							>
 								Todas
 							</button>
-							{uniqueCategories.map((cat) => (
+							{uniqueClassifications.map((cat) => (
 								<button
 									key={cat}
 									onClick={() => setCategoryFilter(cat)}
@@ -361,13 +294,13 @@ const CocktailsAdmin = () => {
 					</div>
 				</div>
 
-				{/* Ancla para scroll al top de la lista */}
+				{/* ancla lista */}
 				<div ref={listTopRef} />
 
-				{/* Grid de mini-cards estilo admin con paginación */}
+				{/* Grid de cards */}
 				{filtered.length === 0 ? (
 					<div className="p-10 text-center text-gray-400 bg-white rounded-xl">
-						No hay cócteles para mostrar.
+						No hay productos para mostrar.
 					</div>
 				) : (
 					<Motion.div
@@ -377,122 +310,100 @@ const CocktailsAdmin = () => {
 						transition={{ duration: 0.2 }}
 						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
 					>
-						{paginated.map((cocktail) => (
+						{paginated.map((it) => (
 							<div
-								key={cocktail.id}
+								key={it.id}
 								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
 							>
 								<div className="flex items-start justify-between gap-2">
 									<div>
 										<h3 className="text-lg font-semibold text-gray-900 capitalize">
-											{cocktail.name}
+											{it.name}
 										</h3>
-										<p className="text-sm text-gray-600 line-clamp-2 mt-1">
-											{cocktail.description}
-										</p>
+										{(it.clasificacion_name ||
+											it.classification ||
+											it.food_classification) && (
+											<span className="inline-flex text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full capitalize mt-1 mr-2">
+												{it.clasificacion_name ||
+													it.classification ||
+													it.food_classification}
+											</span>
+										)}
+										{Array.isArray(it.categories) && it.categories[0] && (
+											<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize mt-1">
+												{typeof it.categories[0] === "string"
+													? it.categories[0]
+													: it.categories[0].name}
+											</span>
+										)}
 									</div>
 									<span
 										className={`text-xs px-2 py-1 rounded-full ${
-											cocktail.is_active
+											it.is_active
 												? "bg-green-100 text-green-700"
 												: "bg-red-100 text-red-700"
 										}`}
 									>
-										{cocktail.is_active ? "Activo" : "Inactivo"}
+										{it.is_active ? "Activo" : "Inactivo"}
 									</span>
-								</div>
-
-								<div className="flex items-center gap-2 mt-3">
-									{cocktail.destilado_name && (
-										<span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize">
-											{cocktail.destilado_name}
-										</span>
-									)}
-									{Array.isArray(cocktail.categories) &&
-										(() => {
-											const dest = (
-												cocktail.destilado_name || ""
-											).toLowerCase();
-											const names = (cocktail.categories || [])
-												.map((c) => (typeof c === "string" ? c : c.name))
-												.filter(Boolean);
-											const dedup = Array.from(new Set(names))
-												.filter((n) => n.toLowerCase() !== dest)
-												.slice(0, 2);
-											return dedup.map((name, idx) => (
-												<span
-													key={idx}
-													className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full capitalize"
-												>
-													{name}
-												</span>
-											));
-										})()}
 								</div>
 
 								<div className="flex items-center justify-between mt-3">
 									<div className="text-sm text-gray-800 font-semibold">
-										${Number(cocktail.price).toLocaleString("es-CO")}
+										${Number(it.price).toLocaleString("es-CO")}
 									</div>
-									{cocktail.alcohol_percentage != null && (
-										<div className="text-xs text-orange-600 font-medium">
-											{cocktail.alcohol_percentage}%
-										</div>
-									)}
 								</div>
-
-								{Array.isArray(cocktail.ingredients) &&
-									cocktail.ingredients.length > 0 && (
-										<div className="mt-3">
-											<div className="text-xs text-gray-500 mb-1">
-												Ingredientes:
-											</div>
-											<div className="flex flex-wrap gap-1">
-												{cocktail.ingredients.slice(0, 3).map((ing, idx) => (
-													<span
-														key={idx}
-														className="text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize"
-													>
-														{typeof ing === "string" ? ing : ing.name}
-													</span>
-												))}
-												{cocktail.ingredients.length > 3 && (
-													<span className="text-[11px] text-gray-500">
-														+{cocktail.ingredients.length - 3} más
-													</span>
-												)}
-											</div>
+								{Array.isArray(it.ingredients) && it.ingredients.length > 0 && (
+									<div className="mt-3">
+										<div className="text-xs text-gray-500 mb-1">
+											Ingredientes:
 										</div>
-									)}
+										<div className="flex flex-wrap gap-1">
+											{it.ingredients.slice(0, 3).map((ing, idx) => (
+												<span
+													key={idx}
+													className="text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize"
+												>
+													{typeof ing === "string" ? ing : ing.name}
+												</span>
+											))}
+											{it.ingredients.length > 3 && (
+												<span className="text-[11px] text-gray-500">
+													+{it.ingredients.length - 3} más
+												</span>
+											)}
+										</div>
+									</div>
+								)}
 
 								<div className="flex items-center justify-between mt-4">
 									<button
-										onClick={() => openDetailModal(cocktail)}
+										onClick={() => openDetailModal(it)}
 										className="inline-flex items-center text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium px-3 py-1.5 rounded-full"
 									>
 										<FiSearch className="mr-1" /> Ver
 									</button>
 									<div className="flex items-center gap-2">
 										<button
-											onClick={() => openEditModal(cocktail)}
+											onClick={() => openEditModal(it)}
 											className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 										>
 											<FiEdit className="mr-1" /> Editar
 										</button>
 										<button
-											onClick={() => openManageModal(cocktail)}
+											onClick={() => openManageModal(it)}
 											className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
-												cocktail.is_active
+												it.is_active
 													? "text-red-700 bg-red-50 hover:bg-red-100"
 													: "text-green-800 bg-green-50 hover:bg-green-100"
 											}`}
 										>
-											{cocktail.is_active ? (
+											{it.is_active ? (
 												<FiEyeOff className="mr-1" />
 											) : (
 												<FiEye className="mr-1" />
 											)}{" "}
-											{cocktail.is_active ? "Desactivar" : "Activar"}
+											{it.is_active ? "Desactivar" : "Activar"}
 										</button>
 									</div>
 								</div>
@@ -525,34 +436,27 @@ const CocktailsAdmin = () => {
 					</div>
 				)}
 			</main>
-			{/* Modales */}
+
+			{/* Modales reutilizados */}
 			<EditCocktailModal
-				cocktail={selectedCocktail}
+				cocktail={selected}
 				isOpen={isEditModalOpen}
 				onClose={closeEditModal}
 				onUpdateSuccess={handleUpdateSuccess}
 			/>
 			<ManageCocktailModal
-				cocktail={selectedCocktail}
+				cocktail={selected}
 				isOpen={isManageModalOpen}
 				onClose={closeManageModal}
 				onUpdateSuccess={handleUpdateSuccess}
 			/>
 			<CocktailDetailModal
-				cocktail={selectedCocktail}
+				cocktail={selected}
 				isOpen={isDetailModalOpen}
 				onClose={closeDetailModal}
 			/>
-			{/* Modal de vista previa usando PreviewCardCocktail */}
-			{isDetailModalOpen && selectedCocktail && (
-				<PreviewCardCocktail
-					cocktail={selectedCocktail}
-					isModal={true}
-					onClose={closeDetailModal}
-				/>
-			)}
 		</div>
 	);
 };
 
-export default CocktailsAdmin;
+export default FoodAdmin;

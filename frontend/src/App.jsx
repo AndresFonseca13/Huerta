@@ -9,6 +9,7 @@ import AdminLayout from "./layouts/AdminLayout.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import CocktailsAdmin from "./pages/CocktailsAdmin";
+import FoodAdmin from "./pages/FoodAdmin.jsx";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
 import Footer from "./components/Footer.jsx";
 
@@ -56,6 +57,7 @@ function App() {
 					<Route index element={<AdminPanel />} />
 					<Route path="cocktails" element={<CocktailsAdmin />} />
 					<Route path="categories" element={<CategoriesAdmin />} />
+					<Route path="food" element={<FoodAdmin />} />
 					<Route path="create" element={<CreateCocktail />} />
 				</Route>
 			</Routes>

@@ -62,6 +62,12 @@ const AdminLayout = () => {
 									onClick={() => navigate("/admin/cocktails")}
 								/>
 								<SidebarItem
+									active={is("/admin/food")}
+									icon={FiTag}
+									label="Food"
+									onClick={() => navigate("/admin/food")}
+								/>
+								<SidebarItem
 									active={is("/admin/categories")}
 									icon={FiTag}
 									label="Categories"
