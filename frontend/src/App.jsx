@@ -17,12 +17,15 @@ import Footer from "./components/Footer.jsx";
 function App() {
 	const location = useLocation();
 	// Rutas donde SÍ debe aparecer el Footer
-	const showFooter = ["/", "/login", "/cocteles", "/comida"].some((path) => {
+	const showFooter = ["/", "/login", "/bebidas", "/comida"].some((path) => {
 		if (path === "/cocteles" || path === "/comida") {
 			return (
-				location.pathname === path ||
-				location.pathname.startsWith("/cocteles/") ||
-				location.pathname.startsWith("/comida/")
+				location.pathname === path || location.pathname.startsWith("/comida/")
+			);
+		}
+		if (path === "/bebidas") {
+			return (
+				location.pathname === path || location.pathname.startsWith("/bebidas/")
 			);
 		}
 		return location.pathname === path;
@@ -32,7 +35,7 @@ function App() {
 		<>
 			<ConditionalNavbar />
 			<Routes>
-				<Route path="/" element={<Navigate to="/cocteles" replace />} />
+				<Route path="/" element={<Navigate to="/bebidas" replace />} />
 				<Route path="/login" element={<Login />} />
 				<Route
 					path="/admin/create"
@@ -42,8 +45,8 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route path="/cocteles" element={<FilteredCocktails />} />
-				<Route path="/cocteles/:categoria" element={<FilteredCocktails />} />
+				<Route path="/bebidas" element={<FilteredCocktails />} />
+				<Route path="/bebidas/:categoria" element={<FilteredCocktails />} />
 				<Route path="/comida" element={<FilteredCocktails />} />
 				<Route path="/comida/:categoria" element={<FilteredCocktails />} />
 				<Route path="/admin/login" element={<AdminLogin />} />
@@ -56,7 +59,7 @@ function App() {
 					}
 				>
 					<Route index element={<AdminPanel />} />
-					<Route path="cocktails" element={<CocktailsAdmin />} />
+					<Route path="beverages" element={<CocktailsAdmin />} />
 					<Route path="categories" element={<CategoriesAdmin />} />
 					<Route path="food" element={<FoodAdmin />} />
 					<Route path="create" element={<CreateCocktail />} />

@@ -14,7 +14,7 @@ const CategoryFilterBar = () => {
 
 	// Determinar el tipo basado en la ruta actual
 	const initialTipo = useMemo(() => {
-		if (location.pathname.startsWith("/cocteles")) return "destilado";
+		if (location.pathname.startsWith("/bebidas")) return "destilado";
 		if (location.pathname.startsWith("/comida")) return "clasificacion";
 		return "destilado"; // predeterminado
 	}, [location.pathname]);
@@ -67,25 +67,49 @@ const CategoryFilterBar = () => {
 	const handleTipoChange = (nuevoTipo) => {
 		setTipo(nuevoTipo);
 		// Ir a la ruta base del tipo seleccionado
-		if (nuevoTipo === "destilado") {
-			navigate("/cocteles");
-		} else {
-			navigate("/comida");
-		}
+		if (nuevoTipo === "destilado") navigate("/bebidas");
+		else navigate("/comida");
+		// Scroll al inicio tras el cambio
+		try {
+			requestAnimationFrame(() => {
+				if (document?.scrollingElement) {
+					document.scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
+				} else {
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				}
+			});
+		} catch (_) {}
 		setIsFabOpen(false);
 	};
 
 	const handleSelectCategoria = (nombreCategoria) => {
 		if (!nombreCategoria) {
-			// "Todos"
-			navigate(tipo === "destilado" ? "/cocteles" : "/comida");
+			navigate(tipo === "destilado" ? "/bebidas" : "/comida");
+			try {
+				requestAnimationFrame(() => {
+					if (document?.scrollingElement) {
+						document.scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
+					} else {
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}
+				});
+			} catch (_) {}
 			return;
 		}
 		navigate(
 			tipo === "destilado"
-				? `/cocteles/${nombreCategoria}`
+				? `/bebidas/${nombreCategoria}`
 				: `/comida/${nombreCategoria}`
 		);
+		try {
+			requestAnimationFrame(() => {
+				if (document?.scrollingElement) {
+					document.scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
+				} else {
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				}
+			});
+		} catch (_) {}
 	};
 
 	const isSelected = (name) => {
@@ -107,7 +131,7 @@ const CategoryFilterBar = () => {
 					<button
 						className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-colors shadow-sm ${
 							!categoria &&
-							(location.pathname === "/cocteles" ||
+							(location.pathname === "/bebidas" ||
 								location.pathname === "/comida")
 								? "bg-green-900 text-white border-green-900"
 								: "bg-white text-gray-800 border-gray-200 hover:bg-green-50"

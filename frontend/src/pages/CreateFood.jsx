@@ -117,7 +117,12 @@ const CreateFood = () => {
 			setCreatedItem({ ...result.product, images: imageUrls });
 			resetForm();
 		} catch (err) {
-			setError(err.message || "Error inesperado al crear el plato");
+			const msg = err?.response?.data?.mensaje || err.message;
+			if (err?.response?.status === 409) {
+				setError(msg || "El plato ya existe");
+			} else {
+				setError(msg || "Error inesperado al crear el plato");
+			}
 		} finally {
 			setIsCreating(false);
 		}

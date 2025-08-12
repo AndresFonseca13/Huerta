@@ -254,10 +254,10 @@ const CocktailsAdmin = () => {
 							transition={{ duration: 0.35 }}
 						>
 							<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
-								Gestión de Cócteles
+								Gestión de Bebidas
 							</h1>
 							<p className="text-gray-600">
-								Administra los cócteles del sistema
+								Administra las bebidas del sistema
 							</p>
 						</Motion.div>
 						<div className="mt-4 md:mt-0">
@@ -266,7 +266,7 @@ const CocktailsAdmin = () => {
 								className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
 							>
 								<FiPlus className="mr-2" />
-								Crear Cóctel
+								Crear Bebida
 							</button>
 						</div>
 					</div>
@@ -327,7 +327,7 @@ const CocktailsAdmin = () => {
 							type="text"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							placeholder="Buscar cóctel..."
+							placeholder="Buscar bebida..."
 							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
 						/>
 					</div>
@@ -367,7 +367,7 @@ const CocktailsAdmin = () => {
 				{/* Grid de mini-cards estilo admin con paginación */}
 				{filtered.length === 0 ? (
 					<div className="p-10 text-center text-gray-400 bg-white rounded-xl">
-						No hay cócteles para mostrar.
+						No hay bebidas para mostrar.
 					</div>
 				) : (
 					<Motion.div

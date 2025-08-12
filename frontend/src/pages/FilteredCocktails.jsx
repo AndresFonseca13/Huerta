@@ -20,8 +20,8 @@ const FilteredCocktails = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
-	// Determinar el tipo basado en la ruta (soporta "/cocteles" y "/cocteles/:categoria")
-	const tipo = location.pathname.startsWith("/cocteles")
+	// Determinar el tipo basado en la ruta (soporta "/bebidas" y "/comida")
+	const tipo = location.pathname.startsWith("/bebidas")
 		? "destilado"
 		: "clasificacion";
 
@@ -116,10 +116,10 @@ const FilteredCocktails = () => {
 
 	const getFilterTitle = () => {
 		if (!categoria) {
-			return tipo === "destilado" ? "Todos los cocteles" : "Toda la comida";
+			return tipo === "destilado" ? "Todas las bebidas" : "Toda la comida";
 		}
 		if (tipo === "destilado") {
-			return `Cocteles de ${categoria}`;
+			return `Bebidas de ${categoria}`;
 		} else if (tipo === "clasificacion") {
 			return `Comida de ${categoria}`;
 		}
@@ -142,7 +142,7 @@ const FilteredCocktails = () => {
 				<p className="text-gray-600">
 					{totalRecords > 0
 						? `Encontramos ${totalRecords} ${
-								tipo === "destilado" ? "cocteles" : "platos"
+								tipo === "destilado" ? "bebidas" : "platos"
 						  }`
 						: "No se encontraron resultados"}
 				</p>
@@ -171,7 +171,7 @@ const FilteredCocktails = () => {
 				>
 					<div className="text-sm text-gray-600">
 						Mostrando {cocktails.length} de {totalRecords}{" "}
-						{tipo === "destilado" ? "cocteles" : "platos"} (Página {currentPage}{" "}
+						{tipo === "destilado" ? "bebidas" : "platos"} (Página {currentPage}{" "}
 						de {totalPages})
 					</div>
 					<div className="flex justify-center space-x-2 overflow-x-auto">

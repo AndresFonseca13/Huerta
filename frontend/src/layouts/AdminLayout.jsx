@@ -62,6 +62,12 @@ const AdminLayout = () => {
 					>
 						Huerta
 					</span>
+					<button
+						onClick={handleLogout}
+						className="ml-auto lg:hidden inline-flex items-center px-3 py-1.5 rounded-md border border-white/60 text-white text-sm hover:bg-white/10"
+					>
+						Cerrar sesión
+					</button>
 				</div>
 			</div>
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 sm:pb-6">
@@ -80,10 +86,10 @@ const AdminLayout = () => {
 									onClick={() => navigate("/admin")}
 								/>
 								<SidebarItem
-									active={is("/admin/cocktails")}
+									active={is("/admin/beverages")}
 									icon={FiCoffee}
-									label="Cocktails"
-									onClick={() => navigate("/admin/cocktails")}
+									label="Bebidas"
+									onClick={() => navigate("/admin/beverages")}
 								/>
 								<SidebarItem
 									active={is("/admin/food")}
@@ -94,7 +100,7 @@ const AdminLayout = () => {
 								<SidebarItem
 									active={is("/admin/categories")}
 									icon={FiTag}
-									label="Categories"
+									label="Categorías"
 									onClick={() => navigate("/admin/categories")}
 								/>
 								<SidebarItem

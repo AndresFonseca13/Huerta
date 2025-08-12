@@ -156,7 +156,12 @@ const CreateCocktail = () => {
 			resetForm();
 		} catch (error) {
 			console.error("[CreateBeverage] Error:", error);
-			setError(error.message || "Error inesperado al crear el cóctel");
+			const msg = error?.response?.data?.mensaje || error.message;
+			if (error?.response?.status === 409) {
+				setError(msg || "La bebida ya existe");
+			} else {
+				setError(msg || "Error inesperado al crear la bebida");
+			}
 		} finally {
 			setIsCreating(false);
 		}

@@ -139,7 +139,7 @@ const AdminPanel = () => {
 						</div>
 						<div className="mt-4">
 							<button
-								onClick={() => navigate("/admin/cocktails")}
+								onClick={() => navigate("/admin/beverages")}
 								className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 							>
 								Ir a Bebidas
