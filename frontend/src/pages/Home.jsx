@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { getCocktails } from "../services/cocktailService";
+import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
 import CocktailDetailModal from "../components/CocktailDetailModal";
 
@@ -19,10 +20,9 @@ const Home = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
-				const { cocteles, paginacion } = await getCocktails(
-					currentPage,
-					pageSize
-				);
+				const response = await getProducts(currentPage, pageSize);
+				const { cocteles, paginacion } = response;
+
 				setCocktails(cocteles);
 				setTotalPages(paginacion.totalPages);
 				setTotalRecords(paginacion.totalRecords);
@@ -81,8 +81,6 @@ const Home = () => {
 			},
 		},
 	};
-
-	console.log("Cocktails en Home:", cocktails);
 
 	return (
 		<>

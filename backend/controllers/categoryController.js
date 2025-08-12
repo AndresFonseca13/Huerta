@@ -1,6 +1,5 @@
-const { ConflictError } = require("../errors/ConflictError");
-const categoryService = require("../services/category/index");
-const { v4: uuidv4 } = require("uuid");
+import { ConflictError } from "../errors/ConflictError.js";
+import * as categoryService from "../services/category/index.js";
 
 const createCategory = async (req, res) => {
 	const { name, type, is_active } = req.body;
@@ -69,6 +68,12 @@ const deleteCategory = async (req, res) => {
 const getAllCategories = async (req, res) => {
 	try {
 		const showAll = req.query.showAll === "true";
+		const onlyFood = req.query.onlyFood === "true";
+		if (onlyFood) {
+			const cats =
+				await categoryService.getFoodClassificationCategoriesService();
+			return res.status(200).json(cats);
+		}
 		const categories = await categoryService.getAllCategoriesService(showAll);
 		res.status(200).json(categories);
 	} catch (error) {
@@ -214,7 +219,7 @@ const setCategoryActive = async (req, res) => {
 	}
 };
 
-module.exports = {
+export {
 	createCategory,
 	deleteCategory,
 	getAllCategories,

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { loginAdmin } from "../services/authService";

@@ -7,10 +7,7 @@ import {
 	FiTrash2,
 	FiAlertTriangle,
 } from "react-icons/fi";
-import {
-	updateCocktailStatus,
-	deleteCocktail,
-} from "../services/cocktailService";
+import { updateProductStatus, deleteProduct } from "../services/productService";
 import ErrorModal from "./ErrorModal";
 
 const ManageCocktailModal = ({
@@ -43,7 +40,7 @@ const ManageCocktailModal = ({
 				originalIsActive: cocktail.is_active,
 			});
 
-			const result = await updateCocktailStatus(cocktail.id, newStatus);
+			const result = await updateProductStatus(cocktail.id, newStatus);
 
 			setIsSuccess(true);
 			setTimeout(() => {
@@ -63,7 +60,7 @@ const ManageCocktailModal = ({
 		setError(null);
 
 		try {
-			await deleteCocktail(cocktail.id);
+			await deleteProduct(cocktail.id);
 			setShowDeleteConfirm(false);
 			onUpdateSuccess(null); // null indica que se eliminó
 		} catch (err) {

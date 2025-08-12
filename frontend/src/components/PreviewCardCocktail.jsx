@@ -68,9 +68,14 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 									key={index}
 									className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
 								>
-									{typeof ingredient === "string"
-										? ingredient
-										: ingredient.name}
+									{(() => {
+										const value =
+											typeof ingredient === "string"
+												? ingredient
+												: ingredient.name;
+										if (!value) return value;
+										return value.charAt(0).toUpperCase() + value.slice(1);
+									})()}
 								</span>
 							))}
 						</div>

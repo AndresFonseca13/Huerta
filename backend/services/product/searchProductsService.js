@@ -1,4 +1,4 @@
-const pool = require("../../config/db");
+import pool from "../../config/db.js";
 
 const searchProductsService = async (searchTerm) => {
 	try {
@@ -41,7 +41,6 @@ const searchProductsService = async (searchTerm) => {
 
 		const result = await pool.query(query, [`%${searchTerm}%`]);
 
-		// Limpiar los resultados para manejar productos sin categorías o imágenes
 		const products = result.rows.map((product) => ({
 			...product,
 			categories: product.categories[0] === null ? [] : product.categories,
@@ -55,4 +54,4 @@ const searchProductsService = async (searchTerm) => {
 	}
 };
 
-module.exports = searchProductsService;
+export default searchProductsService;

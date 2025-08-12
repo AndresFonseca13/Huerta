@@ -1,16 +1,15 @@
-const express = require("express");
-const { uploadImage } = require("../controllers/uploadController");
-const authMiddleware = require("../middleware/authMiddleware");
-const { upload, handleMulterError } = require("../middleware/uploadMiddleware");
+import express from 'express';
+import { uploadImage } from '../controllers/uploadController.js';
+import { upload, handleMulterError } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
 router.post(
-	"/upload",
-	// authMiddleware,
-	upload.array("images", 5), // Permitir hasta 5 imágenes
-	handleMulterError,
-	uploadImage
+  '/upload',
+  // authMiddleware,
+  upload.array('images', 5), // Permitir hasta 5 imágenes
+  handleMulterError,
+  uploadImage,
 );
 
-module.exports = router;
+export default router;

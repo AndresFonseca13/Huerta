@@ -1,13 +1,14 @@
-require("dotenv").config();
-const express = require("express");
+import "dotenv/config";
+import express from "express";
+import productsRoutes from "./routes/products.routes.js";
+import categoriesRoutes from "./routes/categories.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import ingredientRoutes from "./routes/ingredients.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import cors from "cors";
+
 const app = express();
 const port = process.env.PORT || 3000;
-const coctelesRoutes = require("./routes/cocktails.routes");
-const categoriesRoutes = require("./routes/categories.routes");
-const authRoutes = require("./routes/auth.routes");
-const ingredientRoutes = require("./routes/ingredients.routes");
-const uploadRoutes = require("./routes/upload.routes");
-const cors = require("cors");
 
 // Esto habilita CORS para todos los dominios (en desarrollo está bien)
 app.use(cors());
@@ -16,14 +17,14 @@ app.use(cors());
 app.use(express.json());
 // app.use('/api/...') etc
 
-app.use("/cocktails", coctelesRoutes);
-app.use("/categories", categoriesRoutes);
-app.use("/auth", authRoutes);
-app.use("/ingredient", ingredientRoutes);
-app.use("/upload", uploadRoutes);
+app.use("/api/products", productsRoutes);
+app.use("/api/categories", categoriesRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/ingredient", ingredientRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.get("/bienvenido", (req, res) => {
-	mensaje = "Bienvenido a Huerta";
+	const mensaje = "Bienvenido a Huerta";
 	res.json({ mensaje });
 });
 

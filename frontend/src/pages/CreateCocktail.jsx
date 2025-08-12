@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { searchIngredients } from "../services/ingredientService.js";
 import { searchCategories } from "../services/categoryService.js";
-import { createCocktail, uploadImages } from "../services/cocktailService.js";
+import { uploadImages } from "../services/uploadService.js";
+import { createProduct } from "../services/productService.js";
 import {
 	FiTrash,
 	FiPlus,
@@ -19,27 +21,42 @@ import ErrorModal from "../components/ErrorModal";
 const CreateCocktail = () => {
 	const [name, setName] = useState("");
 	const [price, setPrice] = useState("");
+	const [alcoholPercentage, setAlcoholPercentage] = useState("");
 	const [description, setDescription] = useState("");
 	// Ingredientes
 	const [ingredients, setIngredients] = useState([]);
 	const [ingredientInput, setIngredientInput] = useState("");
 	const [ingredientSuggestions, setIngredientSuggestions] = useState([]);
 	// Categorías
-	const [categories, setCategories] = useState([]);
+	// Tipo por defecto para bebidas
+	const [categoryType] = useState("clasificacion");
+	// Incluir automáticamente la categoría base "bebida"
+	const [categories, setCategories] = useState([
+		{ name: "bebida", type: "clasificacion" },
+	]);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
-	const [categoryType] = useState("clasificacion");
 	// Imágenes
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	// Estado para mostrar el coctel creado
 	const [createdCocktail, setCreatedCocktail] = useState(null);
 	const [isCreating, setIsCreating] = useState(false);
 	const [error, setError] = useState(null);
+	const [showValidation, setShowValidation] = useState(false);
 
 	const navigate = useNavigate();
 
+	useEffect(() => {
+		try {
+			window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+		} catch (_err) {
+			// ignore
+		}
+	}, []);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log("[CreateBeverage] submit clicked");
 		setIsCreating(true);
 		setError(null);
 
@@ -70,18 +87,40 @@ const CreateCocktail = () => {
 			validationErrors.push("Debes seleccionar al menos una imagen");
 		}
 
+		// Validación de alcohol si fue diligenciado
+		if (alcoholPercentage !== "") {
+			const ap = Number(alcoholPercentage);
+			if (isNaN(ap) || ap < 0 || ap > 100) {
+				validationErrors.push(
+					"El porcentaje de alcohol debe estar entre 0 y 100"
+				);
+			}
+		}
+
 		// Si hay errores de validación, mostrarlos y no continuar
 		if (validationErrors.length > 0) {
 			setError(validationErrors.join(". "));
+			setShowValidation(true);
+			// Llevar el foco/scroll arriba para que el usuario vea el error
+			try {
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			} catch (_err) {
+				// ignore scroll errors
+			}
 			setIsCreating(false);
 			return;
 		}
 
 		try {
+			console.log(
+				"[CreateBeverage] starting uploadImages",
+				selectedFiles.length
+			);
 			// 1. Subir imágenes (solo si la validación pasó)
 			const imageUrls = await uploadImages(selectedFiles, name.trim());
+			console.log("[CreateBeverage] uploadImages OK", imageUrls);
 
-			// 2. Preparar objeto del cóctel
+			// 2. Preparar objeto de la bebida
 			const cocktailData = {
 				name: name.trim(),
 				price: parseFloat(price),
@@ -94,24 +133,35 @@ const CreateCocktail = () => {
 					name: cat.name,
 					type: cat.type,
 				})),
+				// Enviar solo si aplica
+				...(alcoholPercentage !== "" && {
+					alcohol_percentage: Number(alcoholPercentage),
+				}),
 			};
 
-			console.log("Datos del cóctel:", cocktailData);
+			console.log("Datos de la bebida:", cocktailData);
 
 			// 3. Crear cóctel
-			const result = await createCocktail(cocktailData);
+			console.log("[CreateBeverage] creating product...");
+			const result = await createProduct(cocktailData);
+			console.log("[CreateBeverage] createProduct OK", result);
 
 			// 4. Mostrar el coctel creado
 			setCreatedCocktail({
-				...result.cocktail,
+				...result.product,
 				images: imageUrls,
 			});
 
 			// 5. Limpiar el formulario
 			resetForm();
 		} catch (error) {
-			console.error("Error al crear el cóctel:", error.message);
-			setError(error.message);
+			console.error("[CreateBeverage] Error:", error);
+			const msg = error?.response?.data?.mensaje || error.message;
+			if (error?.response?.status === 409) {
+				setError(msg || "La bebida ya existe");
+			} else {
+				setError(msg || "Error inesperado al crear la bebida");
+			}
 		} finally {
 			setIsCreating(false);
 		}
@@ -122,7 +172,7 @@ const CreateCocktail = () => {
 		setPrice("");
 		setDescription("");
 		setIngredients([]);
-		setCategories([]);
+		setCategories([{ name: "bebida", type: "clasificacion" }]);
 		setSelectedFiles([]);
 		setIngredientInput("");
 		setCategoryInput("");
@@ -178,7 +228,7 @@ const CreateCocktail = () => {
 		},
 	};
 
-	// Si se creó un coctel, mostrar la card
+	// Si se creó una bebida, mostrar la card
 	if (createdCocktail) {
 		return (
 			<div className="max-w-4xl mx-auto p-6">
@@ -213,14 +263,14 @@ const CreateCocktail = () => {
 								<span className="text-green-600 text-2xl">✓</span>
 							</motion.div>
 							<h2 className="text-2xl font-bold text-green-900 mb-2">
-								¡Cóctel Creado!
+								¡Bebida Creada!
 							</h2>
 							<p className="text-gray-600">
-								Tu cóctel ha sido creado exitosamente
+								Tu bebida ha sido creada exitosamente
 							</p>
 						</div>
 
-						{/* Card del coctel */}
+						{/* Card de la bebida */}
 						<div className="mb-6">
 							<PreviewCardCocktail cocktail={createdCocktail} />
 						</div>
@@ -233,7 +283,7 @@ const CreateCocktail = () => {
 								onClick={handleViewCocktails}
 								className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-900 transition-colors font-medium"
 							>
-								Ver Todos los Cócteles
+								Ver Todas las Bebidas
 							</motion.button>
 							<motion.button
 								whileHover={{ scale: 1.02 }}
@@ -249,7 +299,7 @@ const CreateCocktail = () => {
 								onClick={handleCreateAnother}
 								className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
 							>
-								Crear Otro Cóctel
+								Crear Otra Bebida
 							</motion.button>
 						</div>
 					</motion.div>
@@ -288,10 +338,10 @@ const CreateCocktail = () => {
 						<FiEdit3 className="text-green-600 text-3xl" />
 					</motion.div>
 					<h1 className="text-4xl font-bold text-green-900 mb-2">
-						Crear Nuevo Cóctel
+						Crear Nueva Bebida
 					</h1>
 					<p className="text-gray-600 text-lg">
-						Completa la información para crear tu cóctel personalizado
+						Completa la información para crear tu bebida
 					</p>
 				</div>
 
@@ -309,7 +359,7 @@ const CreateCocktail = () => {
 							<div className="space-y-2">
 								<label className="flex items-center text-gray-700 font-semibold">
 									<FiEdit3 className="mr-2 text-green-600" />
-									Nombre del Cóctel
+									Nombre de la Bebida
 								</label>
 								<input
 									type="text"
@@ -332,6 +382,24 @@ const CreateCocktail = () => {
 									onChange={(e) => setPrice(e.target.value)}
 									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
 									placeholder="Ej. 8.50"
+								/>
+							</div>
+
+							{/* Porcentaje de alcohol (opcional) */}
+							<div className="space-y-2">
+								<label className="flex items-center text-gray-700 font-semibold">
+									<span className="mr-2 text-green-600">%</span>
+									Porcentaje de Alcohol (opcional)
+								</label>
+								<input
+									type="number"
+									min="0"
+									max="100"
+									step="0.1"
+									value={alcoholPercentage}
+									onChange={(e) => setAlcoholPercentage(e.target.value)}
+									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									placeholder="Ej. 40"
 								/>
 							</div>
 						</div>
@@ -586,10 +654,17 @@ const CreateCocktail = () => {
 								<FiImage className="mr-2 text-green-600" />
 								Imágenes
 							</label>
-							<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+							<div
+								className={`border-2 border-dashed rounded-lg p-6 text-center ${
+									showValidation && selectedFiles.length === 0
+										? "border-red-400 bg-red-50"
+										: "border-gray-300"
+								}`}
+							>
 								<input
 									type="file"
 									multiple
+									accept="image/*"
 									onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
 									className="hidden"
 									id="file-upload"
@@ -602,6 +677,11 @@ const CreateCocktail = () => {
 									<span>Selecciona o arrastra las imágenes aquí</span>
 								</label>
 							</div>
+							{showValidation && selectedFiles.length === 0 && (
+								<p className="text-sm text-red-600 mt-1">
+									Debes seleccionar al menos una imagen.
+								</p>
+							)}
 							<div className="grid grid-cols-3 gap-4 mt-4">
 								{selectedFiles.map((file, index) => (
 									<div key={index} className="relative">

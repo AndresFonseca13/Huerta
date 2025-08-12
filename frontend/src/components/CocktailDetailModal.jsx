@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiList, FiDollarSign } from "react-icons/fi";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import { FiX, FiList, FiDollarSign, FiTag } from "react-icons/fi";
+import { FaWineBottle } from "react-icons/fa6";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -21,6 +22,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 	if (!isOpen || !cocktail) return null;
 
 	const { name, price, description, images, ingredients } = cocktail;
+	const alcoholPct =
+		cocktail.alcohol_percentage ?? cocktail.alcoholPercentage ?? null;
+	const destilado = cocktail.destilado_name || null;
+	const foodClass = cocktail.food_classification_name || null;
 
 	console.log("Cocktail en modal:", cocktail);
 	console.log("Images en modal:", images);
@@ -32,7 +37,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 
 	return (
 		<AnimatePresence>
-			<motion.div
+			<Motion.div
 				className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
@@ -40,7 +45,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 				transition={{ duration: 0.3 }}
 				onClick={onClose}
 			>
-				<motion.div
+				<Motion.div
 					className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
 					initial={{
 						opacity: 0,
@@ -112,12 +117,24 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							/>
 						)}
 						<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-t-2xl" />
+						{/* Badges superpuestos */}
+						{(destilado || foodClass) && (
+							<div className="absolute top-3 left-3 bg-black/70 text-white text-xs font-semibold px-3 py-1 rounded-full capitalize">
+								{foodClass || destilado}
+							</div>
+						)}
+						{alcoholPct !== null && (
+							<div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+								<FaWineBottle className="opacity-90" />
+								{Number(alcoholPct).toFixed(0)}%
+							</div>
+						)}
 					</div>
 
 					{/* Contenido */}
 					<div className="p-6">
 						{/* Header */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.2 }}
@@ -128,16 +145,28 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							</h2>
 							<div className="flex items-center justify-between">
 								<div className="flex items-center text-green-600">
-									<FiDollarSign className="mr-1" />
 									<span className="text-2xl font-bold">
 										${Number(price).toLocaleString()}
 									</span>
 								</div>
 							</div>
-						</motion.div>
+							{/* Etiquetas secundarias */}
+							<div className="mt-3 flex flex-wrap gap-2">
+								{(foodClass || destilado) && (
+									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium capitalize">
+										<FiTag /> {foodClass || destilado}
+									</span>
+								)}
+								{alcoholPct !== null && (
+									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+										<FaWineBottle /> {Number(alcoholPct).toFixed(0)}%
+									</span>
+								)}
+							</div>
+						</Motion.div>
 
 						{/* Descripción */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.3 }}
@@ -146,11 +175,11 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							<p className="text-gray-700 text-lg leading-relaxed">
 								{description}
 							</p>
-						</motion.div>
+						</Motion.div>
 
 						{/* Ingredientes */}
 						{ingredients && ingredients.length > 0 && (
-							<motion.div
+							<Motion.div
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.4 }}
@@ -168,17 +197,22 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 											key={index}
 											className="px-3 py-2 bg-green-100 text-green-800 text-sm rounded-lg font-medium text-center"
 										>
-											{typeof ingredient === "string"
-												? ingredient
-												: ingredient.name}
+											{(() => {
+												const value =
+													typeof ingredient === "string"
+														? ingredient
+														: ingredient.name;
+												if (!value) return value;
+												return value.charAt(0).toUpperCase() + value.slice(1);
+											})()}
 										</span>
 									))}
 								</div>
-							</motion.div>
+							</Motion.div>
 						)}
 
 						{/* Botón de acción */}
-						<motion.div
+						<Motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.6 }}
@@ -190,10 +224,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							>
 								Cerrar
 							</button>
-						</motion.div>
+						</Motion.div>
 					</div>
-				</motion.div>
-			</motion.div>
+				</Motion.div>
+			</Motion.div>
 		</AnimatePresence>
 	);
 };

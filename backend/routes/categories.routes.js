@@ -1,29 +1,30 @@
-const express = require("express");
+import express from 'express';
+import * as categoryController from '../controllers/categoryController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import normalizeTextFields from '../middleware/normalizeTextFields.js';
+
 const router = express.Router();
-const categoryController = require("../controllers/categoryController");
-const authMiddleware = require("../middleware/authMiddleware");
-const normalizeTextFields = require("../middleware/normalizeTextFields");
 
 router.post(
-	"/",
-	normalizeTextFields,
-	authMiddleware,
-	categoryController.createCategory
+  '/',
+  normalizeTextFields,
+  authMiddleware,
+  categoryController.createCategory,
 );
-router.delete("/:id", authMiddleware, categoryController.deleteCategory);
+router.delete('/:id', authMiddleware, categoryController.deleteCategory);
 router.put(
-	"/:id",
-	normalizeTextFields,
-	authMiddleware,
-	categoryController.updateCategory
+  '/:id',
+  normalizeTextFields,
+  authMiddleware,
+  categoryController.updateCategory,
 );
-router.get("/", categoryController.getAllCategories);
-router.get("/search", categoryController.searchCategory);
-router.get("/:id", categoryController.getCategoryById);
+router.get('/', categoryController.getAllCategories);
+router.get('/search', categoryController.searchCategory);
+router.get('/:id', categoryController.getCategoryById);
 router.patch(
-	"/:id/active",
-	authMiddleware,
-	categoryController.setCategoryActive
+  '/:id/active',
+  authMiddleware,
+  categoryController.setCategoryActive,
 );
 
-module.exports = router;
+export default router;

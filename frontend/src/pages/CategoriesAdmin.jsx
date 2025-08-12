@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import {
 	FiEdit,
 	FiTrash2,
 	FiPlus,
 	FiCheckCircle,
 	FiXCircle,
-	FiChevronDown,
-	FiChevronUp,
-	FiChevronRight,
-	FiChevronLeft,
 	FiSearch,
 } from "react-icons/fi";
 import { getAllCategories } from "../services/categoryService";
-import { AnimatePresence, motion as Motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import CategoryModal from "../components/CategoryModal";
 import {
 	createCategory,
@@ -21,25 +17,26 @@ import {
 	deleteCategory,
 } from "../services/categoryService";
 import ConfirmModal from "../components/ErrorModal";
-import BackButton from "../components/BackButton";
 
 const CategoriesAdmin = () => {
 	const [categories, setCategories] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [expandedRowId, setExpandedRowId] = useState(null);
+	// Ya no usamos filas expandibles en el rediseño tipo cards, se conserva por si se requiere en mobile.
+	// const [expandedRowId, setExpandedRowId] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [modalEditData, setModalEditData] = useState(null);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [categoryToDelete, setCategoryToDelete] = useState(null);
-	const [sortOrder, setSortOrder] = useState("asc");
-	const [sortBy, setSortBy] = useState(null);
+	const [sortOrder] = useState("asc");
+	const [sortBy] = useState(null);
 	const [typeFilter, setTypeFilter] = useState(null);
-	const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 	const [statusFilter, setStatusFilter] = useState("all");
-	const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
+	const [currentPage, setCurrentPage] = useState(1);
+	const pageSize = 12;
+	const listTopRef = useRef(null);
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -123,12 +120,31 @@ const CategoriesAdmin = () => {
 		}
 	};
 
-	const toggleRow = (id) => {
-		setExpandedRowId((prevId) => (prevId === id ? null : id));
-	};
+	// const toggleRow = (id) => {
+	//   setExpandedRowId((prevId) => (prevId === id ? null : id));
+	// };
 
 	// Obtener types únicos
-	const uniqueTypes = Array.from(new Set(categories.map((cat) => cat.type)));
+	const uniqueTypes = useMemo(
+		() => Array.from(new Set(categories.map((cat) => cat.type))),
+		[categories]
+	);
+
+	// Contadores
+	const total = categories.length;
+	const activos = useMemo(
+		() => categories.filter((c) => c.is_active).length,
+		[categories]
+	);
+	const inactivos = total - activos;
+	const typeCounts = useMemo(() => {
+		const map = new Map();
+		categories.forEach((c) => {
+			const t = c.type || "";
+			map.set(t, (map.get(t) || 0) + 1);
+		});
+		return map;
+	}, [categories]);
 
 	// Función para filtrar por letras en cualquier orden
 	function matchesAllLetters(name, search) {
@@ -161,48 +177,94 @@ const CategoriesAdmin = () => {
 		});
 	}
 
-	// Handlers de encabezados
-	const handleSortByName = () => {
-		if (sortBy !== "name") {
-			setSortBy("name");
-			setSortOrder("asc");
-		} else {
-			setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-		}
-	};
-	const handleTypeDropdown = () => setShowTypeDropdown((prev) => !prev);
-	const handleStatusDropdown = () => setShowStatusDropdown((prev) => !prev);
+	// Handlers simples
 	const handleTypeSelect = (type) => {
 		setTypeFilter(type);
-		setShowTypeDropdown(false);
+		setCurrentPage(1);
 	};
-	const handleStatusSelect = (status) => {
-		setStatusFilter(status);
-		setShowStatusDropdown(false);
-	};
+	// Estado se cambia ahora desde los KPIs clicables
+
+	// Paginación en cliente
+	const totalItems = filtered.length;
+	const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+	const safeCurrentPage = Math.min(currentPage, totalPages);
+	const startIdx = (safeCurrentPage - 1) * pageSize;
+	const endIdx = startIdx + pageSize;
+	const paginated = filtered.slice(startIdx, endIdx);
+
+	// Al cambiar de página, hacer scroll suave al inicio de la lista
+	useEffect(() => {
+		if (listTopRef.current) {
+			try {
+				listTopRef.current.scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
+			} catch (_) {
+				// fallback sin smooth si el navegador no soporta
+				listTopRef.current.scrollIntoView();
+			}
+		}
+	}, [safeCurrentPage]);
 
 	if (loading)
-		return <div className="p-8 text-center">Cargando categorías...</div>;
+		return (
+			<div className="p-6 md:p-10 min-h-screen bg-gray-50">
+				<div className="max-w-6xl mx-auto">
+					<div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-4" />
+					<div className="h-5 w-72 bg-gray-200 rounded animate-pulse mb-6" />
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+						{Array.from({ length: 3 }).map((_, i) => (
+							<div key={i} className="h-20 bg-white rounded-xl shadow-sm p-4">
+								<div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-2" />
+								<div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
+							</div>
+						))}
+					</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<div key={i} className="h-40 bg-white rounded-xl shadow-sm p-4">
+								<div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-3" />
+								<div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-2" />
+								<div className="h-8 w-full bg-gray-100 rounded animate-pulse" />
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		);
 	if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
 	return (
 		<div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-			<header className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
-				<div className="flex flex-col md:flex-row md:items-center w-full">
-					<div className="mb-4 md:mb-0 md:mr-6">
-						<BackButton />
-					</div>
-					<div className="text-center md:text-left">
-						<h1 className="text-2xl md:text-4xl font-bold text-gray-800">
+			<header className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center w-full">
+				<div className="flex-1">
+					<Motion.div
+						initial={{ opacity: 0, y: -8 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.25 }}
+					>
+						<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
 							Gestión de Categorías
 						</h1>
 						<p className="text-gray-600">
 							Administra las categorías del sistema
 						</p>
-					</div>
+					</Motion.div>
 				</div>
-				<div className="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
-					<div className="relative w-full md:w-64">
+				<div className="mt-4 md:mt-0">
+					<button
+						onClick={openCreateModal}
+						className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
+					>
+						<FiPlus className="mr-2" /> Crear Categoría
+					</button>
+				</div>
+			</header>
+			<main>
+				{/* Buscador y filtros */}
+				<div className="flex flex-col gap-4 mb-4">
+					<div className="relative w-full sm:w-80">
 						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 						<input
 							type="text"
@@ -212,242 +274,179 @@ const CategoriesAdmin = () => {
 							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
 						/>
 					</div>
-					<button
-						onClick={openCreateModal}
-						className="flex items-center bg-green-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors"
+					{/* KPIs: ocupar ancho completo en desktop para evitar estrechamiento */}
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-2 w-full">
+						<Motion.div
+							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "all" ? "ring-2 ring-green-200" : ""
+							}`}
+							initial={{ opacity: 0, y: 8 }}
+							animate={{ opacity: 1, y: 0 }}
+							onClick={() => setStatusFilter("all")}
+						>
+							<div className="text-sm text-gray-500">Total</div>
+							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
+								<span className="font-semibold text-base">{total}</span>
+							</div>
+						</Motion.div>
+						<Motion.div
+							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "active" ? "ring-2 ring-blue-200" : ""
+							}`}
+							initial={{ opacity: 0, y: 8 }}
+							animate={{ opacity: 1, y: 0 }}
+							onClick={() => setStatusFilter("active")}
+						>
+							<div className="text-sm text-gray-500">Activas</div>
+							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+								<span className="font-semibold text-base">{activos}</span>
+							</div>
+						</Motion.div>
+						<Motion.div
+							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "inactive" ? "ring-2 ring-yellow-200" : ""
+							}`}
+							initial={{ opacity: 0, y: 8 }}
+							animate={{ opacity: 1, y: 0 }}
+							onClick={() => setStatusFilter("inactive")}
+						>
+							<div className="text-sm text-gray-500">Inactivas</div>
+							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+								<span className="font-semibold text-base">{inactivos}</span>
+							</div>
+						</Motion.div>
+					</div>
+
+					{/* Píldoras de tipo */}
+					<div className="w-full">
+						<div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+							<button
+								onClick={() => handleTypeSelect(null)}
+								className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${
+									typeFilter === null
+										? "bg-green-600 text-white border-green-600"
+										: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+								}`}
+							>
+								Todos
+							</button>
+							{uniqueTypes.map((type) => (
+								<button
+									key={type}
+									onClick={() => handleTypeSelect(type)}
+									className={`px-3 py-1.5 rounded-full border text-sm capitalize whitespace-nowrap ${
+										typeFilter === type
+											? "bg-green-600 text-white border-green-600"
+											: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+									}`}
+								>
+									{type}{" "}
+									{typeCounts.get(type) ? `(${typeCounts.get(type)})` : ""}
+								</button>
+							))}
+						</div>
+					</div>
+					{/* Quitamos las píldoras de estado; usamos los KPIs clicables */}
+					{/* Ancla para scroll al top de la lista al paginar */}
+					<div ref={listTopRef} />
+				</div>
+
+				{/* Grid de mini-cards */}
+				{paginated.length === 0 ? (
+					<div className="p-10 text-center text-gray-400 bg-white rounded-xl">
+						No hay categorías para mostrar.
+					</div>
+				) : (
+					<Motion.div
+						key={safeCurrentPage}
+						initial={{ opacity: 0, y: 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.2 }}
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
 					>
-						<FiPlus className="mr-2" /> Crear Nueva Categoría
-					</button>
-				</div>
-			</header>
-			<main>
-				<div
-					className="bg-white rounded-lg shadow-md overflow-x-auto"
-					style={{ overflowY: "visible" }}
-				>
-					<table className="w-full text-left">
-						<thead className="border-b bg-gray-100">
-							<tr>
-								<th
-									className="p-4 font-semibold text-gray-600 cursor-pointer select-none relative"
-									onClick={handleSortByName}
-								>
-									Nombre
-									{sortBy === "name" &&
-										(sortOrder === "asc" ? (
-											<FiChevronUp className="inline ml-1" />
+						{paginated.map((cat) => (
+							<div
+								key={cat.id}
+								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
+							>
+								<div className="flex items-start justify-between gap-2">
+									<div>
+										<h3 className="text-lg font-semibold text-gray-900 capitalize">
+											{cat.name}
+										</h3>
+										<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize mt-1">
+											{cat.type}
+										</span>
+									</div>
+									<span
+										className={`text-xs px-2 py-1 rounded-full ${
+											cat.is_active
+												? "bg-green-100 text-green-700"
+												: "bg-red-100 text-red-700"
+										}`}
+									>
+										{cat.is_active ? "Activa" : "Inactiva"}
+									</span>
+								</div>
+								<div className="flex items-center justify-end gap-2 mt-4">
+									<button
+										onClick={() => openEditModal(cat)}
+										className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+									>
+										<FiEdit className="mr-1" /> Editar
+									</button>
+									<button
+										onClick={() => handleToggleActive(cat)}
+										className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
+											cat.is_active
+												? "text-red-700 bg-red-50 hover:bg-red-100"
+												: "text-green-800 bg-green-50 hover:bg-green-100"
+										}`}
+									>
+										{cat.is_active ? (
+											<FiTrash2 className="mr-1" />
 										) : (
-											<FiChevronDown className="inline ml-1" />
-										))}
-								</th>
-								<th
-									className="p-4 font-semibold text-gray-600 cursor-pointer select-none relative"
-									style={{ minWidth: 120 }}
-								>
-									<div
-										className="flex items-center"
-										onClick={handleTypeDropdown}
-									>
-										Tipo
-										<FiChevronDown className="ml-1" />
-									</div>
-									{showTypeDropdown && (
-										<div className="absolute left-0 top-full mt-1 bg-white border rounded shadow-lg z-50 min-w-[120px] max-h-60 overflow-y-auto">
-											<button
-												className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-													typeFilter === null ? "font-bold" : ""
-												}`}
-												onClick={() => handleTypeSelect(null)}
-											>
-												Todos
-											</button>
-											{uniqueTypes.map((type) => (
-												<button
-													key={type}
-													className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-														typeFilter === type ? "font-bold" : ""
-													}`}
-													onClick={() => handleTypeSelect(type)}
-												>
-													{type}
-												</button>
-											))}
-										</div>
-									)}
-								</th>
-								<th
-									className="p-4 font-semibold text-gray-600 cursor-pointer select-none relative"
-									style={{ minWidth: 120 }}
-								>
-									<div
-										className="flex items-center"
-										onClick={handleStatusDropdown}
-									>
-										Estado
-										<FiChevronDown className="ml-1" />
-									</div>
-									{showStatusDropdown && (
-										<div className="absolute left-0 top-full mt-1 bg-white border rounded shadow-lg z-50 min-w-[120px] max-h-60 overflow-y-auto">
-											<button
-												className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-													statusFilter === "all" ? "font-bold" : ""
-												}`}
-												onClick={() => handleStatusSelect("all")}
-											>
-												Todos
-											</button>
-											<button
-												className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-													statusFilter === "active" ? "font-bold" : ""
-												}`}
-												onClick={() => handleStatusSelect("active")}
-											>
-												Activos
-											</button>
-											<button
-												className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-													statusFilter === "inactive" ? "font-bold" : ""
-												}`}
-												onClick={() => handleStatusSelect("inactive")}
-											>
-												Inactivos
-											</button>
-										</div>
-									)}
-								</th>
-								<th className="p-4 font-semibold text-gray-600 text-center hidden md:table-cell">
-									Acciones
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{filtered.length === 0 ? (
-								<tr>
-									<td colSpan={5} className="p-8 text-center text-gray-400">
-										No hay categorías para mostrar.
-									</td>
-								</tr>
-							) : (
-								filtered.map((cat) => (
-									<React.Fragment key={cat.id}>
-										<tr
-											className="border-b hover:bg-gray-50 transition-colors md:cursor-default cursor-pointer"
-											onClick={() =>
-												window.innerWidth < 768 && toggleRow(cat.id)
-											}
+											<FiCheckCircle className="mr-1" />
+										)}
+										{cat.is_active ? "Desactivar" : "Activar"}
+									</button>
+									{!cat.is_active && (
+										<button
+											onClick={() => handleDelete(cat)}
+											className="inline-flex items-center text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
 										>
-											<td className="p-4 font-medium text-gray-800 capitalize">
-												{cat.name}
-											</td>
-											<td className="p-4 text-gray-700 capitalize">
-												{cat.type}
-											</td>
-											<td className="p-4">
-												{cat.is_active ? (
-													<span className="inline-flex items-center text-green-600 font-semibold">
-														<FiCheckCircle className="mr-1" /> Activa
-													</span>
-												) : (
-													<span className="inline-flex items-center text-red-500 font-semibold">
-														<FiXCircle className="mr-1" /> Inactiva
-													</span>
-												)}
-											</td>
-											{/* Acciones en desktop */}
-											<td className="p-4 text-center hidden md:table-cell">
-												<button
-													onClick={(e) => {
-														e.stopPropagation();
-														openEditModal(cat);
-													}}
-													className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-100 rounded-full transition-colors mr-2"
-													title="Editar"
-												>
-													<FiEdit size={18} />
-												</button>
-												<button
-													onClick={(e) => {
-														e.stopPropagation();
-														handleToggleActive(cat);
-													}}
-													className={`p-2 rounded-full transition-colors ${
-														cat.is_active
-															? "text-red-500 hover:text-red-700 hover:bg-red-100"
-															: "text-green-600 hover:text-green-800 hover:bg-green-100"
-													}`}
-													title={cat.is_active ? "Desactivar" : "Activar"}
-												>
-													{cat.is_active ? (
-														<FiTrash2 size={18} />
-													) : (
-														<FiCheckCircle size={18} />
-													)}
-												</button>
-												{!cat.is_active && (
-													<button
-														onClick={(e) => {
-															e.stopPropagation();
-															handleDelete(cat);
-														}}
-														className="p-2 text-red-600 hover:text-white hover:bg-red-600 rounded-full transition-colors ml-2"
-														title="Borrar definitivamente"
-													>
-														<FiTrash2 size={18} />
-													</button>
-												)}
-											</td>
-										</tr>
-										<AnimatePresence>
-											{expandedRowId === cat.id && (
-												<tr className="md:hidden">
-													<td colSpan={4} className="p-4 bg-gray-50">
-														<Motion.div
-															initial={{ opacity: 0, y: -10 }}
-															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: -10 }}
-															transition={{ duration: 0.2 }}
-															className="flex items-center justify-start space-x-4"
-														>
-															<button
-																onClick={() => openEditModal(cat)}
-																className="flex items-center text-sm text-green-600 font-semibold p-2 rounded-md hover:bg-green-100 transition-colors"
-															>
-																<FiEdit className="mr-2" /> Editar
-															</button>
-															<button
-																onClick={() => handleToggleActive(cat)}
-																className={`flex items-center text-sm font-semibold p-2 rounded-md transition-colors ${
-																	cat.is_active
-																		? "text-red-600 hover:bg-red-100"
-																		: "text-green-800 hover:bg-green-100"
-																}`}
-															>
-																{cat.is_active ? (
-																	<FiTrash2 className="mr-2" />
-																) : (
-																	<FiCheckCircle className="mr-2" />
-																)}{" "}
-																{cat.is_active ? "Desactivar" : "Activar"}
-															</button>
-															{!cat.is_active && (
-																<button
-																	onClick={() => handleDelete(cat)}
-																	className="flex items-center text-sm text-red-600 font-semibold p-2 rounded-md hover:bg-red-100 transition-colors"
-																>
-																	<FiTrash2 className="mr-2" /> Borrar
-																</button>
-															)}
-														</Motion.div>
-													</td>
-												</tr>
-											)}
-										</AnimatePresence>
-									</React.Fragment>
-								))
-							)}
-						</tbody>
-					</table>
-				</div>
+											<FiTrash2 className="mr-1" /> Borrar
+										</button>
+									)}
+								</div>
+							</div>
+						))}
+					</Motion.div>
+				)}
+
+				{/* Paginación */}
+				{totalPages > 1 && (
+					<div className="flex items-center justify-center gap-2 mt-6">
+						<button
+							onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							disabled={safeCurrentPage === 1}
+						>
+							Anterior
+						</button>
+						<div className="text-sm text-gray-600">
+							Página <span className="font-semibold">{safeCurrentPage}</span> de{" "}
+							{totalPages}
+						</div>
+						<button
+							onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							disabled={safeCurrentPage === totalPages}
+						>
+							Siguiente
+						</button>
+					</div>
+				)}
 			</main>
 			<CategoryModal
 				isOpen={isModalOpen}
