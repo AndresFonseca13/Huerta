@@ -62,5 +62,8 @@ jobs:
       - name: Install dependencies (no lockfile)
         run: npm install --no-audit --no-fund
 
+      - name: Show rollup version
+        run: npx rollup --version || node -e "console.log(require('rollup/package.json').version)"
+
       - name: Build
         run: npm run build
