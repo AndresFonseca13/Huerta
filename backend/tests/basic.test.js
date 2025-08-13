@@ -37,9 +37,9 @@ describe('Import Tests', () => {
   });
 
   test('should import services', async () => {
-    const cocktailService = await import(
-      '../services/cocktail/getAllCocktailsService.js'
+    const productService = await import(
+      '../services/product/getAllProductsService.js'
     );
-    expect(cocktailService.default).toBeDefined();
+    expect(productService.default).toBeDefined();
   });
 });

@@ -9,7 +9,8 @@
 		"test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
 		"start": "node app.js",
 		"dev": "nodemon app.js",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"migrate:add-alcohol": "node ./scripts/addAlcoholPercentage.js"
 	},
 	"author": "Andres Fonseca",
 	"license": "ISC",

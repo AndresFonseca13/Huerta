@@ -1,7 +1,7 @@
 import React from "react";
 import { FiInstagram, FiMapPin, FiExternalLink } from "react-icons/fi";
 import { FaWhatsapp, FaTripadvisor } from "react-icons/fa";
-import logo from "../assets/Logo mejorado.png";
+import logo from "../assets/Logo-naranja.png";
 
 const Footer = () => {
 	return (

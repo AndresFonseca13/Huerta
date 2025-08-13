@@ -145,7 +145,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 👥 Autores
 
-- **Tu Nombre** - _Desarrollo inicial_ - [TuGitHub](https://github.com/tugithub)
+- **Andres Fonseca** - _Desarrollo inicial_ - [TuGitHub](https://github.com/tugithub)
 
 ## 🙏 Agradecimientos
 

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import coctelesRoutes from './routes/cocktails.routes.js';
+import productsRoutes from './routes/products.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import ingredientRoutes from './routes/ingredients.routes.js';
@@ -17,11 +17,11 @@ app.use(cors());
 app.use(express.json());
 // app.use('/api/...') etc
 
-app.use('/cocktails', coctelesRoutes);
-app.use('/categories', categoriesRoutes);
-app.use('/auth', authRoutes);
-app.use('/ingredient', ingredientRoutes);
-app.use('/upload', uploadRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/ingredient', ingredientRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/bienvenido', (req, res) => {
   const mensaje = 'Bienvenido a Huerta';

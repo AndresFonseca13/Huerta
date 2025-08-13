@@ -41,7 +41,6 @@ const searchProductsService = async (searchTerm) => {
 
     const result = await pool.query(query, [`%${searchTerm}%`]);
 
-    // Limpiar los resultados para manejar productos sin categorías o imágenes
     const products = result.rows.map((product) => ({
       ...product,
       categories: product.categories[0] === null ? [] : product.categories,

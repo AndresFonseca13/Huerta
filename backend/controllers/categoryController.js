@@ -30,7 +30,7 @@ const deleteCategory = async (req, res) => {
     return res.status(400).json({ mensaje: 'ID de categoría es requerido' });
   }
   const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(id)) {
     return res.status(400).json({
       mensaje: 'ID inválido',
@@ -48,9 +48,9 @@ const deleteCategory = async (req, res) => {
     }
     res.status(200).json({
       mensaje:
-        logical !== 'false'
-          ? 'Categoría deshabilitada exitosamente'
-          : 'Categoría eliminada exitosamente',
+				logical !== 'false'
+				  ? 'Categoría deshabilitada exitosamente'
+				  : 'Categoría eliminada exitosamente',
       category: deletedCategory,
     });
   } catch (error) {
@@ -68,6 +68,12 @@ const deleteCategory = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const showAll = req.query.showAll === 'true';
+    const onlyFood = req.query.onlyFood === 'true';
+    if (onlyFood) {
+      const cats =
+				await categoryService.getFoodClassificationCategoriesService();
+      return res.status(200).json(cats);
+    }
     const categories = await categoryService.getAllCategoriesService(showAll);
     res.status(200).json(categories);
   } catch (error) {
@@ -84,7 +90,7 @@ const getCategoryById = async (req, res) => {
 
   // Validación del formato UUID
   const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     return res.status(400).json({
       mensaje: 'ID inválido',
@@ -117,7 +123,7 @@ const updateCategory = async (req, res) => {
   const { name, type, is_active } = req.body;
   // Validación del formato UUID
   const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
     return res.status(400).json({
       mensaje: 'ID inválido',

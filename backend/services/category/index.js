@@ -4,6 +4,7 @@ import getAllCategoriesService from './getAllCategoriesService.js';
 import getCategoryByIdService from './getCategoryByIdService.js';
 import updateCategory from './updateCategory.js';
 import searchCategoryService from './searchCategoryService.js';
+import getFoodClassificationCategoriesService from './getFoodClassificationCategoriesService.js';
 
 export {
   createCategoryService,
@@ -12,4 +13,5 @@ export {
   getCategoryByIdService,
   updateCategory,
   searchCategoryService,
+  getFoodClassificationCategoriesService,
 };

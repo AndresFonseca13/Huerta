@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
-import { getCocktails } from "../services/cocktailService";
+import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
 import CocktailDetailModal from "../components/CocktailDetailModal";
+import CategoryFilterBar from "../components/CategoryFilterBar.jsx";
 
 const FilteredCocktails = () => {
 	const { categoria } = useParams();
@@ -19,8 +20,8 @@ const FilteredCocktails = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
-	// Determinar el tipo basado en la ruta
-	const tipo = location.pathname.startsWith("/cocteles/")
+	// Determinar el tipo basado en la ruta (soporta "/bebidas" y "/comida")
+	const tipo = location.pathname.startsWith("/bebidas")
 		? "destilado"
 		: "clasificacion";
 
@@ -35,7 +36,7 @@ const FilteredCocktails = () => {
 					tipo,
 				});
 
-				const data = await getCocktails(currentPage, pageSize, categoria, tipo);
+				const data = await getProducts(currentPage, pageSize, categoria, tipo);
 
 				// El backend devuelve 'cocteles' y 'paginacion'
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
@@ -114,8 +115,11 @@ const FilteredCocktails = () => {
 	};
 
 	const getFilterTitle = () => {
+		if (!categoria) {
+			return tipo === "destilado" ? "Todas las bebidas" : "Toda la comida";
+		}
 		if (tipo === "destilado") {
-			return `Cocteles de ${categoria}`;
+			return `Bebidas de ${categoria}`;
 		} else if (tipo === "clasificacion") {
 			return `Comida de ${categoria}`;
 		}
@@ -125,6 +129,7 @@ const FilteredCocktails = () => {
 	return (
 		<div className="py-8">
 			<div ref={topRef} />
+			<CategoryFilterBar />
 			<motion.div
 				className="text-center mb-6 px-4"
 				initial={{ opacity: 0, y: -20 }}
@@ -137,7 +142,7 @@ const FilteredCocktails = () => {
 				<p className="text-gray-600">
 					{totalRecords > 0
 						? `Encontramos ${totalRecords} ${
-								tipo === "destilado" ? "cocteles" : "platos"
+								tipo === "destilado" ? "bebidas" : "platos"
 						  }`
 						: "No se encontraron resultados"}
 				</p>
@@ -166,7 +171,7 @@ const FilteredCocktails = () => {
 				>
 					<div className="text-sm text-gray-600">
 						Mostrando {cocktails.length} de {totalRecords}{" "}
-						{tipo === "destilado" ? "cocteles" : "platos"} (Página {currentPage}{" "}
+						{tipo === "destilado" ? "bebidas" : "platos"} (Página {currentPage}{" "}
 						de {totalPages})
 					</div>
 					<div className="flex justify-center space-x-2 overflow-x-auto">
