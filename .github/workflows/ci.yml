@@ -54,8 +54,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Build
-        run: npm run build
+      - name: Install dependencies (pnpm)
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build (pnpm)
+        run: pnpm run build
