@@ -1,22 +1,22 @@
-import pg from "pg";
-import "dotenv/config";
+import pg from 'pg';
+import 'dotenv/config';
 
 const { Pool } = pg;
 
 const pool = new Pool({
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 // Evitar conectar durante los tests en CI para no requerir DB
-if (process.env.NODE_ENV !== "test") {
-	pool
-		.connect()
-		.then(() => console.log("Conexion exitosa a la base de datos"))
-		.catch((err) => console.error("Error al conectar a la base de datos", err));
+if (process.env.NODE_ENV !== 'test') {
+  pool
+    .connect()
+    .then(() => console.log('Conexion exitosa a la base de datos'))
+    .catch((err) => console.error('Error al conectar a la base de datos', err));
 }
 
 export default pool;

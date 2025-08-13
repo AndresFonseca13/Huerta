@@ -1,5 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+// Marcar uso de 'motion' para ESLint cuando JSX member expressions no son detectadas
+void motion;
 import { FiX, FiAlertTriangle } from "react-icons/fi";
 
 // Modal de error simple: si message existe, se muestra; si no, no renderiza

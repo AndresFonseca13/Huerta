@@ -1,8 +1,8 @@
-import pool from "../../config/db.js";
+import pool from '../../config/db.js';
 
 const searchProductsService = async (searchTerm) => {
-	try {
-		const query = `
+  try {
+    const query = `
             SELECT 
                 p.id,
                 p.name,
@@ -39,19 +39,19 @@ const searchProductsService = async (searchTerm) => {
             ORDER BY p.name ASC;
         `;
 
-		const result = await pool.query(query, [`%${searchTerm}%`]);
+    const result = await pool.query(query, [`%${searchTerm}%`]);
 
-		const products = result.rows.map((product) => ({
-			...product,
-			categories: product.categories[0] === null ? [] : product.categories,
-			images: product.images[0] === null ? [] : product.images,
-		}));
+    const products = result.rows.map((product) => ({
+      ...product,
+      categories: product.categories[0] === null ? [] : product.categories,
+      images: product.images[0] === null ? [] : product.images,
+    }));
 
-		return products;
-	} catch (error) {
-		console.error("Error en searchProductsService:", error);
-		throw new Error("Error al buscar productos");
-	}
+    return products;
+  } catch (error) {
+    console.error('Error en searchProductsService:', error);
+    throw new Error('Error al buscar productos');
+  }
 };
 
 export default searchProductsService;

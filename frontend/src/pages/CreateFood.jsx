@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+// Garantizar uso de motion para linter cuando se usa vía props/variants
+void motion;
 import { useNavigate } from "react-router-dom";
 import { searchIngredients } from "../services/ingredientService.js";
 import { searchCategories } from "../services/categoryService.js";
@@ -93,7 +95,9 @@ const CreateFood = () => {
 			setShowValidation(true);
 			try {
 				window.scrollTo({ top: 0, behavior: "smooth" });
-			} catch (_) {}
+			} catch (_err) {
+				/* noop */
+			}
 			setIsCreating(false);
 			return;
 		}

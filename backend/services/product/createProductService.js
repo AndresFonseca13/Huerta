@@ -1,115 +1,115 @@
-import pool from "../../config/db.js";
-import { ConflictError, ValidationError } from "../../errors/errors.js";
+import pool from '../../config/db.js';
+import { ConflictError, ValidationError } from '../../errors/errors.js';
 
 const createProductService = async (
-	name,
-	price,
-	description,
-	ingredients,
-	images,
-	categories,
-	userid,
-	alcoholPercentage = null
+  name,
+  price,
+  description,
+  ingredients,
+  images,
+  categories,
+  userid,
+  alcoholPercentage = null,
 ) => {
-	if (
-		!name ||
+  if (
+    !name ||
 		!price ||
 		!description ||
 		!ingredients ||
 		!images ||
 		!categories
-	) {
-		throw new ValidationError("Todos los campos son obligatorios");
-	}
+  ) {
+    throw new ValidationError('Todos los campos son obligatorios');
+  }
 
-	const checkQuery = "SELECT * FROM products WHERE name = $1";
-	const checkResult = await pool.query(checkQuery, [name]);
-	if (checkResult.rows.length > 0) {
-		throw new ConflictError("El producto ya existe");
-	}
-	try {
-		await pool.query("BEGIN");
-		const insertProductQuery =
-			"INSERT INTO products (name, price, description, created_by, alcohol_percentage) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, price, description, alcohol_percentage";
-		const productResult = await pool.query(insertProductQuery, [
-			name,
-			price,
-			description,
-			userid,
-			alcoholPercentage,
-		]);
-		const productId = productResult.rows[0].id;
+  const checkQuery = 'SELECT * FROM products WHERE name = $1';
+  const checkResult = await pool.query(checkQuery, [name]);
+  if (checkResult.rows.length > 0) {
+    throw new ConflictError('El producto ya existe');
+  }
+  try {
+    await pool.query('BEGIN');
+    const insertProductQuery =
+			'INSERT INTO products (name, price, description, created_by, alcohol_percentage) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, price, description, alcohol_percentage';
+    const productResult = await pool.query(insertProductQuery, [
+      name,
+      price,
+      description,
+      userid,
+      alcoholPercentage,
+    ]);
+    const productId = productResult.rows[0].id;
 
-		const ingredientsIds = [];
-		for (const ingredient of ingredients) {
-			const ingredientQuery = `
+    const ingredientsIds = [];
+    for (const ingredient of ingredients) {
+      const ingredientQuery = `
                 INSERT INTO ingredients (name) 
                 VALUES ($1) 
                 ON CONFLICT (name) DO NOTHING 
                 RETURNING id
                 `;
-			const ingredientResult = await pool.query(ingredientQuery, [ingredient]);
-			if (ingredientResult.rows.length > 0) {
-				ingredientsIds.push(ingredientResult.rows[0].id);
-			} else {
-				const existingIngredientQuery =
-					"SELECT id FROM ingredients WHERE name = $1";
-				const existingIngredientResult = await pool.query(
-					existingIngredientQuery,
-					[ingredient]
-				);
-				ingredientsIds.push(existingIngredientResult.rows[0].id);
-			}
-		}
+      const ingredientResult = await pool.query(ingredientQuery, [ingredient]);
+      if (ingredientResult.rows.length > 0) {
+        ingredientsIds.push(ingredientResult.rows[0].id);
+      } else {
+        const existingIngredientQuery =
+					'SELECT id FROM ingredients WHERE name = $1';
+        const existingIngredientResult = await pool.query(
+          existingIngredientQuery,
+          [ingredient],
+        );
+        ingredientsIds.push(existingIngredientResult.rows[0].id);
+      }
+    }
 
-		for (const ingredientId of ingredientsIds) {
-			const relacionQuery =
-				"INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)";
-			await pool.query(relacionQuery, [productId, ingredientId]);
-		}
+    for (const ingredientId of ingredientsIds) {
+      const relacionQuery =
+				'INSERT INTO products_ingredients (product_id, ingredient_id) VALUES ($1, $2)';
+      await pool.query(relacionQuery, [productId, ingredientId]);
+    }
 
-		for (const { name: categoryName, type: categoryType } of categories) {
-			const insertCategoryQuery = `
+    for (const { name: categoryName, type: categoryType } of categories) {
+      const insertCategoryQuery = `
               INSERT INTO categories (name, type)
               VALUES ($1, $2)
               ON CONFLICT (name, type) DO NOTHING
               RETURNING id;
           `;
-			const result = await pool.query(insertCategoryQuery, [
-				categoryName,
-				categoryType,
-			]);
+      const result = await pool.query(insertCategoryQuery, [
+        categoryName,
+        categoryType,
+      ]);
 
-			let categoryId;
-			if (result.rows.length > 0) {
-				categoryId = result.rows[0].id;
-			} else {
-				const existingQuery =
-					"SELECT id FROM categories WHERE name = $1 AND type = $2";
-				const existingResult = await pool.query(existingQuery, [
-					categoryName,
-					categoryType,
-				]);
-				categoryId = existingResult.rows[0].id;
-			}
+      let categoryId;
+      if (result.rows.length > 0) {
+        categoryId = result.rows[0].id;
+      } else {
+        const existingQuery =
+					'SELECT id FROM categories WHERE name = $1 AND type = $2';
+        const existingResult = await pool.query(existingQuery, [
+          categoryName,
+          categoryType,
+        ]);
+        categoryId = existingResult.rows[0].id;
+      }
 
-			await pool.query(
-				"INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)",
-				[productId, categoryId]
-			);
-		}
+      await pool.query(
+        'INSERT INTO products_categories (product_id, category_id) VALUES ($1, $2)',
+        [productId, categoryId],
+      );
+    }
 
-		for (const url of images) {
-			const insertPhotoQuery = `
+    for (const url of images) {
+      const insertPhotoQuery = `
             INSERT INTO images (product_id, url)
             VALUES ($1, $2)
             `;
-			await pool.query(insertPhotoQuery, [productId, url]);
-		}
+      await pool.query(insertPhotoQuery, [productId, url]);
+    }
 
-		await pool.query("COMMIT");
+    await pool.query('COMMIT');
 
-		const completeProductQuery = `
+    const completeProductQuery = `
       SELECT 
         p.id,
         p.name,
@@ -127,21 +127,21 @@ const createProductService = async (
       WHERE p.id = $1
       GROUP BY p.id, p.name, p.price, p.description
     `;
-		const completeResult = await pool.query(completeProductQuery, [productId]);
-		const product = completeResult.rows[0];
-		if (product) {
-			product.ingredients = (product.ingredients || []).filter(
-				(x) => x !== null
-			);
-			product.categories = product.categories || [];
-			product.images = (product.images || []).filter((x) => x !== null);
-		}
-		return product;
-	} catch (error) {
-		await pool.query("ROLLBACK");
-		console.error("⛔ Error en el servicio de creación:", error);
-		throw error;
-	}
+    const completeResult = await pool.query(completeProductQuery, [productId]);
+    const product = completeResult.rows[0];
+    if (product) {
+      product.ingredients = (product.ingredients || []).filter(
+        (x) => x !== null,
+      );
+      product.categories = product.categories || [];
+      product.images = (product.images || []).filter((x) => x !== null);
+    }
+    return product;
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error('⛔ Error en el servicio de creación:', error);
+    throw error;
+  }
 };
 
 export default createProductService;
