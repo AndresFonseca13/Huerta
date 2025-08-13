@@ -42,9 +42,6 @@ jobs:
   frontend:
     name: Frontend (build)
     runs-on: ubuntu-latest
-    env:
-      ROLLUP_SKIP_NODEJS_NATIVE: "1"
-      npm_config_optional: "false"
     defaults:
       run:
         working-directory: frontend
@@ -57,14 +54,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Clean lockfile and modules (workaround npm optional deps bug)
-        run: rm -f package-lock.json && rm -rf node_modules
-
-      - name: Install dependencies (no lockfile)
-        run: npm install --no-audit --no-fund
-
-      - name: Show rollup version
-        run: npx rollup --version || node -e "console.log(require('rollup/package.json').version)"
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
