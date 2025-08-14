@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import productsRoutes from './routes/products.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
+import usersRoutes from './routes/users.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import ingredientRoutes from './routes/ingredients.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/ingredient', ingredientRoutes);
 app.use('/api/upload', uploadRoutes);

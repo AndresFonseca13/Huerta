@@ -12,6 +12,7 @@ import CocktailsAdmin from "./pages/CocktailsAdmin";
 import FoodAdmin from "./pages/FoodAdmin.jsx";
 import CreateFood from "./pages/CreateFood.jsx";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
+import UsersAdmin from "./pages/UsersAdmin.jsx";
 import Footer from "./components/Footer.jsx";
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
 					<Route index element={<AdminPanel />} />
 					<Route path="beverages" element={<CocktailsAdmin />} />
 					<Route path="categories" element={<CategoriesAdmin />} />
+					<Route path="users" element={<UsersAdmin />} />
 					<Route path="food" element={<FoodAdmin />} />
 					<Route path="create" element={<CreateCocktail />} />
 					<Route path="food/create" element={<CreateFood />} />

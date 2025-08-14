@@ -70,8 +70,7 @@ const AdminBottomNav = () => {
 					active={is("/admin/users")}
 					label="Users"
 					icon={FiUsers}
-					onClick={() => navigate("/admin")}
-					disabled
+					onClick={() => navigate("/admin/users")}
 				/>
 				<NavItem
 					active={is("/admin/beverages")}

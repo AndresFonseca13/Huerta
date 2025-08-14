@@ -1,18 +1,18 @@
-import pool from '../../config/db.js';
+import pool from "../../config/db.js";
 
 const getAllProductsAdminService = async ({
-  categoria,
-  tipo,
-  orden,
-  limite,
-  offset,
+	categoria,
+	tipo,
+	orden,
+	limite,
+	offset,
 }) => {
-  const ordenValido = ['name', 'price'].includes(orden) ? orden : 'name';
+	const ordenValido = ["name", "price"].includes(orden) ? orden : "name";
 
-  const query = `
+	const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT c.name) FILTER (WHERE c.type IS NULL OR c.type NOT IN ('clasificacion', 'clasificacion comida')) AS categories,
+           array_agg(DISTINCT c.name) AS categories,
            array_agg(DISTINCT img.url) AS images,
            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
@@ -37,7 +37,7 @@ const getAllProductsAdminService = async ({
     LIMIT $3 OFFSET $4
   `;
 
-  const countQuery = `
+	const countQuery = `
     SELECT COUNT(DISTINCT p.id) as total
     FROM products p
     WHERE ($1::text IS NULL OR EXISTS (
@@ -52,34 +52,34 @@ const getAllProductsAdminService = async ({
       ))
   `;
 
-  const values = [categoria, tipo, limite, offset];
-  const countValues = [categoria, tipo];
+	const values = [categoria, tipo, limite, offset];
+	const countValues = [categoria, tipo];
 
-  const [result, countResult] = await Promise.all([
-    pool.query(query, values),
-    pool.query(countQuery, countValues),
-  ]);
+	const [result, countResult] = await Promise.all([
+		pool.query(query, values),
+		pool.query(countQuery, countValues),
+	]);
 
-  const processed = result.rows.map((row) => ({
-    ...row,
-    ingredients: (row.ingredients || []).filter((x) => x !== null),
-    categories: (row.categories || []).filter((x) => x !== null),
-    images: (row.images || []).filter((x) => x !== null),
-  }));
+	const processed = result.rows.map((row) => ({
+		...row,
+		ingredients: (row.ingredients || []).filter((x) => x !== null),
+		categories: (row.categories || []).filter((x) => x !== null),
+		images: (row.images || []).filter((x) => x !== null),
+	}));
 
-  const totalRecords = parseInt(countResult.rows[0].total);
-  const totalPages = Math.ceil(totalRecords / limite);
+	const totalRecords = parseInt(countResult.rows[0].total);
+	const totalPages = Math.ceil(totalRecords / limite);
 
-  return {
-    cocktails: processed,
-    pagination: {
-      totalRecords,
-      totalPages,
-      currentPage: Math.floor(offset / limite) + 1,
-      limit: limite,
-      offset,
-    },
-  };
+	return {
+		cocktails: processed,
+		pagination: {
+			totalRecords,
+			totalPages,
+			currentPage: Math.floor(offset / limite) + 1,
+			limit: limite,
+			offset,
+		},
+	};
 };
 
 export default getAllProductsAdminService;

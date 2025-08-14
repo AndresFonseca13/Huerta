@@ -104,10 +104,10 @@ const AdminLayout = () => {
 									onClick={() => navigate("/admin/categories")}
 								/>
 								<SidebarItem
-									active={false}
+									active={is("/admin/users")}
 									icon={FiUsers}
 									label="Users"
-									onClick={() => {}}
+									onClick={() => navigate("/admin/users")}
 								/>
 								<SidebarItem
 									active={false}

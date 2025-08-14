@@ -42,14 +42,49 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 					  )
 					: []
 			);
+			// Derivar la clasificación primaria aunque no venga en categories
+			const classificationName =
+				item.food_classification_name ||
+				item.clasificacion_name ||
+				item.classification ||
+				item.food_classification ||
+				"";
+			const baseCategories = Array.isArray(item.categories)
+				? item.categories.map((cat) => {
+						if (typeof cat === "string") {
+							const isClass =
+								classificationName &&
+								cat.toLowerCase() === String(classificationName).toLowerCase();
+							return {
+								name: cat,
+								type: isClass ? "clasificacion comida" : "categoria",
+							};
+						}
+						const isClass =
+							classificationName &&
+							cat.name &&
+							cat.name.toLowerCase() ===
+								String(classificationName).toLowerCase();
+						return {
+							...cat,
+							type:
+								cat.type || (isClass ? "clasificacion comida" : "categoria"),
+						};
+				  })
+				: [];
+			const hasClassification = baseCategories.some(
+				(c) =>
+					c &&
+					c.name &&
+					c.name.toLowerCase() === String(classificationName).toLowerCase()
+			);
 			setCategories(
-				item.categories
-					? item.categories.map((cat) =>
-							typeof cat === "string"
-								? { name: cat, type: "clasificacion comida" }
-								: { ...cat, type: cat.type || "clasificacion comida" }
-					  )
-					: []
+				hasClassification || !classificationName
+					? baseCategories
+					: [
+							{ name: classificationName, type: "clasificacion comida" },
+							...baseCategories,
+					  ]
 			);
 			setImages(item.images || []);
 			setNewImageFiles([]);
@@ -96,11 +131,27 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 		if (!categories.some((c) => c.name === category.name)) {
 			setCategories([
 				...categories,
-				{ name: category.name, type: category.type || "clasificacion comida" },
+				{ name: category.name, type: category.type || "categoria" },
 			]);
 		}
 		setCategoryInput("");
 		setCategorySuggestions([]);
+	};
+
+	// Permitir crear categorías nuevas desde el input con Enter
+	const handleCategoryKeyDown = (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			const name = (categoryInput || "").trim();
+			if (!name) return;
+			if (
+				!categories.some((c) => c.name.toLowerCase() === name.toLowerCase())
+			) {
+				setCategories([...categories, { name, type: "categoria" }]);
+			}
+			setCategoryInput("");
+			setCategorySuggestions([]);
+		}
 	};
 
 	const removeIngredient = (index) =>
@@ -123,22 +174,46 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 				const uploadedUrls = await uploadImages(newImageFiles, name.trim());
 				finalImageUrls = uploadedUrls;
 			}
+			// Asegurar que la clasificación principal siempre se envíe
+			const classificationName =
+				item.food_classification_name ||
+				item.clasificacion_name ||
+				item.classification ||
+				item.food_classification ||
+				"";
+			const categoriesWithClassification = (() => {
+				const list = categories.map((cat) => ({
+					name: cat.name,
+					type: cat.type || "categoria",
+				}));
+				if (classificationName) {
+					const exists = list.some(
+						(c) =>
+							c.name &&
+							c.name.toLowerCase() === String(classificationName).toLowerCase()
+					);
+					if (!exists) {
+						list.unshift({
+							name: classificationName,
+							type: "clasificacion comida",
+						});
+					}
+				}
+				return list;
+			})();
 			const updatedData = {
 				name: name.trim(),
 				price: parseFloat(price),
 				description: description.trim(),
 				ingredients: ingredients.map((ing) => ing.name),
-				categories: categories.map((cat) => ({
-					name: cat.name,
-					type: cat.type || "clasificacion comida",
-				})),
+				categories: categoriesWithClassification,
 				images: finalImageUrls,
 			};
 			const result = await updateProduct(item.id, updatedData);
 			setIsSuccess(true);
 			setTimeout(() => {
 				setIsSuccess(false);
-				onUpdateSuccess(result.cocktail);
+				onUpdateSuccess(result.product || result.cocktail);
 			}, 1500);
 		} catch (err) {
 			setError(err.message || "Error al actualizar el plato.");
@@ -278,6 +353,7 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									type="text"
 									value={categoryInput}
 									onChange={(e) => handleCategorySearch(e.target.value)}
+									onKeyDown={handleCategoryKeyDown}
 									placeholder="Buscar y agregar clasificación"
 									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
 								/>
