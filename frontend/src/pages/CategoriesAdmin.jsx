@@ -16,7 +16,7 @@ import {
 	toggleCategoryActive,
 	deleteCategory,
 } from "../services/categoryService";
-import ConfirmModal from "../components/ErrorModal";
+import ConfirmModal from "../components/ConfirmModal";
 
 const CategoriesAdmin = () => {
 	const [categories, setCategories] = useState([]);
@@ -404,20 +404,18 @@ const CategoriesAdmin = () => {
 										}`}
 									>
 										{cat.is_active ? (
-											<FiTrash2 className="mr-1" />
+											<FiXCircle className="mr-1" />
 										) : (
 											<FiCheckCircle className="mr-1" />
 										)}
 										{cat.is_active ? "Desactivar" : "Activar"}
 									</button>
-									{!cat.is_active && (
-										<button
-											onClick={() => handleDelete(cat)}
-											className="inline-flex items-center text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
-										>
-											<FiTrash2 className="mr-1" /> Borrar
-										</button>
-									)}
+									<button
+										onClick={() => handleDelete(cat)}
+										className="inline-flex items-center text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
+									>
+										<FiTrash2 className="mr-1" /> Borrar
+									</button>
 								</div>
 							</div>
 						))}
@@ -459,6 +457,7 @@ const CategoriesAdmin = () => {
 				isOpen={confirmOpen}
 				onClose={cancelDelete}
 				onConfirm={confirmDelete}
+				title="Eliminar categoría"
 				message={
 					categoryToDelete
 						? `¿Seguro que deseas borrar la categoría "${categoryToDelete.name}"? Esta acción es irreversible.`
