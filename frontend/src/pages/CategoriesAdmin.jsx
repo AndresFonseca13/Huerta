@@ -42,6 +42,7 @@ const CategoriesAdmin = () => {
 		const fetchCategories = async () => {
 			try {
 				const data = await getAllCategories(true); // showAll=true
+				console.log("CategoriesAdmin - Categorías cargadas:", data);
 				setCategories(data);
 			} catch {
 				setError("No se pudieron cargar las categorías.");
@@ -374,9 +375,14 @@ const CategoriesAdmin = () => {
 										<h3 className="text-lg font-semibold text-gray-900 capitalize">
 											{cat.name}
 										</h3>
-										<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize mt-1">
-											{cat.type}
-										</span>
+										<div className="flex items-center gap-2 mt-1">
+											<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize">
+												{cat.type}
+											</span>
+											<span className="inline-flex text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+												{cat.product_count || 0} productos
+											</span>
+										</div>
 									</div>
 									<span
 										className={`text-xs px-2 py-1 rounded-full ${

@@ -166,8 +166,9 @@ const AdminPanel = () => {
 	console.log("AdminPanel - Componente renderizándose...");
 
 	const navigate = useNavigate();
-	const { permissions } = usePermissions();
+	const { permissions, username, userRole } = usePermissions();
 	console.log("AdminPanel - Permisos recibidos del hook:", permissions);
+	console.log("AdminPanel - Usuario:", username, "Rol:", userRole);
 
 	const [loading, setLoading] = useState(true);
 	const [dashboardCards, setDashboardCards] = useState([]);
@@ -312,10 +313,17 @@ const AdminPanel = () => {
 			<main>
 				<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
 					<h2 className="text-2xl font-bold text-gray-900">
-						¡Bienvenido de nuevo! 👋
+						¡Bienvenido, {username}! 👋
 					</h2>
 					<p className="text-gray-600 mt-1">
-						Resumen del estado de tu restaurante
+						{userRole === "admin" &&
+							"Tienes el rol de administrador. Puedes gestionar todo el sistema."}
+						{userRole === "ventas" &&
+							"Tienes el rol de ventas. Puedes gestionar productos, categorías y usuarios."}
+						{userRole === "chef" &&
+							"Tienes el rol de chef. Puedes gestionar comida y categorías."}
+						{userRole === "barmanager" &&
+							"Tienes el rol de barmanager. Puedes gestionar bebidas y categorías."}
 					</p>
 				</div>
 

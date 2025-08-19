@@ -479,7 +479,10 @@ const CreateFood = () => {
 												}
 											}}
 										>
-											{s.name}
+											<span className="font-medium">{s.name}</span>
+											<span className="text-gray-500 text-sm ml-2">
+												({s.type})
+											</span>
 										</li>
 									))}
 								</ul>
@@ -490,7 +493,8 @@ const CreateFood = () => {
 										key={index}
 										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
 									>
-										<span>{cat.name}</span>
+										<span className="font-medium">{cat.name}</span>
+										<span className="text-blue-600 text-xs">({cat.type})</span>
 										<button
 											type="button"
 											onClick={() => {

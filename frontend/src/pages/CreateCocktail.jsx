@@ -619,7 +619,10 @@ const CreateCocktail = () => {
 												}
 											}}
 										>
-											{suggestion.name}
+											<span className="font-medium">{suggestion.name}</span>
+											<span className="text-gray-500 text-sm ml-2">
+												({suggestion.type})
+											</span>
 										</li>
 									))}
 								</ul>
@@ -630,7 +633,10 @@ const CreateCocktail = () => {
 										key={index}
 										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
 									>
-										<span>{category.name}</span>
+										<span className="font-medium">{category.name}</span>
+										<span className="text-blue-600 text-xs">
+											({category.type})
+										</span>
 										<button
 											type="button"
 											onClick={() => {

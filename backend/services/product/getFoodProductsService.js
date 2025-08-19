@@ -1,27 +1,27 @@
-import pool from '../../config/db.js';
+import pool from "../../config/db.js";
 
 const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
-  const safeOrder = ['name', 'price'].includes(orden) ? orden : 'name';
-  const baseFilterComida = `EXISTS (
+	const safeOrder = ["name", "price"].includes(orden) ? orden : "name";
+	const baseFilterComida = `EXISTS (
       SELECT 1 FROM products_categories pcx
       JOIN categories cx ON pcx.category_id = cx.id
       WHERE pcx.product_id = p.id AND cx.type = 'clasificacion comida'
     )`;
 
-  const categoriaExtra = categoria
-    ? `AND EXISTS (
+	const categoriaExtra = categoria
+		? `AND EXISTS (
         SELECT 1 FROM products_categories pc2
         JOIN categories c2 ON pc2.category_id = c2.id
         WHERE pc2.product_id = p.id AND c2.type = 'clasificacion comida' AND c2.name = $1
       )`
-    : '';
+		: "";
 
-  const values = categoria ? [categoria] : [];
+	const values = categoria ? [categoria] : [];
 
-  const query = `
+	const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT c.name) AS categories,
+           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
            array_agg(DISTINCT img.url) AS images,
            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
     FROM products p
@@ -38,47 +38,47 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
     LIMIT ${limite} OFFSET ${offset}
   `;
 
-  const countQuery = `
+	const countQuery = `
     SELECT COUNT(DISTINCT p.id) AS total
     FROM products p
     WHERE p.is_active = true
       AND ${baseFilterComida}
       ${
-  categoria
-    ? `AND EXISTS (
+				categoria
+					? `AND EXISTS (
         SELECT 1 FROM products_categories pc2
         JOIN categories c2 ON pc2.category_id = c2.id
         WHERE pc2.product_id = p.id AND c2.name = $1
       )`
-    : ''
-}
+					: ""
+			}
   `;
 
-  const [result, countResult] = await Promise.all([
-    pool.query(query, values),
-    pool.query(countQuery, values),
-  ]);
+	const [result, countResult] = await Promise.all([
+		pool.query(query, values),
+		pool.query(countQuery, values),
+	]);
 
-  const processed = result.rows.map((row) => ({
-    ...row,
-    ingredients: (row.ingredients || []).filter((x) => x !== null),
-    categories: (row.categories || []).filter((x) => x !== null),
-    images: (row.images || []).filter((x) => x !== null),
-  }));
+	const processed = result.rows.map((row) => ({
+		...row,
+		ingredients: (row.ingredients || []).filter((x) => x !== null),
+		categories: (row.categories || []).filter((x) => x !== null),
+		images: (row.images || []).filter((x) => x !== null),
+	}));
 
-  const totalRecords = parseInt(countResult.rows[0]?.total || 0);
-  const totalPages = Math.ceil(totalRecords / limite);
+	const totalRecords = parseInt(countResult.rows[0]?.total || 0);
+	const totalPages = Math.ceil(totalRecords / limite);
 
-  return {
-    cocktails: processed,
-    pagination: {
-      totalRecords,
-      totalPages,
-      currentPage: Math.floor(offset / limite) + 1,
-      limit: limite,
-      offset,
-    },
-  };
+	return {
+		cocktails: processed,
+		pagination: {
+			totalRecords,
+			totalPages,
+			currentPage: Math.floor(offset / limite) + 1,
+			limit: limite,
+			offset,
+		},
+	};
 };
 
 export default getFoodProductsService;

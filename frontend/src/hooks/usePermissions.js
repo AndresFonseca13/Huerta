@@ -7,10 +7,34 @@ const getUserRole = () => {
 	return role;
 };
 
+// Función para obtener información del usuario desde el JWT
+const getUserInfo = () => {
+	try {
+		const token = localStorage.getItem("token");
+		if (!token) return { username: "Usuario", role: "admin" };
+
+		const payload = JSON.parse(atob(token.split(".")[1]));
+		console.log("usePermissions - JWT payload:", payload);
+
+		const userInfo = {
+			username: payload.username || payload.name || "Usuario",
+			role: payload.role || "admin",
+			userId: payload.id || payload.userId,
+		};
+
+		console.log("usePermissions - Información del usuario extraída:", userInfo);
+		return userInfo;
+	} catch (error) {
+		console.error("usePermissions - Error al decodificar JWT:", error);
+		return { username: "Usuario", role: "admin" };
+	}
+};
+
 // Hook para verificar permisos del usuario
 export const usePermissions = () => {
 	console.log("usePermissions - Hook ejecutándose...");
-	const userRole = getUserRole();
+	const userInfo = getUserInfo();
+	const userRole = userInfo.role;
 
 	const permissions = useMemo(() => {
 		console.log("usePermissions - Generando permisos para rol:", userRole);
@@ -71,6 +95,8 @@ export const usePermissions = () => {
 
 	return {
 		userRole,
+		username: userInfo.username,
+		userId: userInfo.userId,
 		permissions,
 		hasPermission: (permission) => permissions[permission] || false,
 	};

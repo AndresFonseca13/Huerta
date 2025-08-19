@@ -16,7 +16,9 @@ export const loginUser = async (username, password) => {
 		try {
 			const payload = JSON.parse(atob(token.split(".")[1]));
 			if (payload?.role) localStorage.setItem("role", payload.role);
-		} catch {}
+		} catch (_e) {
+			void _e;
+		}
 		return response.data;
 	} catch (error) {
 		// Manejar diferentes tipos de errores con mensajes amigables
@@ -59,7 +61,9 @@ export const loginAdmin = async (username, password) => {
 		try {
 			const payload = JSON.parse(atob(token.split(".")[1]));
 			if (payload?.role) localStorage.setItem("role", payload.role);
-		} catch {}
+		} catch (_e) {
+			void _e;
+		}
 		return response.data;
 	} catch (error) {
 		// Manejar diferentes tipos de errores con mensajes amigables
@@ -118,7 +122,8 @@ export const isAuthenticated = () => {
 			localStorage.removeItem("token");
 			return false;
 		}
-	} catch {
+	} catch (_e) {
+		void _e;
 		// Si no es un JWT válido, asumimos que es un token simple
 		// y solo verificamos que no esté vacío
 	}
