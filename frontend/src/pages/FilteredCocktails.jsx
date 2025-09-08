@@ -118,12 +118,7 @@ const FilteredCocktails = () => {
 		if (!categoria) {
 			return tipo === "destilado" ? "Todas las bebidas" : "Toda la comida";
 		}
-		if (tipo === "destilado") {
-			return `Bebidas de ${categoria}`;
-		} else if (tipo === "clasificacion") {
-			return `Comida de ${categoria}`;
-		}
-		return `Filtro: ${categoria}`;
+		return categoria;
 	};
 
 	return (

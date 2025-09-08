@@ -368,7 +368,7 @@ const CategoriesAdmin = () => {
 						{paginated.map((cat) => (
 							<div
 								key={cat.id}
-								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
+								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow overflow-hidden"
 							>
 								<div className="flex items-start justify-between gap-2">
 									<div>
@@ -394,16 +394,16 @@ const CategoriesAdmin = () => {
 										{cat.is_active ? "Activa" : "Inactiva"}
 									</span>
 								</div>
-								<div className="flex items-center justify-end gap-2 mt-4">
+								<div className="flex flex-wrap items-center gap-2 mt-4">
 									<button
 										onClick={() => openEditModal(cat)}
-										className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 									>
 										<FiEdit className="mr-1" /> Editar
 									</button>
 									<button
 										onClick={() => handleToggleActive(cat)}
-										className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
+										className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full ${
 											cat.is_active
 												? "text-red-700 bg-red-50 hover:bg-red-100"
 												: "text-green-800 bg-green-50 hover:bg-green-100"
@@ -418,7 +418,7 @@ const CategoriesAdmin = () => {
 									</button>
 									<button
 										onClick={() => handleDelete(cat)}
-										className="inline-flex items-center text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
 									>
 										<FiTrash2 className="mr-1" /> Borrar
 									</button>
