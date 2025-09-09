@@ -1,7 +1,7 @@
-import pool from "../../config/db.js";
+import pool from '../../config/db.js';
 
 const getProductByIdService = async (id) => {
-	const query = `
+  const query = `
         SELECT 
             p.id AS product_id, 
             p.name AS product_name,
@@ -22,8 +22,8 @@ const getProductByIdService = async (id) => {
         WHERE p.id = $1
         GROUP BY p.id
     `;
-	const result = await pool.query(query, [id]);
-	return result.rows[0];
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
 };
 
 export default getProductByIdService;
