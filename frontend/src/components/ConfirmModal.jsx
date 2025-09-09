@@ -1,12 +1,16 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-// Marcar uso de 'motion' para ESLint cuando JSX member expressions no son detectadas
-void motion;
 import { FiX, FiAlertTriangle } from "react-icons/fi";
 
-// Modal de error simple: si message existe, se muestra; si no, no renderiza
-const ErrorModal = ({ message, onClose }) => {
-	if (!message) return null;
+const ConfirmModal = ({
+	isOpen,
+	onClose,
+	onConfirm,
+	message,
+	title = "Confirmar acción",
+}) => {
+	if (!isOpen) return null;
+
 	return (
 		<AnimatePresence>
 			<motion.div
@@ -30,11 +34,27 @@ const ErrorModal = ({ message, onClose }) => {
 						<FiX size={20} />
 					</button>
 					<div className="flex flex-col items-center">
-						<FiAlertTriangle className="text-red-500 text-4xl mb-2" />
-						<h2 className="text-lg font-bold text-gray-800 mb-2 text-center">
-							Ocurrió un error
+						<FiAlertTriangle className="text-amber-500 text-4xl mb-4" />
+						<h2 className="text-lg font-bold text-gray-800 mb-3 text-center">
+							{title}
 						</h2>
-						<p className="text-gray-700 text-center mb-2">{message}</p>
+						<p className="text-gray-700 text-center mb-6">{message}</p>
+
+						{/* Botones de acción */}
+						<div className="flex gap-3 w-full">
+							<button
+								onClick={onClose}
+								className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+							>
+								Cancelar
+							</button>
+							<button
+								onClick={onConfirm}
+								className="flex-1 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
+							>
+								Confirmar
+							</button>
+						</div>
 					</div>
 				</motion.div>
 			</motion.div>
@@ -42,4 +62,4 @@ const ErrorModal = ({ message, onClose }) => {
 	);
 };
 
-export default ErrorModal;
+export default ConfirmModal;

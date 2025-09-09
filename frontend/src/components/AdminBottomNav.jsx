@@ -3,6 +3,70 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { FiHome, FiCoffee, FiTag, FiUsers, FiVolume2 } from "react-icons/fi";
+import { usePermissions } from "../hooks/usePermissions";
+
+// Función para obtener las opciones del menú móvil según los permisos
+const getMobileMenuOptions = (permissions) => {
+	const options = [];
+
+	// Dashboard - Todos los roles tienen acceso
+	options.push({
+		path: "/admin",
+		label: "Dashboard",
+		icon: FiHome,
+		roles: ["admin", "ventas", "chef", "barmanager"],
+	});
+
+	// Comida - Solo si tiene permiso
+	if (permissions.canAccessFood) {
+		options.push({
+			path: "/admin/food",
+			label: "Comida",
+			icon: FiTag,
+			roles: ["admin", "ventas", "chef"],
+		});
+	}
+
+	// Usuarios - Solo si tiene permiso
+	if (permissions.canAccessUsers) {
+		options.push({
+			path: "/admin/users",
+			label: "Users",
+			icon: FiUsers,
+			roles: ["admin", "ventas"],
+		});
+	}
+
+	// Bebidas - Solo si tiene permiso
+	if (permissions.canAccessBeverages) {
+		options.push({
+			path: "/admin/beverages",
+			label: "Bebidas",
+			icon: FiCoffee,
+			roles: ["admin", "ventas", "barmanager"],
+		});
+	}
+
+	// Promociones - Solo si tiene permiso
+	if (permissions.canAccessPromotions) {
+		options.push({
+			path: "/admin/promotions",
+			label: "Promos",
+			icon: FiVolume2,
+			roles: ["admin", "ventas", "chef", "barmanager"],
+		});
+	}
+
+	// Categorías - Todos los roles pueden ver
+	options.push({
+		path: "/admin/categories",
+		label: "Categorías",
+		icon: FiTag,
+		roles: ["admin", "ventas", "chef", "barmanager"],
+	});
+
+	return options;
+};
 
 const NavItem = ({ active, label, icon: Icon, onClick, disabled }) => (
 	<div className="relative flex-1">
@@ -29,7 +93,13 @@ const NavItem = ({ active, label, icon: Icon, onClick, disabled }) => (
 const AdminBottomNav = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { permissions } = usePermissions();
 	const [isMobile, setIsMobile] = useState(true);
+	const [menuOptions, setMenuOptions] = useState([]);
+
+	useEffect(() => {
+		setMenuOptions(getMobileMenuOptions(permissions));
+	}, [permissions]);
 
 	useEffect(() => {
 		const update = () =>
@@ -54,44 +124,15 @@ const AdminBottomNav = () => {
 			style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
 		>
 			<div className="max-w-5xl mx-auto px-2 flex">
-				<NavItem
-					active={is("/admin")}
-					label="Dashboard"
-					icon={FiHome}
-					onClick={() => navigate("/admin")}
-				/>
-				<NavItem
-					active={is("/admin/food")}
-					label="Comida"
-					icon={FiTag}
-					onClick={() => navigate("/admin/food")}
-				/>
-				<NavItem
-					active={is("/admin/users")}
-					label="Users"
-					icon={FiUsers}
-					onClick={() => navigate("/admin")}
-					disabled
-				/>
-				<NavItem
-					active={is("/admin/beverages")}
-					label="Bebidas"
-					icon={FiCoffee}
-					onClick={() => navigate("/admin/beverages")}
-				/>
-				<NavItem
-					active={is("/admin/promotions")}
-					label="Promos"
-					icon={FiVolume2}
-					onClick={() => navigate("/admin")}
-					disabled
-				/>
-				<NavItem
-					active={is("/admin/categories")}
-					label="Categorías"
-					icon={FiTag}
-					onClick={() => navigate("/admin/categories")}
-				/>
+				{menuOptions.map((option) => (
+					<NavItem
+						key={option.path}
+						active={is(option.path)}
+						label={option.label}
+						icon={option.icon}
+						onClick={() => navigate(option.path)}
+					/>
+				))}
 			</div>
 		</Motion.nav>
 	);

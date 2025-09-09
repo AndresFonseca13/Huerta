@@ -1,10 +1,74 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { FiGrid, FiCoffee, FiTag, FiUsers, FiTrendingUp } from "react-icons/fi";
 import AdminBottomNav from "../components/AdminBottomNav";
 import { logout } from "../services/authService";
+import { usePermissions } from "../hooks/usePermissions";
 import logo from "../assets/Logo-naranja.png";
+
+// Función para obtener las opciones del menú según los permisos
+const getMenuOptions = (permissions) => {
+	const options = [];
+
+	// Dashboard - Todos los roles tienen acceso
+	options.push({
+		path: "/admin",
+		icon: FiGrid,
+		label: "Dashboard",
+		roles: ["admin", "ventas", "chef", "barmanager"],
+	});
+
+	// Bebidas - Solo si tiene permiso
+	if (permissions.canAccessBeverages) {
+		options.push({
+			path: "/admin/beverages",
+			icon: FiCoffee,
+			label: "Bebidas",
+			roles: ["admin", "ventas", "barmanager"],
+		});
+	}
+
+	// Comida - Solo si tiene permiso
+	if (permissions.canAccessFood) {
+		options.push({
+			path: "/admin/food",
+			icon: FiTag,
+			label: "Food",
+			roles: ["admin", "ventas", "chef"],
+		});
+	}
+
+	// Categorías - Todos los roles pueden ver
+	options.push({
+		path: "/admin/categories",
+		icon: FiTag,
+		label: "Categorías",
+		roles: ["admin", "ventas", "chef", "barmanager"],
+	});
+
+	// Usuarios - Solo si tiene permiso
+	if (permissions.canAccessUsers) {
+		options.push({
+			path: "/admin/users",
+			icon: FiUsers,
+			label: "Users",
+			roles: ["admin", "ventas"],
+		});
+	}
+
+	// Promociones - Solo si tiene permiso
+	if (permissions.canAccessPromotions) {
+		options.push({
+			path: "/admin/promotions",
+			icon: FiTrendingUp,
+			label: "Promotions",
+			roles: ["admin", "ventas", "chef", "barmanager"],
+		});
+	}
+
+	return options;
+};
 
 const SidebarItem = ({ active, icon: Icon, label, onClick }) => (
 	<div className="relative">
@@ -32,6 +96,12 @@ const pageAnimate = { opacity: 1, y: 0 };
 const AdminLayout = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { permissions } = usePermissions();
+	const [menuOptions, setMenuOptions] = useState([]);
+
+	useEffect(() => {
+		setMenuOptions(getMenuOptions(permissions));
+	}, [permissions]);
 
 	const is = (path) => location.pathname === path;
 	const handleLogout = () => {
@@ -79,42 +149,15 @@ const AdminLayout = () => {
 								<FiGrid /> Management Panel
 							</div>
 							<nav className="space-y-2 relative">
-								<SidebarItem
-									active={is("/admin")}
-									icon={FiGrid}
-									label="Dashboard"
-									onClick={() => navigate("/admin")}
-								/>
-								<SidebarItem
-									active={is("/admin/beverages")}
-									icon={FiCoffee}
-									label="Bebidas"
-									onClick={() => navigate("/admin/beverages")}
-								/>
-								<SidebarItem
-									active={is("/admin/food")}
-									icon={FiTag}
-									label="Food"
-									onClick={() => navigate("/admin/food")}
-								/>
-								<SidebarItem
-									active={is("/admin/categories")}
-									icon={FiTag}
-									label="Categorías"
-									onClick={() => navigate("/admin/categories")}
-								/>
-								<SidebarItem
-									active={false}
-									icon={FiUsers}
-									label="Users"
-									onClick={() => {}}
-								/>
-								<SidebarItem
-									active={false}
-									icon={FiTrendingUp}
-									label="Promotions"
-									onClick={() => {}}
-								/>
+								{menuOptions.map((option) => (
+									<SidebarItem
+										key={option.path}
+										active={is(option.path)}
+										icon={option.icon}
+										label={option.label}
+										onClick={() => navigate(option.path)}
+									/>
+								))}
 							</nav>
 							<button
 								onClick={handleLogout}
@@ -140,7 +183,7 @@ const AdminLayout = () => {
 			</div>
 
 			{/* Bottom navigation persistente en mobile */}
-			<AdminBottomNav />
+			<AdminBottomNav userRole={permissions.userRole} />
 		</div>
 	);
 };

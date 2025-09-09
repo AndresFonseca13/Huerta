@@ -26,7 +26,7 @@ describe('Project Structure Tests', () => {
     const servicesDir = join(process.cwd(), 'services');
     const serviceCategories = readdirSync(servicesDir);
 
-    expect(serviceCategories).toContain('cocktail');
+    expect(serviceCategories).toContain('product');
     expect(serviceCategories).toContain('category');
     expect(serviceCategories).toContain('ingredient');
   });

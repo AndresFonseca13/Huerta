@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+// Garantizar uso de motion para linter cuando se usa vía props/variants
+void motion;
 import { useNavigate } from "react-router-dom";
 import { searchIngredients } from "../services/ingredientService.js";
 import { searchCategories } from "../services/categoryService.js";
@@ -93,7 +95,9 @@ const CreateFood = () => {
 			setShowValidation(true);
 			try {
 				window.scrollTo({ top: 0, behavior: "smooth" });
-			} catch (_) {}
+			} catch (_err) {
+				/* noop */
+			}
 			setIsCreating(false);
 			return;
 		}
@@ -475,7 +479,10 @@ const CreateFood = () => {
 												}
 											}}
 										>
-											{s.name}
+											<span className="font-medium">{s.name}</span>
+											<span className="text-gray-500 text-sm ml-2">
+												({s.type})
+											</span>
 										</li>
 									))}
 								</ul>
@@ -486,7 +493,8 @@ const CreateFood = () => {
 										key={index}
 										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
 									>
-										<span>{cat.name}</span>
+										<span className="font-medium">{cat.name}</span>
+										<span className="text-blue-600 text-xs">({cat.type})</span>
 										<button
 											type="button"
 											onClick={() => {

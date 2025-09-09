@@ -8,10 +8,12 @@ import AdminPanel from "./pages/AdminPanel.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import RoleProtectedRoute from "./components/RoleProtectedRoute.jsx";
 import CocktailsAdmin from "./pages/CocktailsAdmin";
 import FoodAdmin from "./pages/FoodAdmin.jsx";
 import CreateFood from "./pages/CreateFood.jsx";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
+import UsersAdmin from "./pages/UsersAdmin.jsx";
 import Footer from "./components/Footer.jsx";
 
 function App() {
@@ -41,7 +43,11 @@ function App() {
 					path="/admin/create"
 					element={
 						<ProtectedRoute>
-							<CreateCocktail />
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "barmanager"]}
+							>
+								<CreateCocktail />
+							</RoleProtectedRoute>
 						</ProtectedRoute>
 					}
 				/>
@@ -59,11 +65,77 @@ function App() {
 					}
 				>
 					<Route index element={<AdminPanel />} />
-					<Route path="beverages" element={<CocktailsAdmin />} />
-					<Route path="categories" element={<CategoriesAdmin />} />
-					<Route path="food" element={<FoodAdmin />} />
-					<Route path="create" element={<CreateCocktail />} />
-					<Route path="food/create" element={<CreateFood />} />
+					<Route
+						path="beverages"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "barmanager"]}
+							>
+								<CocktailsAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="categories"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+							>
+								<CategoriesAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="users"
+						element={
+							<RoleProtectedRoute requiredRoles={["admin", "ventas"]}>
+								<UsersAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="food"
+						element={
+							<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
+								<FoodAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="create"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "barmanager"]}
+							>
+								<CreateCocktail />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="food/create"
+						element={
+							<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
+								<CreateFood />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="promotions"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+							>
+								<div className="p-6">
+									<h1 className="text-2xl font-bold text-gray-900 mb-4">
+										Promociones
+									</h1>
+									<p className="text-gray-600">
+										Sección de promociones en desarrollo...
+									</p>
+								</div>
+							</RoleProtectedRoute>
+						}
+					/>
 				</Route>
 			</Routes>
 			{showFooter && <Footer />}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import FloatingTypeSwitcher from "./FloatingTypeSwitcher.jsx";
 import {
 	getAllCategories,
@@ -23,7 +23,8 @@ const CategoryFilterBar = () => {
 	const [allCategories, setAllCategories] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
-	const [isFabOpen, setIsFabOpen] = useState(false);
+	// Estado eliminado por no uso para evitar warning de lint
+	// const [isFabOpen, setIsFabOpen] = useState(false);
 
 	useEffect(() => {
 		setTipo(initialTipo);
@@ -49,7 +50,7 @@ const CategoryFilterBar = () => {
 					data = await getAllCategories(false);
 				}
 				setAllCategories(Array.isArray(data) ? data : []);
-			} catch (err) {
+			} catch (_err) {
 				setError("No se pudieron cargar las categorías");
 			} finally {
 				setLoading(false);
@@ -78,8 +79,10 @@ const CategoryFilterBar = () => {
 					window.scrollTo({ top: 0, behavior: "smooth" });
 				}
 			});
-		} catch (_) {}
-		setIsFabOpen(false);
+		} catch (_err) {
+			/* noop */
+		}
+		// setIsFabOpen(false);
 	};
 
 	const handleSelectCategoria = (nombreCategoria) => {
@@ -93,7 +96,9 @@ const CategoryFilterBar = () => {
 						window.scrollTo({ top: 0, behavior: "smooth" });
 					}
 				});
-			} catch (_) {}
+			} catch (_err) {
+				/* noop */
+			}
 			return;
 		}
 		navigate(
@@ -109,7 +114,9 @@ const CategoryFilterBar = () => {
 					window.scrollTo({ top: 0, behavior: "smooth" });
 				}
 			});
-		} catch (_) {}
+		} catch (_err) {
+			/* noop */
+		}
 	};
 
 	const isSelected = (name) => {

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCocktail, FaUtensils, FaTimes } from "react-icons/fa";
+// Evitar warning de var no usada si no hay JSX directo con motion
+void motion;
 
 const FloatingTypeSwitcher = ({ tipo, onChange }) => {
 	const [open, setOpen] = useState(false);

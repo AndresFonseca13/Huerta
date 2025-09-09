@@ -46,7 +46,9 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 			setCategories(
 				cocktail.categories
 					? cocktail.categories.map((cat) =>
-							typeof cat === "string" ? { name: cat, type: "destilado" } : cat
+							typeof cat === "string"
+								? { name: cat, type: "clasificacion" }
+								: { name: cat.name, type: cat.type }
 					  )
 					: []
 			);
@@ -403,7 +405,10 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 												onClick={() => addCategory(s)}
 												className="px-4 py-2 cursor-pointer hover:bg-gray-100 capitalize text-gray-900"
 											>
-												{s.name}
+												<span className="font-medium">{s.name}</span>
+												<span className="text-gray-500 text-sm ml-2">
+													({s.type})
+												</span>
 											</li>
 										))}
 									</ul>
@@ -442,7 +447,10 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 											key={index}
 											className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm"
 										>
-											<span>{cat.name}</span>
+											<span className="font-medium">{cat.name}</span>
+											<span className="text-blue-600 text-xs ml-1">
+												({cat.type})
+											</span>
 											<button
 												type="button"
 												onClick={() => removeCategory(index)}
