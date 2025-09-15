@@ -6,6 +6,8 @@ import { getProductsAdmin } from "../services/productService";
 import { getAllCategories } from "../services/categoryService";
 import { FiPlus, FiTag, FiUserPlus, FiGift, FiCoffee } from "react-icons/fi";
 import { usePermissions } from "../hooks/usePermissions";
+import { listPromotions } from "../services/promotionService";
+import { getUsers } from "../services/userService";
 // Bottom nav vive en el layout; no lo dupliquemos aquí
 
 // Función para obtener las tarjetas permitidas según los permisos
@@ -50,9 +52,8 @@ const getDashboardCards = (permissions, stats) => {
 			id: "users",
 			title: "Usuarios",
 			stats: [
-				{ label: "Total usuarios", value: "3" },
-				{ label: "Activos", value: "2" },
-				{ label: "Admins", value: "1" },
+				{ label: "Total usuarios", value: stats.totalUsers },
+				{ label: "Activos", value: stats.activeUsers },
 			],
 			navigate: "/admin/users",
 			roles: ["admin", "ventas"],
@@ -83,9 +84,8 @@ const getDashboardCards = (permissions, stats) => {
 			id: "promotions",
 			title: "Promociones",
 			stats: [
-				{ label: "Total promos", value: "3" },
-				{ label: "Activas", value: "2" },
-				{ label: "Usos totales", value: "338" },
+				{ label: "Total promos", value: stats.totalPromotions },
+				{ label: "Activas", value: stats.activePromotions },
 			],
 			navigate: "/admin/promotions",
 			roles: ["admin", "ventas", "chef", "barmanager"],
@@ -180,6 +180,10 @@ const AdminPanel = () => {
 		activeFood: 0,
 		totalCategories: 0,
 		activeCategories: 0,
+		totalPromotions: 0,
+		activePromotions: 0,
+		totalUsers: 0,
+		activeUsers: 0,
 	});
 
 	useEffect(() => {
@@ -251,6 +255,18 @@ const AdminPanel = () => {
 					console.log("AdminPanel - No tiene permisos para comida");
 				}
 
+				// Cargar promociones si tiene permiso
+				if (permissions.canAccessPromotions) {
+					console.log("AdminPanel - Cargando promociones...");
+					promises.push(listPromotions(1, 200));
+				}
+
+				// Cargar usuarios si tiene permiso
+				if (permissions.canAccessUsers) {
+					console.log("AdminPanel - Cargando usuarios...");
+					promises.push(getUsers());
+				}
+
 				console.log("AdminPanel - Promesas a ejecutar:", promises.length);
 				const results = await Promise.all(promises);
 				console.log("AdminPanel - Resultados obtenidos:", results.length);
@@ -260,28 +276,35 @@ const AdminPanel = () => {
 				let cocktails = [];
 				let food = [];
 				let catsApi = [];
+				let promos = [];
+				let users = [];
 
-				// El primer resultado siempre son las categorías
-				catsApi = Array.isArray(results[0]) ? results[0] : [];
-				console.log("AdminPanel - Categorías cargadas:", catsApi.length);
-				console.log("AdminPanel - Datos de categorías:", results[0]);
+				// Índice base de resultados
+				let idx = 0;
+				catsApi = Array.isArray(results[idx]) ? results[idx] : [];
+				idx += 1;
 
-				// Procesar bebidas si se cargaron
-				if (permissions.canAccessBeverages && results.length > 1) {
-					const resCocktails = results[1];
-					cocktails = resCocktails.cocteles || [];
-					console.log("AdminPanel - Bebidas cargadas:", cocktails.length);
+				if (permissions.canAccessBeverages) {
+					const resCocktails = results[idx];
+					cocktails = (resCocktails && resCocktails.cocteles) || [];
+					idx += 1;
 				}
 
-				// Procesar comida si se cargó
-				if (
-					permissions.canAccessFood &&
-					results.length > (permissions.canAccessBeverages ? 2 : 1)
-				) {
-					const resFood = results[permissions.canAccessBeverages ? 2 : 1];
-					food = resFood.cocteles || [];
-					console.log("AdminPanel - Comida cargada:", food.length);
-					console.log("AdminPanel - Datos de comida:", resFood);
+				if (permissions.canAccessFood) {
+					const resFood = results[idx];
+					food = (resFood && resFood.cocteles) || [];
+					idx += 1;
+				}
+
+				if (permissions.canAccessPromotions) {
+					const resPromos = results[idx];
+					promos = (resPromos && resPromos.promotions) || [];
+					idx += 1;
+				}
+
+				if (permissions.canAccessUsers) {
+					users = Array.isArray(results[idx]) ? results[idx] : [];
+					idx += 1;
 				}
 
 				const newStats = {
@@ -291,6 +314,10 @@ const AdminPanel = () => {
 					activeFood: food.filter((c) => c.is_active).length,
 					totalCategories: catsApi.length,
 					activeCategories: catsApi.filter((c) => c.is_active).length,
+					totalPromotions: promos.length,
+					activePromotions: promos.filter((p) => p.is_active).length,
+					totalUsers: users.length,
+					activeUsers: users.filter((u) => u.is_active).length,
 				};
 
 				console.log("AdminPanel - Stats finales:", newStats);
@@ -336,9 +363,6 @@ const AdminPanel = () => {
 						>
 							<div className="flex items-center justify-between">
 								<h3 className="font-semibold text-gray-900">{card.title}</h3>
-								<span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
-									Activa
-								</span>
 							</div>
 							<div className="mt-4 space-y-2 text-sm text-gray-700">
 								{card.stats.map((stat, index) => (

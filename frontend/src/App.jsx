@@ -14,6 +14,8 @@ import FoodAdmin from "./pages/FoodAdmin.jsx";
 import CreateFood from "./pages/CreateFood.jsx";
 import CategoriesAdmin from "./pages/CategoriesAdmin";
 import UsersAdmin from "./pages/UsersAdmin.jsx";
+import PromotionsAdmin from "./pages/PromotionsAdmin.jsx";
+import PromotionEditor from "./pages/PromotionEditor.jsx";
 import Footer from "./components/Footer.jsx";
 
 function App() {
@@ -125,14 +127,27 @@ function App() {
 							<RoleProtectedRoute
 								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
 							>
-								<div className="p-6">
-									<h1 className="text-2xl font-bold text-gray-900 mb-4">
-										Promociones
-									</h1>
-									<p className="text-gray-600">
-										Sección de promociones en desarrollo...
-									</p>
-								</div>
+								<PromotionsAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="promotions/create"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+							>
+								<PromotionEditor />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="promotions/:id/edit"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+							>
+								<PromotionEditor />
 							</RoleProtectedRoute>
 						}
 					/>
