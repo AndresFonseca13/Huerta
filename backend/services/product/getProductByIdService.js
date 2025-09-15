@@ -10,7 +10,7 @@ const getProductByIdService = async (id) => {
             p.alcohol_percentage,
             array_agg(DISTINCT i.name) AS ingredients,
             array_agg(DISTINCT img.url) AS images,
-            array_agg(DISTINCT c.name) AS categories,
+            array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
             MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
             MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
         FROM products p

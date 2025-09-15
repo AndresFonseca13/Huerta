@@ -21,7 +21,7 @@ const getAllProductsService = async ({
   const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT c.name) FILTER (WHERE c.type IS NULL OR c.type NOT IN ('clasificacion', 'clasificacion comida')) AS categories,
+           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
            array_agg(DISTINCT img.url) AS images,
            MIN(CASE WHEN c.type = 'destilado' THEN c.name END) AS destilado_name,
            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
@@ -38,7 +38,7 @@ const getAllProductsService = async ({
       SELECT pc2.product_id
       FROM products_categories pc2
       JOIN categories c2 ON pc2.category_id = c2.id
-      WHERE c2.name = '${categoria}'
+      WHERE pc2.product_id = p.id AND c2.name = '${categoria}'
     )`
     : ''
 }

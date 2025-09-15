@@ -21,7 +21,7 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
   const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT c.name) AS categories,
+           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
            array_agg(DISTINCT img.url) AS images,
            MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
     FROM products p

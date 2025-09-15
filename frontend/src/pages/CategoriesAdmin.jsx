@@ -16,7 +16,7 @@ import {
 	toggleCategoryActive,
 	deleteCategory,
 } from "../services/categoryService";
-import ConfirmModal from "../components/ErrorModal";
+import ConfirmModal from "../components/ConfirmModal";
 
 const CategoriesAdmin = () => {
 	const [categories, setCategories] = useState([]);
@@ -42,6 +42,7 @@ const CategoriesAdmin = () => {
 		const fetchCategories = async () => {
 			try {
 				const data = await getAllCategories(true); // showAll=true
+				console.log("CategoriesAdmin - Categorías cargadas:", data);
 				setCategories(data);
 			} catch {
 				setError("No se pudieron cargar las categorías.");
@@ -367,16 +368,21 @@ const CategoriesAdmin = () => {
 						{paginated.map((cat) => (
 							<div
 								key={cat.id}
-								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
+								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow overflow-hidden"
 							>
 								<div className="flex items-start justify-between gap-2">
 									<div>
 										<h3 className="text-lg font-semibold text-gray-900 capitalize">
 											{cat.name}
 										</h3>
-										<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize mt-1">
-											{cat.type}
-										</span>
+										<div className="flex items-center gap-2 mt-1">
+											<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize">
+												{cat.type}
+											</span>
+											<span className="inline-flex text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+												{cat.product_count || 0} productos
+											</span>
+										</div>
 									</div>
 									<span
 										className={`text-xs px-2 py-1 rounded-full ${
@@ -388,36 +394,34 @@ const CategoriesAdmin = () => {
 										{cat.is_active ? "Activa" : "Inactiva"}
 									</span>
 								</div>
-								<div className="flex items-center justify-end gap-2 mt-4">
+								<div className="flex flex-wrap items-center gap-2 mt-4">
 									<button
 										onClick={() => openEditModal(cat)}
-										className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
 									>
 										<FiEdit className="mr-1" /> Editar
 									</button>
 									<button
 										onClick={() => handleToggleActive(cat)}
-										className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
+										className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full ${
 											cat.is_active
 												? "text-red-700 bg-red-50 hover:bg-red-100"
 												: "text-green-800 bg-green-50 hover:bg-green-100"
 										}`}
 									>
 										{cat.is_active ? (
-											<FiTrash2 className="mr-1" />
+											<FiXCircle className="mr-1" />
 										) : (
 											<FiCheckCircle className="mr-1" />
 										)}
 										{cat.is_active ? "Desactivar" : "Activar"}
 									</button>
-									{!cat.is_active && (
-										<button
-											onClick={() => handleDelete(cat)}
-											className="inline-flex items-center text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
-										>
-											<FiTrash2 className="mr-1" /> Borrar
-										</button>
-									)}
+									<button
+										onClick={() => handleDelete(cat)}
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
+									>
+										<FiTrash2 className="mr-1" /> Borrar
+									</button>
 								</div>
 							</div>
 						))}
@@ -459,6 +463,7 @@ const CategoriesAdmin = () => {
 				isOpen={confirmOpen}
 				onClose={cancelDelete}
 				onConfirm={confirmDelete}
+				title="Eliminar categoría"
 				message={
 					categoryToDelete
 						? `¿Seguro que deseas borrar la categoría "${categoryToDelete.name}"? Esta acción es irreversible.`

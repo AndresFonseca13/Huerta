@@ -320,8 +320,8 @@ const CocktailsAdmin = () => {
 			</header>
 			<main>
 				{/* Buscador y filtros */}
-				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-					<div className="relative w-full sm:w-80">
+				<div className="flex flex-col gap-4 mb-4">
+					<div className="relative w-full max-w-xl">
 						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 						<input
 							type="text"
@@ -332,7 +332,7 @@ const CocktailsAdmin = () => {
 						/>
 					</div>
 					{/* Píldoras de categorías (desktop y mobile) */}
-					<div className="w-full sm:flex-1">
+					<div className="w-full">
 						<div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
 							<button
 								onClick={() => setCategoryFilter(null)}

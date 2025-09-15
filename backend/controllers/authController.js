@@ -2,9 +2,9 @@ import signupService from '../services/auth/signupService.js';
 import loginService from '../services/auth/loginService.js';
 
 const signup = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
   try {
-    const user = await signupService(username, password);
+    const user = await signupService(username, password, role);
     res.status(201).json({ mensaje: 'Usuario creado exitosamente', user });
   } catch (err) {
     res.status(400).json({ mensaje: err.message });
