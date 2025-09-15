@@ -174,7 +174,6 @@ const PromotionFormModal = ({
 	const [isPriority, setIsPriority] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
-	const [tooManyModal, setTooManyModal] = useState({ open: false, names: [] });
 
 	const isPage = variant === "page";
 
@@ -195,7 +194,9 @@ const PromotionFormModal = ({
 			setImageUrl(promotion.image_url || "");
 
 			// Prefill reglas si existen
-			if (promotion.valid_from || promotion.valid_to) setUseFixedDates(true);
+			const hasBothDates =
+				Boolean(promotion.valid_from) && Boolean(promotion.valid_to);
+			setUseFixedDates(hasBothDates);
 			setValidFrom(promotion.valid_from || "");
 			setValidTo(promotion.valid_to || "");
 
@@ -224,10 +225,15 @@ const PromotionFormModal = ({
 		if (!imageUrl && (!fileList || fileList.length === 0))
 			return "Debes seleccionar una imagen de la promoción";
 		if (useFixedDates) {
-			if (!validFrom || !validTo)
-				return "Debes seleccionar fecha de inicio y fin";
-			if (new Date(validFrom) > new Date(validTo))
-				return "La fecha de inicio no puede ser mayor que la fecha fin";
+			// Requerir ambas fechas solo si el usuario está proporcionando alguna fecha
+			// o si originalmente la promo tenía ambas fechas y ahora quedarían inconsistentes
+			const providingAnyDate = Boolean(validFrom) || Boolean(validTo);
+			if (providingAnyDate) {
+				if (!validFrom || !validTo)
+					return "Debes seleccionar fecha de inicio y fin";
+				if (new Date(validFrom) > new Date(validTo))
+					return "La fecha de inicio no puede ser mayor que la fecha fin";
+			}
 		}
 		if (useTimeWindow) {
 			if (!startTime || !endTime) return "Debes seleccionar hora inicio y fin";
@@ -282,9 +288,11 @@ const PromotionFormModal = ({
 			const list = Array.isArray(currentEligibles) ? currentEligibles : [];
 			const eligiblePriority = list.filter((p) => p.is_priority);
 			const eligiblePriorityCount = eligiblePriority.length;
-			const alreadyNames = eligiblePriority.map((p) => p.title);
 			if (isPriority && willBeEligible && eligiblePriorityCount >= 2) {
-				setTooManyModal({ open: true, names: alreadyNames });
+				setTooManyModal({
+					open: true,
+					names: eligiblePriority.map((p) => p.title),
+				});
 				return;
 			}
 		} catch (_e) {
@@ -305,15 +313,27 @@ const PromotionFormModal = ({
 				title,
 				description,
 				image_url: finalImageUrl,
-				valid_from: useFixedDates ? validFrom || null : null,
-				valid_to: useFixedDates ? validTo || null : null,
-				start_time: useTimeWindow ? startTime || null : null,
-				end_time: useTimeWindow ? endTime || null : null,
-				days_of_week: useSpecificDays ? daysOfWeek.sort((a, b) => a - b) : null,
 				is_active: isActive,
 				is_priority: isPriority,
 				applicability: [],
 			};
+
+			// Incluir fechas solo si la sección está activa y ambas fechas están presentes
+			if (useFixedDates && validFrom && validTo) {
+				payload.valid_from = validFrom;
+				payload.valid_to = validTo;
+			}
+
+			// Incluir horas solo si la sección está activa y ambas horas están presentes
+			if (useTimeWindow && startTime && endTime) {
+				payload.start_time = startTime;
+				payload.end_time = endTime;
+			}
+
+			// Incluir días solo si la sección está activa
+			if (useSpecificDays) {
+				payload.days_of_week = daysOfWeek.sort((a, b) => a - b);
+			}
 
 			if (promotion) await updatePromotion(promotion.id, payload);
 			else await createPromotion(payload);

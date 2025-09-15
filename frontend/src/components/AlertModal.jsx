@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 const AlertModal = ({
 	isOpen = true,
@@ -26,21 +26,14 @@ const AlertModal = ({
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<motion.div
+				<div
 					className="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
 					onClick={(e) => {
 						if (e.target === e.currentTarget) onClose?.();
 					}}
 				>
-					<motion.div
+					<div
 						className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-						initial={{ y: 20, scale: 0.98 }}
-						animate={{ y: 0, scale: 1 }}
-						exit={{ y: 20, scale: 0.98 }}
-						transition={{ type: "spring", stiffness: 240, damping: 20 }}
 						role="dialog"
 						aria-modal="true"
 					>
@@ -86,17 +79,16 @@ const AlertModal = ({
 								</ul>
 							)}
 							<div className="flex justify-end">
-								<motion.button
-									whileTap={{ scale: 0.98 }}
+								<button
 									onClick={onClose}
 									className="px-4 py-2 rounded-md bg-green-700 text-white hover:bg-green-800"
 								>
 									Entendido
-								</motion.button>
+								</button>
 							</div>
 						</div>
-					</motion.div>
-				</motion.div>
+					</div>
+				</div>
 			)}
 		</AnimatePresence>
 	);

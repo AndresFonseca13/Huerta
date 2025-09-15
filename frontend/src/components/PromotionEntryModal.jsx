@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 const PromotionEntryModal = ({ promotion, onClose }) => {
-	if (!promotion) return null;
-
 	const [imageLoaded, setImageLoaded] = useState(false);
 
 	// Bloquear scroll del fondo mientras el modal está abierto
@@ -14,6 +11,8 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 			document.body.style.overflow = prev;
 		};
 	}, []);
+
+	if (!promotion) return null;
 
 	const handleOverlayClick = (e) => {
 		if (e.target === e.currentTarget) onClose();
@@ -26,16 +25,7 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 			role="dialog"
 			aria-modal="true"
 		>
-			<motion.div
-				initial={{ opacity: 0, scale: 0.96, y: 12 }}
-				animate={{
-					opacity: imageLoaded ? 1 : 0.6,
-					scale: imageLoaded ? 1 : 0.98,
-					y: 0,
-				}}
-				transition={{ duration: 0.25, ease: "easeOut" }}
-				className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-gray-100"
-			>
+			<div className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-gray-100">
 				<div className="relative bg-black">
 					{!imageLoaded && (
 						<div className="flex items-center justify-center h-[40vh] text-white/80 text-sm">
@@ -76,7 +66,7 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 						</button>
 					</div>
 				</div>
-			</motion.div>
+			</div>
 		</div>
 	);
 };

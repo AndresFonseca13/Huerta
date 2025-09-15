@@ -29,37 +29,15 @@ const FilteredCocktails = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
-				console.log("[DEBUG] FilteredCocktails - Iniciando fetchData con:", {
-					currentPage,
-					pageSize,
-					categoria,
-					tipo,
-				});
-
 				const data = await getProducts(currentPage, pageSize, categoria, tipo);
-
-				// El backend devuelve 'cocteles' y 'paginacion'
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
 				const totalPages = data.paginacion?.totalPages || 0;
 				const totalRecords = data.paginacion?.totalRecords || 0;
-
-				console.log("[DEBUG] FilteredCocktails - Datos recibidos:", {
-					items,
-					totalPages,
-					totalRecords,
-				});
-
 				setCocktails(items);
 				setTotalPages(totalPages);
 				setTotalRecords(totalRecords);
-
-				console.log("[DEBUG] FilteredCocktails - Estado actualizado:", {
-					cocktailsCount: items.length,
-					totalPages,
-					totalRecords,
-				});
-			} catch (error) {
-				console.error("[DEBUG] FilteredCocktails - Error:", error);
+			} catch (_error) {
+				// noop
 			} finally {
 				setIsLoading(false);
 			}
@@ -91,26 +69,17 @@ const FilteredCocktails = () => {
 		hidden: { opacity: 0 },
 		visible: {
 			opacity: 1,
-			transition: {
-				staggerChildren: 0.1,
-			},
+			transition: { staggerChildren: 0.1 },
 		},
 	};
 
 	const itemVariants = {
-		hidden: {
-			opacity: 0,
-			y: 20,
-			scale: 0.95,
-		},
+		hidden: { opacity: 0, y: 20, scale: 0.95 },
 		visible: {
 			opacity: 1,
 			y: 0,
 			scale: 1,
-			transition: {
-				duration: 0.3,
-				ease: "easeOut",
-			},
+			transition: { duration: 0.3, ease: "easeOut" },
 		},
 	};
 

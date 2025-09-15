@@ -1,12 +1,5 @@
 import { useMemo } from "react";
 
-// Función para obtener el rol del usuario desde localStorage
-const getUserRole = () => {
-	const role = localStorage.getItem("role") || "admin";
-	console.log("usePermissions - Rol detectado:", role);
-	return role;
-};
-
 // Función para obtener información del usuario desde el JWT
 const getUserInfo = () => {
 	try {

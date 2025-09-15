@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import PromotionEntryModal from "./PromotionEntryModal.jsx";
 import { getEligiblePromotionNow } from "../services/promotionService";
+
+const SESSION_FLAG = "promoShownThisSession";
 
 const ConditionalNavbar = () => {
 	const location = useLocation();
@@ -31,19 +33,24 @@ const ConditionalNavbar = () => {
 			location.pathname.startsWith("/bebidas/") ||
 			location.pathname === "/comida" ||
 			location.pathname.startsWith("/comida/");
-		console.log("[Promo] Path:", location.pathname, "isPublic:", isPublic);
 		if (!isPublic) return;
+
+		// Mostrar solo una vez por sesión
+		const alreadyShown = sessionStorage.getItem(SESSION_FLAG) === "1";
+		if (alreadyShown) return;
+
 		let cancelled = false;
 		(async () => {
 			try {
 				const promos = await getEligiblePromotionNow();
-				console.log("[Promo] elegible-now result:", promos);
 				if (!cancelled && Array.isArray(promos) && promos.length > 0) {
 					setPromotions(promos.slice(0, 2));
 					setShowPromo(true);
+					// Marcar como mostrado para toda la sesión
+					sessionStorage.setItem(SESSION_FLAG, "1");
 				}
 			} catch (_e) {
-				console.warn("[Promo] error fetching elegible-now:", _e);
+				// noop
 			}
 		})();
 		return () => {
@@ -66,15 +73,9 @@ const ConditionalNavbar = () => {
 			<Navbar />
 			<AnimatePresence>
 				{showPromo && current && (
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.2 }}
-						className="fixed inset-0 z-[49]"
-					>
+					<div className="fixed inset-0 z-[49]">
 						<PromotionEntryModal promotion={current} onClose={handleClose} />
-					</motion.div>
+					</div>
 				)}
 			</AnimatePresence>
 		</>
