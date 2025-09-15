@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./Navbar";
 import PromotionEntryModal from "./PromotionEntryModal.jsx";
 import { getEligiblePromotionNow } from "../services/promotionService";
@@ -35,7 +35,6 @@ const ConditionalNavbar = () => {
 			location.pathname.startsWith("/comida/");
 		if (!isPublic) return;
 
-		// Mostrar solo una vez por sesión
 		const alreadyShown = sessionStorage.getItem(SESSION_FLAG) === "1";
 		if (alreadyShown) return;
 
@@ -46,7 +45,6 @@ const ConditionalNavbar = () => {
 				if (!cancelled && Array.isArray(promos) && promos.length > 0) {
 					setPromotions(promos.slice(0, 2));
 					setShowPromo(true);
-					// Marcar como mostrado para toda la sesión
 					sessionStorage.setItem(SESSION_FLAG, "1");
 				}
 			} catch (_e) {
@@ -71,11 +69,18 @@ const ConditionalNavbar = () => {
 	return (
 		<>
 			<Navbar />
-			<AnimatePresence>
+			<AnimatePresence mode="wait">
 				{showPromo && current && (
-					<div className="fixed inset-0 z-[49]">
+					<motion.div
+						key={current.id}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="fixed inset-0 z-[49]"
+					>
 						<PromotionEntryModal promotion={current} onClose={handleClose} />
-					</div>
+					</motion.div>
 				)}
 			</AnimatePresence>
 		</>

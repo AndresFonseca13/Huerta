@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const PromotionEntryModal = ({ promotion, onClose }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);
@@ -25,7 +27,13 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 			role="dialog"
 			aria-modal="true"
 		>
-			<div className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-gray-100">
+			<motion.div
+				initial={{ y: 20, opacity: 0, scale: 0.98 }}
+				animate={{ y: 0, opacity: 1, scale: 1 }}
+				exit={{ y: 20, opacity: 0, scale: 0.98 }}
+				transition={{ duration: 0.22, ease: "easeOut" }}
+				className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-gray-100"
+			>
 				<div className="relative bg-black">
 					{!imageLoaded && (
 						<div className="flex items-center justify-center h-[40vh] text-white/80 text-sm">
@@ -66,7 +74,7 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 						</button>
 					</div>
 				</div>
-			</div>
+			</motion.div>
 		</div>
 	);
 };

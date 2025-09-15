@@ -6,6 +6,7 @@ import {
 } from "../services/promotionService";
 import { uploadImages } from "../services/uploadService";
 import AlertModal from "./AlertModal.jsx";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 
 const defaultDays = [0, 1, 2, 3, 4, 5, 6];
@@ -174,6 +175,13 @@ const PromotionFormModal = ({
 	const [isPriority, setIsPriority] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
+	const [tooManyModal, setTooManyModal] = useState({
+		open: false,
+		names: [],
+		tone: "amber",
+		title: "Aviso",
+		message: "",
+	});
 
 	const isPage = variant === "page";
 
@@ -711,6 +719,14 @@ const PromotionFormModal = ({
 				className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-start justify-center"
 			>
 				{Card}
+				<AlertModal
+					isOpen={tooManyModal.open}
+					title={tooManyModal.title}
+					message={tooManyModal.message}
+					items={tooManyModal.names}
+					tone={tooManyModal.tone}
+					onClose={() => setTooManyModal((s) => ({ ...s, open: false }))}
+				/>
 			</motion.div>
 		);
 	}
@@ -724,6 +740,14 @@ const PromotionFormModal = ({
 				className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
 			>
 				{Card}
+				<AlertModal
+					isOpen={tooManyModal.open}
+					title={tooManyModal.title}
+					message={tooManyModal.message}
+					items={tooManyModal.names}
+					tone={tooManyModal.tone}
+					onClose={() => setTooManyModal((s) => ({ ...s, open: false }))}
+				/>
 			</motion.div>
 		</AnimatePresence>
 	);
