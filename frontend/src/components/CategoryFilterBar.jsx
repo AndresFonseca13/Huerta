@@ -65,25 +65,6 @@ const CategoryFilterBar = () => {
 		return allCategories.filter((c) => c.type === tipo);
 	}, [allCategories, tipo]);
 
-	const handleTipoChange = (nuevoTipo) => {
-		setTipo(nuevoTipo);
-		// Ir a la ruta base del tipo seleccionado
-		if (nuevoTipo === "destilado") navigate("/bebidas");
-		else navigate("/comida");
-		// Scroll al inicio tras el cambio
-		try {
-			requestAnimationFrame(() => {
-				if (document?.scrollingElement) {
-					document.scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
-				} else {
-					window.scrollTo({ top: 0, behavior: "smooth" });
-				}
-			});
-		} catch (_err) {
-			/* noop */
-		}
-		// setIsFabOpen(false);
-	};
 
 	const handleSelectCategoria = (nombreCategoria) => {
 		if (!nombreCategoria) {
@@ -125,8 +106,8 @@ const CategoryFilterBar = () => {
 
 	return (
 		<div className="w-full flex flex-col gap-3 md:gap-4 items-center mb-4">
-			{/* Botón flotante movido a Portal para evitar stacking context */}
-			<FloatingTypeSwitcher tipo={tipo} onChange={handleTipoChange} />
+			{/* Botón flotante - ahora maneja su propia navegación */}
+			<FloatingTypeSwitcher />
 
 			{/* Botones de categorías - scroll horizontal */}
 			<div className="w-full max-w-7xl px-4">

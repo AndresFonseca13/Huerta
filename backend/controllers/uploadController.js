@@ -2,7 +2,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import sharp from 'sharp';
 
 const AZURE_STORAGE_CONNECTION_STRING =
-  process.env.AZURE_STORAGE_CONNECTION_STRING;
+	process.env.AZURE_STORAGE_CONNECTION_STRING;
 const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const containerName = 'cocktail-images';
 
@@ -46,7 +46,7 @@ export const uploadImage = async (req, res) => {
     return res.status(500).json({
       error: true,
       mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno',
+				'Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno',
     });
   }
 
@@ -54,7 +54,7 @@ export const uploadImage = async (req, res) => {
     return res.status(500).json({
       error: true,
       mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno',
+				'Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno',
     });
   }
 
@@ -76,9 +76,11 @@ export const uploadImage = async (req, res) => {
     const uploadedUrls = [];
 
     // Procesar cada archivo
-    for (const [idx, file] of req.files.entries()) {
-      // Generar un nombre único para el archivo (nombre-coctel-1.webp, etc)
-      const blobName = `${cocktailSlug}-${idx + 1}.webp`;
+    for (const file of req.files) {
+      // Generar un nombre único para el archivo usando timestamp para evitar sobrescribir
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const blobName = `${cocktailSlug}-${timestamp}-${randomSuffix}.webp`;
 
       // Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
       const optimizedBuffer = await sharp(file.buffer)

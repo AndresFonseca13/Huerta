@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getProductsAdmin } from "../services/productService.js";
+import { getAllCategories } from "../services/categoryService.js";
 // Quitamos BackButton: navegación persiste en el layout
 import EditCocktailModal from "../components/EditCocktailModal";
 import ManageCocktailModal from "../components/ManageCocktailModal";
@@ -38,12 +39,30 @@ const CocktailsAdmin = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 12;
 	const listTopRef = useRef(null);
+	const [beverageCats, setBeverageCats] = useState([]);
 
 	useEffect(() => {
 		const fetchCocktails = async () => {
 			try {
-				const response = await getProductsAdmin(1, 50, null, "destilado");
-				setCocktails(response.cocteles || []);
+				const [resDest, resClasifBeb] = await Promise.all([
+					getProductsAdmin(1, 200, null, "destilado"),
+					getProductsAdmin(1, 200, null, "clasificacion bebida"),
+				]);
+				const listA = resDest.cocteles || [];
+				const listB = resClasifBeb.cocteles || [];
+				const merged = new Map();
+				[...listA, ...listB].forEach((p) => merged.set(p.id, p));
+				setCocktails(Array.from(merged.values()));
+				// Cargar categorías de bebidas
+				try {
+					const all = await getAllCategories(false);
+					const onlyBeb = (Array.isArray(all) ? all : []).filter(
+						(c) => (c?.type || "").toLowerCase() === "clasificacion bebida"
+					);
+					setBeverageCats(onlyBeb);
+				} catch (_) {
+					setBeverageCats([]);
+				}
 			} catch {
 				setError("No se pudieron cargar los cócteles.");
 			} finally {
@@ -56,8 +75,15 @@ const CocktailsAdmin = () => {
 	const refreshCocktails = async () => {
 		setLoading(true);
 		try {
-			const response = await getProductsAdmin(1, 50, null, "destilado");
-			setCocktails(response.cocteles || []);
+			const [resDest, resClasifBeb] = await Promise.all([
+				getProductsAdmin(1, 200, null, "destilado"),
+				getProductsAdmin(1, 200, null, "clasificacion bebida"),
+			]);
+			const listA = resDest.cocteles || [];
+			const listB = resClasifBeb.cocteles || [];
+			const merged = new Map();
+			[...listA, ...listB].forEach((p) => merged.set(p.id, p));
+			setCocktails(Array.from(merged.values()));
 		} catch {
 			setError("No se pudieron cargar los cócteles.");
 		} finally {
@@ -101,16 +127,28 @@ const CocktailsAdmin = () => {
 	// Siempre calcular hooks antes de cualquier return condicional
 	// Obtener categorías únicas (solo destilado)
 	const uniqueCategories = useMemo(() => {
-		return Array.from(
-			new Set(
-				cocktails.flatMap((c) =>
-					(c.categories || []).map((cat) =>
-						typeof cat === "string" ? cat : cat.name
-					)
-				)
-			)
-		);
-	}, [cocktails]);
+		const names = new Set();
+		// 1) Añadir explícitamente categorías de 'clasificacion bebida' desde backend
+		for (const cat of beverageCats) {
+			if (cat?.name) names.add(cat.name);
+		}
+		// 2) Unir con categorías presentes en productos, filtrando tags no deseados
+		for (const c of cocktails) {
+			for (const cat of c.categories || []) {
+				const name = typeof cat === "string" ? cat : cat.name;
+				const type =
+					typeof cat === "string" ? null : (cat.type || "").toLowerCase();
+				const n = (name || "").toLowerCase();
+				const isGroup = n.startsWith("grupo:");
+				const isPresentation = n === "botella" || n === "trago";
+				if (isGroup || isPresentation) continue;
+				if (type === "clasificacion bebida" || type === "destilado") {
+					names.add(name);
+				}
+			}
+		}
+		return Array.from(names);
+	}, [cocktails, beverageCats]);
 
 	// const formatCategories = (categories) => {
 	//     if (!categories || categories.length === 0) {
@@ -375,12 +413,12 @@ const CocktailsAdmin = () => {
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.2 }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
 					>
 						{paginated.map((cocktail) => (
 							<div
 								key={cocktail.id}
-								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
+								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow"
 							>
 								<div className="flex items-start justify-between gap-2">
 									<div>

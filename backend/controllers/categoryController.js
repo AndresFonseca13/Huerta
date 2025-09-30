@@ -69,9 +69,15 @@ const getAllCategories = async (req, res) => {
   try {
     const showAll = req.query.showAll === 'true';
     const onlyFood = req.query.onlyFood === 'true';
+    const onlyBeverage = req.query.onlyBeverage === 'true';
     if (onlyFood) {
       const cats =
 				await categoryService.getFoodClassificationCategoriesService();
+      return res.status(200).json(cats);
+    }
+    if (onlyBeverage) {
+      const cats =
+				await categoryService.getBeverageClassificationCategoriesService();
       return res.status(200).json(cats);
     }
     const categories = await categoryService.getAllCategoriesService(showAll);

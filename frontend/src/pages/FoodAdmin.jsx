@@ -308,7 +308,7 @@ const FoodAdmin = () => {
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.2 }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
 					>
 						{paginated.map((it) => {
 							const classification =
@@ -333,7 +333,7 @@ const FoodAdmin = () => {
 							return (
 								<div
 									key={it.id}
-									className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+									className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all"
 								>
 									<div className="flex items-start justify-between gap-2">
 										<div>

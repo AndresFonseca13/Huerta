@@ -101,25 +101,38 @@ const updateProductService = async (productId, productData) => {
       }
     }
 
-    if (images && images.length > 0) {
+    // Actualizar imágenes si se envía el campo images (incluso si es un array vacío)
+    if (typeof images !== 'undefined') {
       const oldImagesResult = await client.query(
         'SELECT url FROM images WHERE product_id = $1',
         [productId],
       );
       const oldImageUrls = oldImagesResult.rows.map((row) => row.url);
+
+      // Determinar qué imágenes eliminar (las que estaban pero ya no están en el nuevo array)
       const imagesToDelete = oldImageUrls.filter(
         (url) => !images.includes(url),
       );
+
+      // Eliminar todas las imágenes antiguas de la BD
       await client.query('DELETE FROM images WHERE product_id = $1', [
         productId,
       ]);
-      for (const imageUrl of images) {
-        await client.query(
-          'INSERT INTO images (product_id, url) VALUES ($1, $2)',
-          [productId, imageUrl],
-        );
+
+      // Insertar las nuevas imágenes
+      if (Array.isArray(images) && images.length > 0) {
+        for (const imageUrl of images) {
+          await client.query(
+            'INSERT INTO images (product_id, url) VALUES ($1, $2)',
+            [productId, imageUrl],
+          );
+        }
       }
-      await deleteImagesFromAzure(imagesToDelete);
+
+      // Eliminar las imágenes antiguas de Azure Storage
+      if (imagesToDelete.length > 0) {
+        await deleteImagesFromAzure(imagesToDelete);
+      }
     }
 
     await client.query('COMMIT');

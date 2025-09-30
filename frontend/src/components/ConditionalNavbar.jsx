@@ -21,12 +21,10 @@ const ConditionalNavbar = () => {
 			location.pathname === route || location.pathname.startsWith(route)
 	);
 
-	// Solo mostrar navbar si NO es una ruta de admin
-	if (isAdminRoute) {
-		return null;
-	}
-
 	useEffect(() => {
+		// Si es ruta de admin, no cargar promociones
+		if (isAdminRoute) return;
+
 		const isPublic =
 			location.pathname === "/" ||
 			location.pathname === "/bebidas" ||
@@ -54,7 +52,12 @@ const ConditionalNavbar = () => {
 		return () => {
 			cancelled = true;
 		};
-	}, [location.pathname]);
+	}, [location.pathname, isAdminRoute]);
+
+	// Solo mostrar navbar si NO es una ruta de admin
+	if (isAdminRoute) {
+		return null;
+	}
 
 	const current = promotions[0] || null;
 	const handleClose = () => {

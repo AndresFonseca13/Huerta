@@ -30,10 +30,46 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	const [error, setError] = useState(null);
 	const [isSuccess, setIsSuccess] = useState(false);
 
+	const formatPrice = (value) => {
+		// Extraer solo los dígitos del valor ingresado
+		const numbers = String(value).replace(/\D/g, "");
+		if (!numbers) return "";
+		// Formatear con separador de miles
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	};
+
+	const handlePriceChange = (e) => {
+		const inputValue = e.target.value;
+		// Solo formatear si hay contenido
+		if (inputValue === "") {
+			setPrice("");
+			return;
+		}
+		const formatted = formatPrice(inputValue);
+		setPrice(formatted);
+	};
+
+	const handleImageChange = (e) => {
+		const files = Array.from(e.target.files);
+		const totalImages = images.length + newImageFiles.length + files.length;
+
+		if (totalImages > 5) {
+			setError(
+				`Solo puedes tener máximo 5 imágenes. Actualmente tienes ${
+					images.length + newImageFiles.length
+				}.`
+			);
+			return;
+		}
+
+		setNewImageFiles([...newImageFiles, ...files]);
+	};
+
 	useEffect(() => {
 		if (item) {
 			setName(item.name || "");
-			setPrice(item.price || "");
+			const priceValue = item.price || "";
+			setPrice(priceValue ? formatPrice(String(priceValue)) : "");
 			setDescription(item.description || "");
 			setIngredients(
 				item.ingredients
@@ -159,7 +195,6 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	const removeCategory = (index) =>
 		setCategories(categories.filter((_, i) => i !== index));
 	const handleRemoveImage = (url) => setImages(images.filter((u) => u !== url));
-	const handleImageChange = (e) => setNewImageFiles(Array.from(e.target.files));
 	const handleRemoveNewImage = (i) =>
 		setNewImageFiles(newImageFiles.filter((_, idx) => idx !== i));
 
@@ -169,11 +204,16 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 		setError(null);
 		setIsSuccess(false);
 		try {
+			// Empezar con las imágenes existentes que NO fueron eliminadas manualmente
 			let finalImageUrls = [...images];
+
+			// Si se seleccionaron nuevas imágenes, subirlas y AGREGARLAS a las existentes
 			if (newImageFiles.length > 0) {
 				const uploadedUrls = await uploadImages(newImageFiles, name.trim());
-				finalImageUrls = uploadedUrls;
+				// AGREGAR las nuevas imágenes a las existentes (no reemplazar)
+				finalImageUrls = [...finalImageUrls, ...uploadedUrls];
 			}
+
 			// Asegurar que la clasificación principal siempre se envíe
 			const classificationName =
 				item.food_classification_name ||
@@ -203,12 +243,13 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 			})();
 			const updatedData = {
 				name: name.trim(),
-				price: parseFloat(price),
+				price: parseFloat(price.replace(/\./g, "")),
 				description: description.trim(),
 				ingredients: ingredients.map((ing) => ing.name),
 				categories: categoriesWithClassification,
-				images: finalImageUrls,
+				images: finalImageUrls, // Envía todas las imágenes (antiguas + nuevas)
 			};
+			console.log("[EditFood] Actualizando con:", updatedData);
 			const result = await updateProduct(item.id, updatedData);
 			setIsSuccess(true);
 			setTimeout(() => {
@@ -284,11 +325,15 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									Precio
 								</label>
 								<input
-									type="number"
+									type="text"
 									value={price}
-									onChange={(e) => setPrice(e.target.value)}
+									onChange={handlePriceChange}
+									placeholder="0"
 									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
 								/>
+								{price && (
+									<p className="text-xs text-gray-500 mt-1">${price} COP</p>
+								)}
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-gray-700">

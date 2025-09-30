@@ -1,82 +1,193 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCocktail, FaUtensils, FaTimes } from "react-icons/fa";
-// Evitar warning de var no usada si no hay JSX directo con motion
-void motion;
+import {
+	FaCocktail,
+	FaUtensils,
+	FaWineBottle,
+	FaBars,
+	FaTimes,
+} from "react-icons/fa";
 
-const FloatingTypeSwitcher = ({ tipo, onChange }) => {
+const FloatingTypeSwitcher = () => {
 	const [open, setOpen] = useState(false);
+	const navigate = useNavigate();
+	const location = useLocation();
+	const containerRef = useRef(null);
+
+	// Cerrar al hacer clic fuera
+	useEffect(() => {
+		if (!open) return;
+
+		const handleClickOutside = (event) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(event.target)
+			) {
+				setOpen(false);
+			}
+		};
+
+		// Usar setTimeout para evitar que el mismo click que abre cierre el menú
+		const timer = setTimeout(() => {
+			document.addEventListener("mousedown", handleClickOutside);
+		}, 100);
+
+		return () => {
+			clearTimeout(timer);
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [open]);
+
+	// Determinar cuál está activo basado en la ruta
+	const activeMenu = location.pathname.startsWith("/comida")
+		? "comida"
+		: location.pathname.startsWith("/otras-bebidas")
+		? "otras-bebidas"
+		: "cocteles";
+
+	const menuOptions = [
+		{
+			key: "cocteles",
+			label: "Cócteles",
+			icon: FaCocktail,
+			color: "bg-green-600",
+			hoverColor: "hover:bg-green-700",
+			path: "/bebidas",
+		},
+		{
+			key: "comida",
+			label: "Comida",
+			icon: FaUtensils,
+			color: "bg-orange-600",
+			hoverColor: "hover:bg-orange-700",
+			path: "/comida",
+		},
+		{
+			key: "otras-bebidas",
+			label: "Otras Bebidas",
+			icon: FaWineBottle,
+			color: "bg-blue-600",
+			hoverColor: "hover:bg-blue-700",
+			path: "/otras-bebidas",
+		},
+	];
+
+	const handleNavigate = (path) => {
+		navigate(path);
+		setOpen(false);
+	};
 
 	const content = (
 		<div
+			ref={containerRef}
 			className="fixed z-[2000] pointer-events-auto"
 			style={{
-				right: "1rem",
+				right: "1.5rem",
 				top: "50%",
 				transform: "translateY(-50%)",
 			}}
 		>
-			<button
+			{/* Botón principal */}
+			<motion.button
 				type="button"
-				aria-label="Cambiar tipo"
-				onClick={() => setOpen((v) => !v)}
-				className="flex items-center justify-center w-12 h-12 rounded-full bg-green-700 text-white shadow-lg hover:bg-green-800 focus:outline-none"
+				aria-label="Menú de navegación"
+				onClick={(e) => {
+					e.stopPropagation();
+					setOpen(!open);
+				}}
+				className={`flex items-center justify-center w-14 h-14 rounded-full ${
+					open ? "bg-gray-700" : "bg-green-700"
+				} text-white shadow-xl hover:scale-110 transition-all duration-200 focus:outline-none`}
+				whileTap={{ scale: 0.95 }}
 			>
-				{tipo === "destilado" ? (
-					<FaCocktail size={18} />
-				) : (
-					<FaUtensils size={18} />
-				)}
-			</button>
+				<AnimatePresence mode="wait">
+					{open ? (
+						<motion.div
+							key="close"
+							initial={{ rotate: -90, opacity: 0 }}
+							animate={{ rotate: 0, opacity: 1 }}
+							exit={{ rotate: 90, opacity: 0 }}
+							transition={{ duration: 0.2 }}
+						>
+							<FaTimes size={20} />
+						</motion.div>
+					) : (
+						<motion.div
+							key="menu"
+							initial={{ rotate: 90, opacity: 0 }}
+							animate={{ rotate: 0, opacity: 1 }}
+							exit={{ rotate: -90, opacity: 0 }}
+							transition={{ duration: 0.2 }}
+						>
+							<FaBars size={20} />
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</motion.button>
 
+			{/* Burbujas expandidas */}
 			<AnimatePresence>
 				{open && (
 					<motion.div
-						initial={{ opacity: 0, y: 10, scale: 0.98 }}
-						animate={{ opacity: 1, y: 0, scale: 1 }}
-						exit={{ opacity: 0, y: 10, scale: 0.98 }}
+						className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col gap-3 pr-20"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
 						transition={{ duration: 0.2 }}
-						className="absolute top-14 right-0 w-48 bg-white rounded-xl shadow-2xl border border-green-100 overflow-hidden z-[2001]"
 					>
-						<div className="flex items-center justify-between px-3 py-2 border-b">
-							<span className="text-sm font-medium text-gray-700">
-								Seleccionar
-							</span>
-							<button
-								className="p-1 text-gray-500 hover:text-gray-700"
-								onClick={() => setOpen(false)}
-								aria-label="Cerrar"
-							>
-								<FaTimes size={14} />
-							</button>
-						</div>
-						<button
-							className={`w-full flex items-center gap-2 px-3 py-3 text-left text-sm transition-colors ${
-								tipo === "destilado"
-									? "bg-green-50 text-green-800"
-									: "hover:bg-gray-50"
-							}`}
-							onClick={() => {
-								onChange?.("destilado");
-								setOpen(false);
-							}}
-						>
-							<FaCocktail /> Bebidas
-						</button>
-						<button
-							className={`w-full flex items-center gap-2 px-3 py-3 text-left text-sm transition-colors ${
-								tipo === "clasificacion"
-									? "bg-green-50 text-green-800"
-									: "hover:bg-gray-50"
-							}`}
-							onClick={() => {
-								onChange?.("clasificacion");
-								setOpen(false);
-							}}
-						>
-							<FaUtensils /> Comida
-						</button>
+						{menuOptions.map((option, index) => {
+							const Icon = option.icon;
+							const isActive = activeMenu === option.key;
+
+							return (
+								<motion.button
+									key={option.key}
+									type="button"
+									onClick={() => handleNavigate(option.path)}
+									className={`flex items-center gap-3 ${option.color} ${
+										option.hoverColor
+									} text-white rounded-full shadow-lg pl-4 pr-5 py-3 transition-all ${
+										isActive ? "ring-2 ring-white ring-offset-2" : ""
+									}`}
+									initial={{
+										x: 80,
+										opacity: 0,
+									}}
+									animate={{
+										x: 0,
+										opacity: 1,
+									}}
+									exit={{
+										x: 80,
+										opacity: 0,
+									}}
+									transition={{
+										delay: index * 0.08,
+										duration: 0.3,
+										ease: [0.4, 0, 0.2, 1],
+									}}
+									whileHover={{ scale: 1.05, x: -8 }}
+									whileTap={{ scale: 0.95 }}
+								>
+									<Icon size={18} />
+									<span className="text-sm font-medium whitespace-nowrap">
+										{option.label}
+									</span>
+									{isActive && (
+										<motion.div
+											layoutId="active-indicator"
+											className="w-2 h-2 bg-white rounded-full"
+											initial={{ scale: 0 }}
+											animate={{ scale: 1 }}
+											transition={{ duration: 0.2 }}
+										/>
+									)}
+								</motion.button>
+							);
+						})}
 					</motion.div>
 				)}
 			</AnimatePresence>

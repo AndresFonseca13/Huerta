@@ -24,7 +24,8 @@ const validateCategories = (req, res, next) => {
     if (
       type !== 'destilado' &&
 			type !== 'clasificacion' &&
-			type !== 'clasificacion comida'
+			type !== 'clasificacion comida' &&
+			type !== 'clasificacion bebida'
     ) {
       // si viene otro type, mantén el anterior si existe para este name
       if (seenByName.has(name)) continue;
