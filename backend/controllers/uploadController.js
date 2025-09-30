@@ -75,12 +75,12 @@ export const uploadImage = async (req, res) => {
     // Array para almacenar las URLs de las imágenes subidas
     const uploadedUrls = [];
 
-		// Procesar cada archivo
-		for (const file of req.files) {
-			// Generar un nombre único para el archivo usando timestamp para evitar sobrescribir
-			const timestamp = Date.now();
-			const randomSuffix = Math.random().toString(36).substring(2, 8);
-			const blobName = `${cocktailSlug}-${timestamp}-${randomSuffix}.webp`;
+    // Procesar cada archivo
+    for (const file of req.files) {
+      // Generar un nombre único para el archivo usando timestamp para evitar sobrescribir
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const blobName = `${cocktailSlug}-${timestamp}-${randomSuffix}.webp`;
 
       // Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
       const optimizedBuffer = await sharp(file.buffer)
