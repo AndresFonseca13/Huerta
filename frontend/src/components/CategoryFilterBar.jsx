@@ -65,25 +65,6 @@ const CategoryFilterBar = () => {
 		return allCategories.filter((c) => c.type === tipo);
 	}, [allCategories, tipo]);
 
-	const handleTipoChange = (nuevoTipo) => {
-		setTipo(nuevoTipo);
-		// Ir a la ruta base del tipo seleccionado
-		if (nuevoTipo === "destilado") navigate("/bebidas");
-		else navigate("/comida");
-		// Scroll al inicio tras el cambio
-		try {
-			requestAnimationFrame(() => {
-				if (document?.scrollingElement) {
-					document.scrollingElement.scrollTo({ top: 0, behavior: "smooth" });
-				} else {
-					window.scrollTo({ top: 0, behavior: "smooth" });
-				}
-			});
-		} catch (_err) {
-			/* noop */
-		}
-		// setIsFabOpen(false);
-	};
 
 	const handleSelectCategoria = (nombreCategoria) => {
 		if (!nombreCategoria) {

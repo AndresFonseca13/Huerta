@@ -22,7 +22,6 @@ const OtherDrinksAdmin = () => {
 	const [error, setError] = useState("");
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState(null);
-	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 12;
 	const topRef = useRef(null);
 
@@ -45,7 +44,7 @@ const OtherDrinksAdmin = () => {
 					return !isFood && !isCocktail;
 				});
 				setItems(filtered);
-			} catch (e) {
+			} catch (_e) {
 				setError("No se pudieron cargar las bebidas.");
 			} finally {
 				setLoading(false);
@@ -71,10 +70,10 @@ const OtherDrinksAdmin = () => {
 
 	const paginated = useMemo(() => {
 		const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-		const safePage = Math.min(currentPage, totalPages);
+		const safePage = 1; // Siempre página 1 ya que no hay paginación activa
 		const start = (safePage - 1) * pageSize;
 		return filtered.slice(start, start + pageSize);
-	}, [filtered, currentPage]);
+	}, [filtered]);
 
 	const duplicateAs = async (product, asTag) => {
 		// asTag: 'botella' | 'trago'
@@ -102,7 +101,7 @@ const OtherDrinksAdmin = () => {
 			await createProduct(payload);
 			// Recargar
 			window.location.reload();
-		} catch (e) {
+		} catch (_e) {
 			alert("No se pudo duplicar el producto.");
 		}
 	};
