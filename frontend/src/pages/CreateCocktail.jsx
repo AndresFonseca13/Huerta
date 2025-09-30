@@ -46,6 +46,36 @@ const CreateCocktail = () => {
 
 	const navigate = useNavigate();
 
+	const formatPrice = (value) => {
+		// Extraer solo los dígitos del valor ingresado
+		const numbers = String(value).replace(/\D/g, "");
+		if (!numbers) return "";
+		// Formatear con separador de miles
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	};
+
+	const handlePriceChange = (e) => {
+		const inputValue = e.target.value;
+		// Solo formatear si hay contenido
+		if (inputValue === "") {
+			setPrice("");
+			return;
+		}
+		const formatted = formatPrice(inputValue);
+		setPrice(formatted);
+	};
+
+	const handleFileChange = (e) => {
+		const files = Array.from(e.target.files);
+		if (selectedFiles.length + files.length > 5) {
+			setError(
+				`Solo puedes subir máximo 5 imágenes. Actualmente tienes ${selectedFiles.length}.`
+			);
+			return;
+		}
+		setSelectedFiles([...selectedFiles, ...files]);
+	};
+
 	useEffect(() => {
 		try {
 			window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -75,17 +105,13 @@ const CreateCocktail = () => {
 			validationErrors.push("La descripción es obligatoria");
 		}
 
-		if (ingredients.length === 0) {
-			validationErrors.push("Debes agregar al menos un ingrediente");
-		}
+		// Ingredientes ahora son opcionales para otras bebidas
 
 		if (categories.length === 0) {
 			validationErrors.push("Debes agregar al menos una categoría");
 		}
 
-		if (selectedFiles.length === 0) {
-			validationErrors.push("Debes seleccionar al menos una imagen");
-		}
+		// Imágenes ahora son opcionales para otras bebidas
 
 		// Validación de alcohol si fue diligenciado
 		if (alcoholPercentage !== "") {
@@ -116,19 +142,26 @@ const CreateCocktail = () => {
 				"[CreateBeverage] starting uploadImages",
 				selectedFiles.length
 			);
-			// 1. Subir imágenes (solo si la validación pasó)
-			const imageUrls = await uploadImages(selectedFiles, name.trim());
-			console.log("[CreateBeverage] uploadImages OK", imageUrls);
+			// 1. Subir imágenes si fueron seleccionadas
+			const imageUrls = selectedFiles.length
+				? await uploadImages(selectedFiles, name.trim())
+				: [];
+			if (selectedFiles.length) {
+				console.log("[CreateBeverage] uploadImages OK", imageUrls);
+			}
 
 			// 2. Preparar objeto de la bebida
 			const cocktailData = {
 				name: name.trim(),
-				price: parseFloat(price),
+				price: parseFloat(price.replace(/\./g, "")),
 				description: description.trim(),
-				ingredients: ingredients.map((ing) =>
-					typeof ing === "string" ? ing : ing.name
-				),
-				images: imageUrls,
+				// Solo incluimos ingredientes si hay
+				...(ingredients.length > 0 && {
+					ingredients: ingredients.map((ing) =>
+						typeof ing === "string" ? ing : ing.name
+					),
+				}),
+				images: imageUrls, // puede ser []
 				categories: categories.map((cat) => ({
 					name: cat.name,
 					type: cat.type,
@@ -377,12 +410,15 @@ const CreateCocktail = () => {
 									Precio
 								</label>
 								<input
-									type="number"
+									type="text"
 									value={price}
-									onChange={(e) => setPrice(e.target.value)}
+									onChange={handlePriceChange}
 									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
-									placeholder="Ej. 8.50"
+									placeholder="0"
 								/>
+								{price && (
+									<p className="text-xs text-gray-500 mt-1">${price} COP</p>
+								)}
 							</div>
 
 							{/* Porcentaje de alcohol (opcional) */}
@@ -422,8 +458,15 @@ const CreateCocktail = () => {
 						<div className="space-y-2">
 							<label className="flex items-center text-gray-700 font-semibold">
 								<FiPlus className="mr-2 text-green-600" />
-								Ingredientes
+								Ingredientes{" "}
+								<span className="ml-1 text-gray-500 font-normal text-sm">
+									(opcional)
+								</span>
 							</label>
+							<p className="text-xs text-gray-500">
+								Puedes dejar este campo vacío para otras bebidas como agua,
+								sodas, vinos o cervezas.
+							</p>
 							<div className="flex items-center gap-2">
 								<input
 									type="text"
@@ -658,20 +701,23 @@ const CreateCocktail = () => {
 						<div className="space-y-2">
 							<label className="flex items-center text-gray-700 font-semibold">
 								<FiImage className="mr-2 text-green-600" />
-								Imágenes
+								Imágenes{" "}
+								<span className="ml-1 text-gray-500 font-normal text-sm">
+									(opcional)
+								</span>
 							</label>
+							<p className="text-xs text-gray-500">
+								Puedes omitir imágenes en otras bebidas si no las necesitas.
+							</p>
 							<div
-								className={`border-2 border-dashed rounded-lg p-6 text-center ${
-									showValidation && selectedFiles.length === 0
-										? "border-red-400 bg-red-50"
-										: "border-gray-300"
-								}`}
+								className={`border-2 border-dashed rounded-lg p-6 text-center border-gray-300`}
 							>
 								<input
 									type="file"
 									multiple
 									accept="image/*"
-									onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
+									onChange={handleFileChange}
+									disabled={selectedFiles.length >= 5}
 									className="hidden"
 									id="file-upload"
 								/>
@@ -683,11 +729,6 @@ const CreateCocktail = () => {
 									<span>Selecciona o arrastra las imágenes aquí</span>
 								</label>
 							</div>
-							{showValidation && selectedFiles.length === 0 && (
-								<p className="text-sm text-red-600 mt-1">
-									Debes seleccionar al menos una imagen.
-								</p>
-							)}
 							<div className="grid grid-cols-3 gap-4 mt-4">
 								{selectedFiles.map((file, index) => (
 									<div key={index} className="relative">
@@ -722,7 +763,7 @@ const CreateCocktail = () => {
 								whileTap={{ scale: 0.95 }}
 								className="bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-green-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
 							>
-								{isCreating ? "Creando..." : "Crear Cóctel"}
+								{isCreating ? "Creando..." : "Crear Bebida"}
 							</motion.button>
 						</div>
 					</form>

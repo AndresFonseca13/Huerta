@@ -31,10 +31,31 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 	const [error, setError] = useState(null);
 	const [isSuccess, setIsSuccess] = useState(false);
 
+	const formatPrice = (value) => {
+		// Extraer solo los dígitos del valor ingresado
+		const numbers = String(value).replace(/\D/g, "");
+		if (!numbers) return "";
+		// Formatear con separador de miles
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	};
+
+	const handlePriceChange = (e) => {
+		const inputValue = e.target.value;
+		// Solo formatear si hay contenido
+		if (inputValue === "") {
+			setPrice("");
+			return;
+		}
+		const formatted = formatPrice(inputValue);
+		setPrice(formatted);
+	};
+
 	useEffect(() => {
 		if (cocktail) {
 			setName(cocktail.name || "");
-			setPrice(cocktail.price || "");
+			// Formatear el precio al cargar
+			const priceValue = cocktail.price || "";
+			setPrice(priceValue ? formatPrice(String(priceValue)) : "");
 			setDescription(cocktail.description || "");
 			setIngredients(
 				cocktail.ingredients
@@ -133,7 +154,20 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 	};
 
 	const handleImageChange = (e) => {
-		setNewImageFiles(Array.from(e.target.files));
+		const files = Array.from(e.target.files);
+		const totalImages = images.length + newImageFiles.length + files.length;
+
+		// Validar que no exceda el máximo de 5 imágenes
+		if (totalImages > 5) {
+			setError(
+				`Solo puedes tener máximo 5 imágenes. Actualmente tienes ${
+					images.length + newImageFiles.length
+				}.`
+			);
+			return;
+		}
+
+		setNewImageFiles([...newImageFiles, ...files]);
 	};
 
 	const handleRemoveNewImage = (indexToRemove) => {
@@ -149,34 +183,38 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 		setIsSuccess(false);
 
 		try {
+			// Empezar con las imágenes existentes que NO fueron eliminadas manualmente
 			let finalImageUrls = [...images];
 
+			// Si se seleccionaron nuevas imágenes, subirlas y AGREGARLAS a las existentes
 			if (newImageFiles.length > 0) {
 				const uploadedUrls = await uploadImages(newImageFiles, name.trim());
-				finalImageUrls = uploadedUrls;
+				// AGREGAR las nuevas imágenes a las existentes (no reemplazar)
+				finalImageUrls = [...finalImageUrls, ...uploadedUrls];
 			}
 
 			const updatedData = {
 				name: name.trim(),
-				price: parseFloat(price),
+				price: parseFloat(price.replace(/\./g, "")), // Remover separadores de miles
 				description: description.trim(),
 				ingredients: ingredients.map((ing) => ing.name),
 				categories: categories.map((cat) => ({
 					name: cat.name,
 					type: cat.type || "destilado",
 				})),
-				images: finalImageUrls,
+				images: finalImageUrls, // Envía todas las imágenes (antiguas + nuevas)
 				...(alcoholPercentage !== "" && {
 					alcohol_percentage: Number(alcoholPercentage),
 				}),
 			};
 
+			console.log("[EditCocktail] Actualizando con:", updatedData);
 			const result = await updateProduct(cocktail.id, updatedData);
 			setIsSuccess(true);
 
 			setTimeout(() => {
 				setIsSuccess(false);
-				onUpdateSuccess(result.cocktail);
+				onUpdateSuccess(result.cocktail || result.product);
 			}, 2000);
 		} catch (err) {
 			setError(err.message || "Error al actualizar el cóctel.");
@@ -278,11 +316,15 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 								</label>
 								<input
 									id="price"
-									type="number"
+									type="text"
 									value={price}
-									onChange={(e) => setPrice(e.target.value)}
+									onChange={handlePriceChange}
+									placeholder="0"
 									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
 								/>
+								{price && (
+									<p className="text-xs text-gray-500 mt-1">${price} COP</p>
+								)}
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-gray-700">
@@ -496,47 +538,60 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mt-4">
-									Nuevas Imágenes
+									Agregar Nuevas Imágenes {images.length + newImageFiles.length}
+									/5
 								</label>
 								<p className="text-xs text-gray-500 mb-2">
-									{newImageFiles.length > 0
-										? "Las nuevas imágenes reemplazarán las actuales."
-										: "Selecciona nuevas imágenes solo si quieres reemplazar las actuales."}
+									Las nuevas imágenes se agregarán a las existentes (máximo 5
+									imágenes en total).
 								</p>
 								<div className="mt-2">
 									<label
 										htmlFor="images"
-										className="cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-md hover:border-green-500"
+										className={`cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-md ${
+											images.length + newImageFiles.length >= 5
+												? "border-gray-200 bg-gray-50 cursor-not-allowed"
+												: "border-gray-300 hover:border-green-500"
+										}`}
 									>
 										<FiUpload className="mr-2" />
-										<span>Seleccionar nuevas imágenes</span>
+										<span>
+											{images.length + newImageFiles.length >= 5
+												? "Máximo de imágenes alcanzado"
+												: "Seleccionar nuevas imágenes"}
+										</span>
 									</label>
 									<input
 										id="images"
 										type="file"
 										multiple
+										accept="image/*"
 										onChange={handleImageChange}
+										disabled={images.length + newImageFiles.length >= 5}
 										className="hidden"
 									/>
 								</div>
-								<div className="flex flex-col gap-2 mt-2">
-									{newImageFiles.map((file, index) => (
-										<div
-											key={index}
-											className="flex items-center justify-between text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-md"
-										>
-											<span>{file.name}</span>
-											<button
-												type="button"
-												onClick={() => handleRemoveNewImage(index)}
-												className="text-red-500 hover:text-red-700"
-												aria-label="Eliminar imagen nueva"
-											>
-												<FiTrash size={16} />
-											</button>
-										</div>
-									))}
-								</div>
+								{newImageFiles.length > 0 && (
+									<div className="grid grid-cols-3 gap-4 mt-4">
+										{newImageFiles.map((file, index) => (
+											<div key={index} className="relative">
+												<img
+													src={URL.createObjectURL(file)}
+													alt={`preview ${index}`}
+													className="w-full h-24 object-cover rounded-lg"
+												/>
+												<button
+													type="button"
+													onClick={() => handleRemoveNewImage(index)}
+													className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600"
+													aria-label="Eliminar imagen nueva"
+												>
+													<FiX size={14} />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
 							</div>
 
 							<div className="pt-4 flex justify-end space-x-4">

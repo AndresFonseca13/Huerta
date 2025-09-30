@@ -1,137 +1,139 @@
-import { BlobServiceClient } from '@azure/storage-blob';
-import sharp from 'sharp';
+import { BlobServiceClient } from "@azure/storage-blob";
+import sharp from "sharp";
 
 const AZURE_STORAGE_CONNECTION_STRING =
-  process.env.AZURE_STORAGE_CONNECTION_STRING;
+	process.env.AZURE_STORAGE_CONNECTION_STRING;
 const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const containerName = 'cocktail-images';
+const containerName = "cocktail-images";
 
 function slugify(str) {
-  return str
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // quitar acentos
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
+	return str
+		.toString()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "") // quitar acentos
+		.replace(/[^a-zA-Z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "")
+		.toLowerCase();
 }
 
 // Log para depuración (solo en desarrollo)
-if (process.env.NODE_ENV !== 'production') {
-  console.log('Configuración de Azure Storage:');
-  console.log(
-    'AZURE_STORAGE_ACCOUNT_NAME:',
-    AZURE_STORAGE_ACCOUNT_NAME ? 'Configurado' : 'No configurado',
-  );
-  console.log(
-    'AZURE_STORAGE_CONNECTION_STRING:',
-    AZURE_STORAGE_CONNECTION_STRING ? 'Configurado' : 'No configurado',
-  );
+if (process.env.NODE_ENV !== "production") {
+	console.log("Configuración de Azure Storage:");
+	console.log(
+		"AZURE_STORAGE_ACCOUNT_NAME:",
+		AZURE_STORAGE_ACCOUNT_NAME ? "Configurado" : "No configurado"
+	);
+	console.log(
+		"AZURE_STORAGE_CONNECTION_STRING:",
+		AZURE_STORAGE_CONNECTION_STRING ? "Configurado" : "No configurado"
+	);
 }
 
 export const uploadImage = async (req, res) => {
-  // Verificar si se recibieron archivos
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({
-      error: true,
-      mensaje: 'No se han proporcionado imágenes',
-    });
-  }
+	// Verificar si se recibieron archivos
+	if (!req.files || req.files.length === 0) {
+		return res.status(400).json({
+			error: true,
+			mensaje: "No se han proporcionado imágenes",
+		});
+	}
 
-  const cocktailNameRaw = req.body.cocktailName || 'imagen-coctel';
-  const cocktailSlug = slugify(cocktailNameRaw);
+	const cocktailNameRaw = req.body.cocktailName || "imagen-coctel";
+	const cocktailSlug = slugify(cocktailNameRaw);
 
-  // Verificar la configuración de Azure con mensajes más específicos
-  if (!AZURE_STORAGE_CONNECTION_STRING) {
-    return res.status(500).json({
-      error: true,
-      mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno',
-    });
-  }
+	// Verificar la configuración de Azure con mensajes más específicos
+	if (!AZURE_STORAGE_CONNECTION_STRING) {
+		return res.status(500).json({
+			error: true,
+			mensaje:
+				"Error de configuración: Falta AZURE_STORAGE_CONNECTION_STRING en las variables de entorno",
+		});
+	}
 
-  if (!AZURE_STORAGE_ACCOUNT_NAME) {
-    return res.status(500).json({
-      error: true,
-      mensaje:
-        'Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno',
-    });
-  }
+	if (!AZURE_STORAGE_ACCOUNT_NAME) {
+		return res.status(500).json({
+			error: true,
+			mensaje:
+				"Error de configuración: Falta AZURE_STORAGE_ACCOUNT_NAME en las variables de entorno",
+		});
+	}
 
-  try {
-    const blobServiceClient = BlobServiceClient.fromConnectionString(
-      AZURE_STORAGE_CONNECTION_STRING,
-    );
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+	try {
+		const blobServiceClient = BlobServiceClient.fromConnectionString(
+			AZURE_STORAGE_CONNECTION_STRING
+		);
+		const containerClient = blobServiceClient.getContainerClient(containerName);
 
-    // Verificar si el contenedor existe, si no, crearlo con acceso público
-    const containerExists = await containerClient.exists();
-    if (!containerExists) {
-      await containerClient.create({
-        access: 'blob', // Esto hace que los blobs sean accesibles públicamente
-      });
-    }
+		// Verificar si el contenedor existe, si no, crearlo con acceso público
+		const containerExists = await containerClient.exists();
+		if (!containerExists) {
+			await containerClient.create({
+				access: "blob", // Esto hace que los blobs sean accesibles públicamente
+			});
+		}
 
-    // Array para almacenar las URLs de las imágenes subidas
-    const uploadedUrls = [];
+		// Array para almacenar las URLs de las imágenes subidas
+		const uploadedUrls = [];
 
-    // Procesar cada archivo
-    for (const [idx, file] of req.files.entries()) {
-      // Generar un nombre único para el archivo (nombre-coctel-1.webp, etc)
-      const blobName = `${cocktailSlug}-${idx + 1}.webp`;
+		// Procesar cada archivo
+		for (const [idx, file] of req.files.entries()) {
+			// Generar un nombre único para el archivo usando timestamp para evitar sobrescribir
+			const timestamp = Date.now();
+			const randomSuffix = Math.random().toString(36).substring(2, 8);
+			const blobName = `${cocktailSlug}-${timestamp}-${randomSuffix}.webp`;
 
-      // Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
-      const optimizedBuffer = await sharp(file.buffer)
-        .resize({ width: 600, withoutEnlargement: true })
-        .webp({ quality: 80 })
-        .toBuffer();
+			// Procesar imagen con sharp: redimensionar SOLO el ancho a 600px, sin recortar
+			const optimizedBuffer = await sharp(file.buffer)
+				.resize({ width: 600, withoutEnlargement: true })
+				.webp({ quality: 80 })
+				.toBuffer();
 
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+			const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-      // Subir el archivo optimizado
-      await blockBlobClient.uploadData(optimizedBuffer, {
-        blobHTTPHeaders: {
-          blobContentType: 'image/webp',
-        },
-      });
+			// Subir el archivo optimizado
+			await blockBlobClient.uploadData(optimizedBuffer, {
+				blobHTTPHeaders: {
+					blobContentType: "image/webp",
+				},
+			});
 
-      // Generar URL pública
-      const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
-      uploadedUrls.push(publicUrl);
-    }
+			// Generar URL pública
+			const publicUrl = `https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${containerName}/${blobName}`;
+			uploadedUrls.push(publicUrl);
+		}
 
-    const response = {
-      error: false,
-      mensaje: 'Imágenes subidas exitosamente',
-      urls: uploadedUrls,
-    };
+		const response = {
+			error: false,
+			mensaje: "Imágenes subidas exitosamente",
+			urls: uploadedUrls,
+		};
 
-    console.log('Respuesta del backend:', response);
-    res.status(200).json(response);
-  } catch (error) {
-    console.error('Error al subir la imagen:', error);
+		console.log("Respuesta del backend:", response);
+		res.status(200).json(response);
+	} catch (error) {
+		console.error("Error al subir la imagen:", error);
 
-    // Manejar errores específicos
-    if (error.code === 'ENOENT') {
-      return res.status(500).json({
-        error: true,
-        mensaje: 'Error de conexión con Azure Storage',
-      });
-    }
+		// Manejar errores específicos
+		if (error.code === "ENOENT") {
+			return res.status(500).json({
+				error: true,
+				mensaje: "Error de conexión con Azure Storage",
+			});
+		}
 
-    // Log detallado del error en desarrollo
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Detalles del error:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack,
-      });
-    }
+		// Log detallado del error en desarrollo
+		if (process.env.NODE_ENV !== "production") {
+			console.error("Detalles del error:", {
+				message: error.message,
+				code: error.code,
+				stack: error.stack,
+			});
+		}
 
-    res.status(500).json({
-      error: true,
-      mensaje: 'Error al subir la imagen',
-      detalle: error.message,
-    });
-  }
+		res.status(500).json({
+			error: true,
+			mensaje: "Error al subir la imagen",
+			detalle: error.message,
+		});
+	}
 };

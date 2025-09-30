@@ -125,8 +125,8 @@ const CategoryFilterBar = () => {
 
 	return (
 		<div className="w-full flex flex-col gap-3 md:gap-4 items-center mb-4">
-			{/* Botón flotante movido a Portal para evitar stacking context */}
-			<FloatingTypeSwitcher tipo={tipo} onChange={handleTipoChange} />
+			{/* Botón flotante - ahora maneja su propia navegación */}
+			<FloatingTypeSwitcher />
 
 			{/* Botones de categorías - scroll horizontal */}
 			<div className="w-full max-w-7xl px-4">

@@ -1,17 +1,19 @@
-import createCategoryService from './createCategoryService.js';
-import deleteCategoryService from './deleteCategoryService.js';
-import getAllCategoriesService from './getAllCategoriesService.js';
-import getCategoryByIdService from './getCategoryByIdService.js';
-import updateCategory from './updateCategory.js';
-import searchCategoryService from './searchCategoryService.js';
-import getFoodClassificationCategoriesService from './getFoodClassificationCategoriesService.js';
+import createCategoryService from "./createCategoryService.js";
+import deleteCategoryService from "./deleteCategoryService.js";
+import getAllCategoriesService from "./getAllCategoriesService.js";
+import getCategoryByIdService from "./getCategoryByIdService.js";
+import updateCategory from "./updateCategory.js";
+import searchCategoryService from "./searchCategoryService.js";
+import getFoodClassificationCategoriesService from "./getFoodClassificationCategoriesService.js";
+import getBeverageClassificationCategoriesService from "./getBeverageClassificationCategoriesService.js";
 
 export {
-  createCategoryService,
-  deleteCategoryService,
-  getAllCategoriesService,
-  getCategoryByIdService,
-  updateCategory,
-  searchCategoryService,
-  getFoodClassificationCategoriesService,
+	createCategoryService,
+	deleteCategoryService,
+	getAllCategoriesService,
+	getCategoryByIdService,
+	updateCategory,
+	searchCategoryService,
+	getFoodClassificationCategoriesService,
+	getBeverageClassificationCategoriesService,
 };

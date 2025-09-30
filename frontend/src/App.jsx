@@ -5,6 +5,7 @@ import CreateCocktail from "./pages/CreateCocktail";
 import FilteredCocktails from "./pages/FilteredCocktails";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import AdminPanel from "./pages/AdminPanel.jsx";
+import OtherDrinks from "./pages/OtherDrinks.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -17,11 +18,18 @@ import UsersAdmin from "./pages/UsersAdmin.jsx";
 import PromotionsAdmin from "./pages/PromotionsAdmin.jsx";
 import PromotionEditor from "./pages/PromotionEditor.jsx";
 import Footer from "./components/Footer.jsx";
+import OtherDrinksAdmin from "./pages/OtherDrinksAdmin.jsx";
 
 function App() {
 	const location = useLocation();
 	// Rutas donde SÍ debe aparecer el Footer
-	const showFooter = ["/", "/login", "/bebidas", "/comida"].some((path) => {
+	const showFooter = [
+		"/",
+		"/login",
+		"/bebidas",
+		"/comida",
+		"/otras-bebidas",
+	].some((path) => {
 		if (path === "/cocteles" || path === "/comida") {
 			return (
 				location.pathname === path || location.pathname.startsWith("/comida/")
@@ -30,6 +38,12 @@ function App() {
 		if (path === "/bebidas") {
 			return (
 				location.pathname === path || location.pathname.startsWith("/bebidas/")
+			);
+		}
+		if (path === "/otras-bebidas") {
+			return (
+				location.pathname === path ||
+				location.pathname.startsWith("/otras-bebidas/")
 			);
 		}
 		return location.pathname === path;
@@ -57,6 +71,8 @@ function App() {
 				<Route path="/bebidas/:categoria" element={<FilteredCocktails />} />
 				<Route path="/comida" element={<FilteredCocktails />} />
 				<Route path="/comida/:categoria" element={<FilteredCocktails />} />
+				<Route path="/otras-bebidas" element={<OtherDrinks />} />
+				<Route path="/otras-bebidas/:categoria" element={<OtherDrinks />} />
 				<Route path="/admin/login" element={<AdminLogin />} />
 				<Route
 					path="/admin"
@@ -74,6 +90,16 @@ function App() {
 								requiredRoles={["admin", "ventas", "barmanager"]}
 							>
 								<CocktailsAdmin />
+							</RoleProtectedRoute>
+						}
+					/>
+					<Route
+						path="other-beverages"
+						element={
+							<RoleProtectedRoute
+								requiredRoles={["admin", "ventas", "barmanager"]}
+							>
+								<OtherDrinksAdmin />
 							</RoleProtectedRoute>
 						}
 					/>
