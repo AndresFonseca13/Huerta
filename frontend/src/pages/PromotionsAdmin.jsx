@@ -48,48 +48,41 @@ const TrashIcon = ({ className = "" }) => (
 const SwitchSm = ({ checked, onChange }) => (
 	<button
 		onClick={onChange}
-		className={`relative inline-flex items-center h-5 rounded-full w-10 transition-colors ${
-			checked ? "bg-green-600" : "bg-gray-300"
-		}`}
+		className="relative inline-flex items-center h-5 rounded-full w-10 transition-colors"
+		style={{
+			backgroundColor: checked ? "#e9cc9e" : "#3a3a3a",
+			border: "1px solid #3a3a3a",
+		}}
 	>
 		<span
-			className={`transform transition-transform inline-block w-5 h-5 bg-white rounded-full shadow ${
+			className={`transform transition-transform inline-block w-5 h-5 rounded-full shadow ${
 				checked ? "translate-x-5" : "translate-x-0"
 			}`}
+			style={{ backgroundColor: "#191919" }}
 		/>
 	</button>
 );
 
-const StatCard = ({
-	label,
-	count,
-	tone = "green",
-	active = false,
-	onClick,
-}) => {
-	const toneMap = {
-		green: {
-			card: active ? "border-green-300 bg-green-50" : "border-gray-200",
-			badge: "bg-green-100 text-green-700",
-		},
-		blue: {
-			card: active ? "border-blue-300 bg-blue-50" : "border-gray-200",
-			badge: "bg-blue-100 text-blue-700",
-		},
-		amber: {
-			card: active ? "border-amber-300 bg-amber-50" : "border-gray-200",
-			badge: "bg-amber-100 text-amber-700",
-		},
-	};
-	const t = toneMap[tone] || toneMap.green;
+const StatCard = ({ label, count, active = false, onClick }) => {
 	return (
 		<button
 			onClick={onClick}
-			className={`text-left w-full rounded-2xl border ${t.card} shadow-sm px-4 py-3 hover:brightness-95 transition`}
+			className="text-left w-full rounded-2xl border shadow-sm px-4 py-3 transition"
+			style={{
+				backgroundColor: active ? "#2a2a2a" : "#2a2a2a",
+				borderColor: "#3a3a3a",
+			}}
 		>
-			<div className="text-sm text-gray-600">{label}</div>
+			<div className="text-sm" style={{ color: "#b8b8b8" }}>
+				{label}
+			</div>
 			<div
-				className={`inline-flex mt-2 px-3 py-1 rounded-full text-sm font-semibold ${t.badge}`}
+				className="inline-flex mt-2 px-3 py-1 rounded-full text-sm font-semibold border"
+				style={{
+					backgroundColor: "#3a3a3a",
+					color: "#e9cc9e",
+					borderColor: "#4a4a4a",
+				}}
 			>
 				{count}
 			</div>
@@ -327,12 +320,15 @@ const PromotionsAdmin = () => {
 	};
 
 	return (
-		<div className="p-6 pb-24">
+		<div className="p-6 pb-24" style={{ backgroundColor: "#191919" }}>
 			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-				<h1 className="text-2xl font-bold text-gray-900">Promociones</h1>
+				<h1 className="text-2xl font-bold" style={{ color: "#e9cc9e" }}>
+					Promociones
+				</h1>
 				<button
 					onClick={handleCreate}
-					className="w-full sm:w-auto inline-flex items-center justify-center bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md text-sm"
+					className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-md text-sm"
+					style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 				>
 					Nueva promoción
 				</button>
@@ -364,9 +360,9 @@ const PromotionsAdmin = () => {
 			</div>
 
 			{isLoading ? (
-				<div className="text-gray-600">Cargando...</div>
+				<div style={{ color: "#b8b8b8" }}>Cargando...</div>
 			) : filtered.length === 0 ? (
-				<div className="text-gray-600">
+				<div style={{ color: "#b8b8b8" }}>
 					No hay promociones para este filtro.
 				</div>
 			) : (
@@ -374,10 +370,14 @@ const PromotionsAdmin = () => {
 					{filtered.map((p) => (
 						<div
 							key={p.id}
-							className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col"
+							className="rounded-2xl border shadow-sm p-4 flex flex-col"
+							style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
 						>
 							<div className="flex items-start gap-3">
-								<div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+								<div
+									className="w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center"
+									style={{ backgroundColor: "#1a1a1a" }}
+								>
 									{p.image_url ? (
 										<img
 											src={p.image_url}
@@ -385,48 +385,109 @@ const PromotionsAdmin = () => {
 											className="w-full h-full object-cover"
 										/>
 									) : (
-										<span className="text-xs text-gray-400">Sin imagen</span>
+										<span className="text-xs" style={{ color: "#9a9a9a" }}>
+											Sin imagen
+										</span>
 									)}
 								</div>
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center justify-between">
-										<h3 className="font-semibold text-gray-900 truncate">
+										<h3
+											className="font-semibold truncate"
+											style={{ color: "#e9cc9e" }}
+										>
 											{p.title}
 										</h3>
 										<button
 											onClick={() => setConfirmDelete({ open: true, promo: p })}
-											className="text-red-600 hover:text-red-700"
+											className="hover:brightness-110"
+											style={{ color: "#e9cc9e" }}
 											title="Eliminar"
 										>
 											<TrashIcon />
 										</button>
 									</div>
 									<div className="mt-2 flex flex-wrap gap-2">
-										{p.is_priority && <Badge tone="amber">Prioridad</Badge>}
+										{p.is_priority && (
+											<span
+												className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													borderColor: "#4a4a4a",
+												}}
+											>
+												Prioridad
+											</span>
+										)}
 										{p.valid_from || p.valid_to ? (
-											<Badge tone="blue">{`${formatDate(p.valid_from) || ""}${
+											<span
+												className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													borderColor: "#4a4a4a",
+												}}
+											>{`${formatDate(p.valid_from) || ""}${
 												p.valid_from && p.valid_to ? "–" : ""
-											}${formatDate(p.valid_to) || ""}`}</Badge>
+											}${formatDate(p.valid_to) || ""}`}</span>
 										) : null}
 										{p.start_time && p.end_time && (
-											<Badge tone="blue">{`${p.start_time.slice(
+											<span
+												className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													borderColor: "#4a4a4a",
+												}}
+											>{`${p.start_time.slice(0, 5)}–${p.end_time.slice(
 												0,
 												5
-											)}–${p.end_time.slice(0, 5)}`}</Badge>
+											)}`}</span>
 										)}
 										{Array.isArray(p.days_of_week) &&
 											p.days_of_week.length > 0 && (
-												<Badge>{formatDays(p.days_of_week)}</Badge>
+												<span
+													className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+													style={{
+														backgroundColor: "#3a3a3a",
+														color: "#e9cc9e",
+														borderColor: "#4a4a4a",
+													}}
+												>
+													{formatDays(p.days_of_week)}
+												</span>
 											)}
 										{p.is_active && isNowWithin(p) && (
-											<Badge tone="green">Vigente ahora</Badge>
+											<span
+												className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													borderColor: "#4a4a4a",
+												}}
+											>
+												Vigente ahora
+											</span>
 										)}
 										{isAlwaysActive(p) && (
-											<Badge tone="green">Siempre activo</Badge>
+											<span
+												className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													borderColor: "#4a4a4a",
+												}}
+											>
+												Siempre activo
+											</span>
 										)}
 									</div>
 									{p.description && (
-										<p className="text-sm text-gray-600 mt-2 line-clamp-2">
+										<p
+											className="text-sm mt-2 line-clamp-2"
+											style={{ color: "#b8b8b8" }}
+										>
 											{p.description}
 										</p>
 									)}
@@ -435,14 +496,18 @@ const PromotionsAdmin = () => {
 
 							<div className="mt-4 grid grid-cols-2 gap-3 items-center">
 								<div className="flex items-center gap-2">
-									<span className="text-xs text-gray-500">Activa</span>
+									<span className="text-xs" style={{ color: "#b8b8b8" }}>
+										Activa
+									</span>
 									<SwitchSm
 										checked={!!p.is_active}
 										onChange={() => toggleActive(p)}
 									/>
 								</div>
 								<div className="flex items-center gap-2 justify-end">
-									<span className="text-xs text-gray-500">Prioridad</span>
+									<span className="text-xs" style={{ color: "#b8b8b8" }}>
+										Prioridad
+									</span>
 									<SwitchSm
 										checked={!!p.is_priority}
 										onChange={() => togglePriority(p)}
@@ -453,13 +518,15 @@ const PromotionsAdmin = () => {
 							<div className="mt-4 flex items-center gap-2">
 								<button
 									onClick={() => setPreviewPromotion(p)}
-									className="px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 text-sm"
+									className="px-3 py-1.5 rounded-md text-sm"
+									style={{ border: "1px solid #3a3a3a", color: "#e9cc9e" }}
 								>
 									Previsualizar
 								</button>
 								<button
 									onClick={() => handleEdit(p)}
-									className="px-3 py-1.5 rounded-md bg-green-700 text-white hover:bg-green-800 text-sm"
+									className="px-3 py-1.5 rounded-md text-sm"
+									style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 								>
 									Editar
 								</button>
@@ -477,10 +544,17 @@ const PromotionsAdmin = () => {
 								key={page}
 								onClick={() => fetchData(page)}
 								className={`px-3 py-1 rounded ${
-									page === pagination.currentPage
-										? "bg-green-700 text-white"
-										: "border border-gray-300"
+									page === pagination.currentPage ? "font-semibold" : ""
 								}`}
+								style={
+									page === pagination.currentPage
+										? { backgroundColor: "#e9cc9e", color: "#191919" }
+										: {
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+										  }
+								}
 							>
 								{page}
 							</button>

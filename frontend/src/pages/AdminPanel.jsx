@@ -338,11 +338,14 @@ const AdminPanel = () => {
 		<>
 			{/* Main solo contenido - la navegación vive en AdminLayout */}
 			<main>
-				<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-					<h2 className="text-2xl font-bold text-gray-900">
+				<div
+					className="rounded-2xl border shadow-sm p-6 mb-6"
+					style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+				>
+					<h2 className="text-2xl font-bold" style={{ color: "#e9cc9e" }}>
 						¡Bienvenido, {username}! 👋
 					</h2>
-					<p className="text-gray-600 mt-1">
+					<p className="mt-1" style={{ color: "#b8b8b8" }}>
 						{userRole === "admin" &&
 							"Tienes el rol de administrador. Puedes gestionar todo el sistema."}
 						{userRole === "ventas" &&
@@ -359,12 +362,18 @@ const AdminPanel = () => {
 					{dashboardCards.map((card) => (
 						<div
 							key={card.id}
-							className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+							className="rounded-2xl border shadow-sm p-6"
+							style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
 						>
 							<div className="flex items-center justify-between">
-								<h3 className="font-semibold text-gray-900">{card.title}</h3>
+								<h3 className="font-semibold" style={{ color: "#e9cc9e" }}>
+									{card.title}
+								</h3>
 							</div>
-							<div className="mt-4 space-y-2 text-sm text-gray-700">
+							<div
+								className="mt-4 space-y-2 text-sm"
+								style={{ color: "#b8b8b8" }}
+							>
 								{card.stats.map((stat, index) => (
 									<SkeletonRow
 										key={index}
@@ -377,7 +386,8 @@ const AdminPanel = () => {
 							<div className="mt-4">
 								<button
 									onClick={() => navigate(card.navigate)}
-									className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+									className="text-sm font-medium px-3 py-1.5 rounded-full"
+									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									Ir a {card.title}
 								</button>
@@ -386,22 +396,30 @@ const AdminPanel = () => {
 					))}
 				</div>
 			</main>
-			<section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+			<section
+				className="rounded-2xl border shadow-sm p-6 mt-6"
+				style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+			>
 				<div className="flex items-center gap-2 mb-4">
-					<FiPlus className="text-gray-500" />
-					<h3 className="font-semibold text-gray-900">Atajos rápidos</h3>
+					<FiPlus style={{ color: "#e9cc9e" }} />
+					<h3 className="font-semibold" style={{ color: "#e9cc9e" }}>
+						Atajos rápidos
+					</h3>
 				</div>
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					{quickAccessButtons.map((button) => (
 						<button
 							key={button.id}
 							onClick={() => navigate(button.navigate)}
-							className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 hover:bg-green-50 transition-colors"
+							className="flex items-center justify-center gap-2 rounded-xl py-3 transition-colors"
+							style={{
+								backgroundColor: "#3a3a3a",
+								color: "#e9cc9e",
+								border: "1px solid #4a4a4a",
+							}}
 						>
 							<button.icon className={button.iconColor} />
-							<span className="text-sm font-medium text-gray-800">
-								{button.label}
-							</span>
+							<span className="text-sm font-medium">{button.label}</span>
 						</button>
 					))}
 				</div>

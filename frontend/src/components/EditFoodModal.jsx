@@ -31,16 +31,13 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	const [isSuccess, setIsSuccess] = useState(false);
 
 	const formatPrice = (value) => {
-		// Extraer solo los dígitos del valor ingresado
 		const numbers = String(value).replace(/\D/g, "");
 		if (!numbers) return "";
-		// Formatear con separador de miles
 		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
 	};
 
 	const handlePriceChange = (e) => {
 		const inputValue = e.target.value;
-		// Solo formatear si hay contenido
 		if (inputValue === "") {
 			setPrice("");
 			return;
@@ -52,7 +49,6 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	const handleImageChange = (e) => {
 		const files = Array.from(e.target.files);
 		const totalImages = images.length + newImageFiles.length + files.length;
-
 		if (totalImages > 5) {
 			setError(
 				`Solo puedes tener máximo 5 imágenes. Actualmente tienes ${
@@ -61,7 +57,6 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 			);
 			return;
 		}
-
 		setNewImageFiles([...newImageFiles, ...files]);
 	};
 
@@ -78,7 +73,6 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 					  )
 					: []
 			);
-			// Derivar la clasificación primaria aunque no venga en categories
 			const classificationName =
 				item.food_classification_name ||
 				item.clasificacion_name ||
@@ -93,7 +87,7 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 								cat.toLowerCase() === String(classificationName).toLowerCase();
 							return {
 								name: cat,
-								type: isClass ? "clasificacion comida" : "categoria",
+								type: isClass ? "clasificacion" : "categoria",
 							};
 						}
 						const isClass =
@@ -103,8 +97,7 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 								String(classificationName).toLowerCase();
 						return {
 							...cat,
-							type:
-								cat.type || (isClass ? "clasificacion comida" : "categoria"),
+							type: cat.type || (isClass ? "clasificacion" : "categoria"),
 						};
 				  })
 				: [];
@@ -118,7 +111,7 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 				hasClassification || !classificationName
 					? baseCategories
 					: [
-							{ name: classificationName, type: "clasificacion comida" },
+							{ name: classificationName, type: "clasificacion" },
 							...baseCategories,
 					  ]
 			);
@@ -174,7 +167,6 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 		setCategorySuggestions([]);
 	};
 
-	// Permitir crear categorías nuevas desde el input con Enter
 	const handleCategoryKeyDown = (e) => {
 		if (e.key === "Enter") {
 			e.preventDefault();
@@ -204,17 +196,11 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 		setError(null);
 		setIsSuccess(false);
 		try {
-			// Empezar con las imágenes existentes que NO fueron eliminadas manualmente
 			let finalImageUrls = [...images];
-
-			// Si se seleccionaron nuevas imágenes, subirlas y AGREGARLAS a las existentes
 			if (newImageFiles.length > 0) {
 				const uploadedUrls = await uploadImages(newImageFiles, name.trim());
-				// AGREGAR las nuevas imágenes a las existentes (no reemplazar)
 				finalImageUrls = [...finalImageUrls, ...uploadedUrls];
 			}
-
-			// Asegurar que la clasificación principal siempre se envíe
 			const classificationName =
 				item.food_classification_name ||
 				item.clasificacion_name ||
@@ -247,7 +233,7 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 				description: description.trim(),
 				ingredients: ingredients.map((ing) => ing.name),
 				categories: categoriesWithClassification,
-				images: finalImageUrls, // Envía todas las imágenes (antiguas + nuevas)
+				images: finalImageUrls,
 			};
 			console.log("[EditFood] Actualizando con:", updatedData);
 			const result = await updateProduct(item.id, updatedData);
@@ -270,14 +256,20 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 			{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			{isSuccess && (
 				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
-					<div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
-						<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<div
+						className="rounded-lg shadow-xl p-8 max-w-md w-full text-center"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+					>
+						<div
+							className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+							style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+						>
 							✓
 						</div>
-						<h3 className="text-xl font-bold text-gray-800 mb-2">
+						<h3 className="text-xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
 							¡Plato Actualizado!
 						</h3>
-						<p className="text-gray-600">
+						<p style={{ color: "#b8b8b8" }}>
 							El plato "{name}" ha sido actualizado exitosamente.
 						</p>
 					</div>
@@ -286,21 +278,26 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 			{!isSuccess && (
 				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
 					<div
-						className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
+						className="rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 						onClick={(e) => e.stopPropagation()}
 					>
 						<button
 							onClick={onClose}
-							className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+							className="absolute top-4 right-4"
+							style={{ color: "#e9cc9e" }}
 							aria-label="Cerrar"
 						>
 							<FiX size={24} />
 						</button>
 
-						<h2 className="text-2xl font-bold text-gray-800 mb-2">
+						<h2
+							className="text-2xl font-bold mb-2"
+							style={{ color: "#e9cc9e" }}
+						>
 							Editar Plato
 						</h2>
-						<p className="text-gray-500 mb-4">
+						<p className="mb-4" style={{ color: "#b8b8b8" }}>
 							Actualiza la información del plato. Los campos no enviados se
 							mantienen.
 						</p>
@@ -310,18 +307,29 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 							className="space-y-4 max-h-[70vh] overflow-y-auto pr-4"
 						>
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Nombre
 								</label>
 								<input
 									type="text"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Precio
 								</label>
 								<input
@@ -329,26 +337,44 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									value={price}
 									onChange={handlePriceChange}
 									placeholder="0"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{price && (
-									<p className="text-xs text-gray-500 mt-1">${price} COP</p>
+									<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
+										${price} COP
+									</p>
 								)}
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Descripción
 								</label>
 								<textarea
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
 									rows={3}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 
 							<div className="relative">
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Ingredientes
 								</label>
 								<input
@@ -356,15 +382,27 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									value={ingredientInput}
 									onChange={(e) => handleIngredientSearch(e.target.value)}
 									placeholder="Buscar y agregar ingredientes"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{ingredientSuggestions.length > 0 && (
-									<ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+									<ul
+										className="absolute z-10 w-full rounded-md shadow-lg max-h-40 overflow-y-auto"
+										style={{
+											backgroundColor: "#2a2a2a",
+											border: "1px solid #3a3a3a",
+										}}
+									>
 										{ingredientSuggestions.map((s) => (
 											<li
 												key={s.id}
 												onClick={() => addIngredient(s)}
-												className="px-4 py-2 cursor-pointer hover:bg-gray-100 capitalize text-gray-900"
+												className="px-4 py-2 cursor-pointer capitalize"
+												style={{ color: "#e9cc9e" }}
 											>
 												{s.name}
 											</li>
@@ -375,13 +413,15 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									{ingredients.map((ing, idx) => (
 										<div
 											key={idx}
-											className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm"
+											className="flex items-center px-2 py-1 rounded-full text-sm"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											<span>{ing.name}</span>
 											<button
 												type="button"
 												onClick={() => removeIngredient(idx)}
-												className="ml-2 text-green-600 hover:text-green-800"
+												className="ml-2"
+												style={{ color: "#e9cc9e" }}
 											>
 												<FiTrash size={14} />
 											</button>
@@ -391,7 +431,10 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 							</div>
 
 							<div className="relative">
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Clasificación
 								</label>
 								<input
@@ -400,18 +443,33 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									onChange={(e) => handleCategorySearch(e.target.value)}
 									onKeyDown={handleCategoryKeyDown}
 									placeholder="Buscar y agregar clasificación"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{categorySuggestions.length > 0 && (
-									<ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+									<ul
+										className="absolute z-10 w-full rounded-md shadow-lg max-h-40 overflow-y-auto"
+										style={{
+											backgroundColor: "#2a2a2a",
+											border: "1px solid #3a3a3a",
+										}}
+									>
 										{categorySuggestions.map((s) => (
 											<li
 												key={s.id}
 												onClick={() => addCategory(s)}
-												className="px-4 py-2 cursor-pointer hover:bg-gray-100 capitalize text-gray-900"
+												className="px-4 py-2 cursor-pointer capitalize"
+												style={{ color: "#e9cc9e" }}
 											>
 												<span className="font-medium">{s.name}</span>
-												<span className="text-gray-500 text-sm ml-2">
+												<span
+													className="text-sm ml-2"
+													style={{ color: "#b8b8b8" }}
+												>
 													({s.type})
 												</span>
 											</li>
@@ -422,16 +480,21 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									{categories.map((cat, idx) => (
 										<div
 											key={idx}
-											className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm"
+											className="flex items-center px-2 py-1 rounded-full text-sm"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											<span className="font-medium">{cat.name}</span>
-											<span className="text-blue-600 text-xs ml-1">
+											<span
+												className="text-xs ml-1"
+												style={{ color: "#b8b8b8" }}
+											>
 												({cat.type})
 											</span>
 											<button
 												type="button"
 												onClick={() => removeCategory(idx)}
-												className="ml-2 text-blue-600 hover:text-blue-800"
+												className="ml-2"
+												style={{ color: "#e9cc9e" }}
 											>
 												<FiTrash size={14} />
 											</button>
@@ -441,7 +504,10 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Imágenes actuales
 								</label>
 								{images.length > 0 ? (
@@ -456,7 +522,12 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 												<button
 													type="button"
 													onClick={() => handleRemoveImage(url)}
-													className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 leading-none hover:bg-red-600"
+													className="absolute -top-2 -right-2 rounded-full p-1 leading-none shadow"
+													style={{
+														backgroundColor: "#2a2a2a",
+														border: "1px solid #3a3a3a",
+														color: "#e9cc9e",
+													}}
 												>
 													<FiX size={14} />
 												</button>
@@ -464,22 +535,26 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 										))}
 									</div>
 								) : (
-									<p className="text-sm text-gray-500 mt-2">
+									<p className="text-sm mt-2" style={{ color: "#9a9a9a" }}>
 										No hay imágenes actuales.
 									</p>
 								)}
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mt-4">
+								<label
+									className="block text-sm font-medium mt-4"
+									style={{ color: "#e9cc9e" }}
+								>
 									Nuevas Imágenes
 								</label>
 								<div className="mt-2">
 									<label
 										htmlFor="imagesFood"
-										className="cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-md hover:border-green-500"
+										className="cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-md"
+										style={{ borderColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
-										<FiUpload className="mr-2" />
+										<FiUpload className="mr-2" style={{ color: "#e9cc9e" }} />
 										<span>Seleccionar nuevas imágenes</span>
 									</label>
 									<input
@@ -494,13 +569,18 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 									{newImageFiles.map((file, index) => (
 										<div
 											key={index}
-											className="flex items-center justify-between text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-md"
+											className="flex items-center justify-between text-sm px-3 py-2 rounded-md"
+											style={{
+												backgroundColor: "#2a2a2a",
+												border: "1px solid #3a3a3a",
+												color: "#e9cc9e",
+											}}
 										>
 											<span>{file.name}</span>
 											<button
 												type="button"
 												onClick={() => handleRemoveNewImage(index)}
-												className="text-red-500 hover:text-red-700"
+												style={{ color: "#e9cc9e" }}
 											>
 												<FiTrash size={16} />
 											</button>
@@ -513,14 +593,20 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 								<button
 									type="button"
 									onClick={onClose}
-									className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+									className="px-4 py-2 rounded-md"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								>
 									Cancelar
 								</button>
 								<button
 									type="submit"
 									disabled={isSubmitting}
-									className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+									className="px-4 py-2 rounded-md disabled:opacity-50"
+									style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 								>
 									{isSubmitting ? "Actualizando..." : "Guardar Cambios"}
 								</button>

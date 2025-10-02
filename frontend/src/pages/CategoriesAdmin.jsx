@@ -210,24 +210,62 @@ const CategoriesAdmin = () => {
 
 	if (loading)
 		return (
-			<div className="p-6 md:p-10 min-h-screen bg-gray-50">
+			<div
+				className="p-6 md:p-10 min-h-screen"
+				style={{ backgroundColor: "#191919" }}
+			>
 				<div className="max-w-6xl mx-auto">
-					<div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-4" />
-					<div className="h-5 w-72 bg-gray-200 rounded animate-pulse mb-6" />
+					<div
+						className="h-8 w-48 rounded animate-pulse mb-4"
+						style={{ backgroundColor: "#2a2a2a" }}
+					/>
+					<div
+						className="h-5 w-72 rounded animate-pulse mb-6"
+						style={{ backgroundColor: "#2a2a2a" }}
+					/>
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
 						{Array.from({ length: 3 }).map((_, i) => (
-							<div key={i} className="h-20 bg-white rounded-xl shadow-sm p-4">
-								<div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-2" />
-								<div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
+							<div
+								key={i}
+								className="h-20 rounded-xl shadow-sm p-4"
+								style={{
+									backgroundColor: "#2a2a2a",
+									border: "1px solid #3a3a3a",
+								}}
+							>
+								<div
+									className="h-4 w-24 rounded animate-pulse mb-2"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
+								<div
+									className="h-6 w-16 rounded animate-pulse"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
 							</div>
 						))}
 					</div>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 						{Array.from({ length: 6 }).map((_, i) => (
-							<div key={i} className="h-40 bg-white rounded-xl shadow-sm p-4">
-								<div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-3" />
-								<div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-2" />
-								<div className="h-8 w-full bg-gray-100 rounded animate-pulse" />
+							<div
+								key={i}
+								className="h-40 rounded-xl shadow-sm p-4"
+								style={{
+									backgroundColor: "#2a2a2a",
+									border: "1px solid #3a3a3a",
+								}}
+							>
+								<div
+									className="h-5 w-32 rounded animate-pulse mb-3"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
+								<div
+									className="h-4 w-20 rounded animate-pulse mb-2"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
+								<div
+									className="h-8 w-full rounded animate-pulse"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
 							</div>
 						))}
 					</div>
@@ -237,7 +275,10 @@ const CategoriesAdmin = () => {
 	if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
 	return (
-		<div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+		<div
+			className="p-4 md:p-8 min-h-screen"
+			style={{ backgroundColor: "#191919" }}
+		>
 			<header className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center w-full">
 				<div className="flex-1">
 					<Motion.div
@@ -245,10 +286,13 @@ const CategoriesAdmin = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.25 }}
 					>
-						<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
+						<h1
+							className="text-3xl md:text-4xl font-extrabold mb-1 tracking-tight"
+							style={{ color: "#e9cc9e" }}
+						>
 							Gestión de Categorías
 						</h1>
-						<p className="text-gray-600">
+						<p style={{ color: "#b8b8b8" }}>
 							Administra las categorías del sistema
 						</p>
 					</Motion.div>
@@ -256,7 +300,8 @@ const CategoriesAdmin = () => {
 				<div className="mt-4 md:mt-0">
 					<button
 						onClick={openCreateModal}
-						className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
+						className="flex items-center px-4 py-2 text-white rounded-lg transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
+						style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 					>
 						<FiPlus className="mr-2" /> Crear Categoría
 					</button>
@@ -266,53 +311,88 @@ const CategoriesAdmin = () => {
 				{/* Buscador y filtros */}
 				<div className="flex flex-col gap-4 mb-4">
 					<div className="relative w-full sm:w-80">
-						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+						<FiSearch
+							className="absolute left-3 top-1/2 -translate-y-1/2"
+							style={{ color: "#b8b8b8" }}
+						/>
 						<input
 							type="text"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 							placeholder="Buscar categoría..."
-							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
+							className="pl-10 pr-4 py-2 w-full rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 						/>
 					</div>
 					{/* KPIs: ocupar ancho completo en desktop para evitar estrechamiento */}
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-2 w-full">
 						<Motion.div
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === "all" ? "ring-2 ring-green-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "all" ? "ring-2" : ""
 							}`}
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter("all")}
 						>
-							<div className="text-sm text-gray-500">Total</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Total
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{total}</span>
 							</div>
 						</Motion.div>
 						<Motion.div
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === "active" ? "ring-2 ring-blue-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "active" ? "ring-2" : ""
 							}`}
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter("active")}
 						>
-							<div className="text-sm text-gray-500">Activas</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Activas
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{activos}</span>
 							</div>
 						</Motion.div>
 						<Motion.div
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === "inactive" ? "ring-2 ring-yellow-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "inactive" ? "ring-2" : ""
 							}`}
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter("inactive")}
 						>
-							<div className="text-sm text-gray-500">Inactivas</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Inactivas
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{inactivos}</span>
 							</div>
 						</Motion.div>
@@ -325,9 +405,12 @@ const CategoriesAdmin = () => {
 								onClick={() => handleTypeSelect(null)}
 								className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${
 									typeFilter === null
-										? "bg-green-600 text-white border-green-600"
-										: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									typeFilter === null ? { backgroundColor: "#e9cc9e" } : {}
+								}
 							>
 								Todos
 							</button>
@@ -337,9 +420,12 @@ const CategoriesAdmin = () => {
 									onClick={() => handleTypeSelect(type)}
 									className={`px-3 py-1.5 rounded-full border text-sm capitalize whitespace-nowrap ${
 										typeFilter === type
-											? "bg-green-600 text-white border-green-600"
-											: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+											? "border-[#e9cc9e] text-[#191919]"
+											: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 									}`}
+									style={
+										typeFilter === type ? { backgroundColor: "#e9cc9e" } : {}
+									}
 								>
 									{type}{" "}
 									{typeCounts.get(type) ? `(${typeCounts.get(type)})` : ""}
@@ -354,7 +440,14 @@ const CategoriesAdmin = () => {
 
 				{/* Grid de mini-cards */}
 				{paginated.length === 0 ? (
-					<div className="p-10 text-center text-gray-400 bg-white rounded-xl">
+					<div
+						className="p-10 text-center rounded-xl"
+						style={{
+							backgroundColor: "#2a2a2a",
+							color: "#b8b8b8",
+							border: "1px solid #3a3a3a",
+						}}
+					>
 						No hay categorías para mostrar.
 					</div>
 				) : (
@@ -368,28 +461,38 @@ const CategoriesAdmin = () => {
 						{paginated.map((cat) => (
 							<div
 								key={cat.id}
-								className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow overflow-hidden"
+								className="rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow overflow-hidden"
+								style={{
+									backgroundColor: "#2a2a2a",
+									border: "1px solid #3a3a3a",
+								}}
 							>
 								<div className="flex items-start justify-between gap-2">
 									<div>
-										<h3 className="text-lg font-semibold text-gray-900 capitalize">
+										<h3
+											className="text-lg font-semibold capitalize"
+											style={{ color: "#e9cc9e" }}
+										>
 											{cat.name}
 										</h3>
 										<div className="flex items-center gap-2 mt-1">
-											<span className="inline-flex text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full capitalize">
+											<span
+												className="inline-flex text-xs px-2 py-1 rounded-full capitalize"
+												style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+											>
 												{cat.type}
 											</span>
-											<span className="inline-flex text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+											<span
+												className="inline-flex text-xs px-2 py-1 rounded-full"
+												style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+											>
 												{cat.product_count || 0} productos
 											</span>
 										</div>
 									</div>
 									<span
-										className={`text-xs px-2 py-1 rounded-full ${
-											cat.is_active
-												? "bg-green-100 text-green-700"
-												: "bg-red-100 text-red-700"
-										}`}
+										className="text-xs px-2 py-1 rounded-full"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										{cat.is_active ? "Activa" : "Inactiva"}
 									</span>
@@ -397,17 +500,23 @@ const CategoriesAdmin = () => {
 								<div className="flex flex-wrap items-center gap-2 mt-4">
 									<button
 										onClick={() => openEditModal(cat)}
-										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 									>
 										<FiEdit className="mr-1" /> Editar
 									</button>
 									<button
 										onClick={() => handleToggleActive(cat)}
-										className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full ${
-											cat.is_active
-												? "text-red-700 bg-red-50 hover:bg-red-100"
-												: "text-green-800 bg-green-50 hover:bg-green-100"
-										}`}
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 									>
 										{cat.is_active ? (
 											<FiXCircle className="mr-1" />
@@ -418,7 +527,12 @@ const CategoriesAdmin = () => {
 									</button>
 									<button
 										onClick={() => handleDelete(cat)}
-										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm text-red-600 bg-red-50 hover:bg-red-100 font-medium px-3 py-1.5 rounded-full"
+										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 									>
 										<FiTrash2 className="mr-1" /> Borrar
 									</button>
@@ -433,7 +547,12 @@ const CategoriesAdmin = () => {
 					<div className="flex items-center justify-center gap-2 mt-6">
 						<button
 							onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							className="px-3 py-1.5 rounded-lg"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							disabled={safeCurrentPage === 1}
 						>
 							Anterior
@@ -444,7 +563,12 @@ const CategoriesAdmin = () => {
 						</div>
 						<button
 							onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							className="px-3 py-1.5 rounded-lg"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							disabled={safeCurrentPage === totalPages}
 						>
 							Siguiente

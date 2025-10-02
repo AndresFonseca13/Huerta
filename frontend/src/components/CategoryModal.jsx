@@ -49,7 +49,8 @@ const CategoryModal = ({
 				exit={{ opacity: 0 }}
 			>
 				<motion.div
-					className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md relative"
+					className="rounded-xl shadow-2xl p-6 w-full max-w-md relative"
+					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					initial={{ scale: 0.9, y: 40 }}
 					animate={{ scale: 1, y: 0 }}
 					exit={{ scale: 0.9, y: 40 }}
@@ -62,32 +63,53 @@ const CategoryModal = ({
 					>
 						<FiX size={20} />
 					</button>
-					<h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+					<h2
+						className="text-xl font-bold mb-4 text-center"
+						style={{ color: "#e9cc9e" }}
+					>
 						{modoEdicion ? "Editar Categoría" : "Crear Nueva Categoría"}
 					</h2>
 					<form onSubmit={handleSubmit} className="space-y-4">
 						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								<FiTag className="inline mr-1 text-green-600" /> Nombre
+							<label
+								className="block text-sm font-medium mb-1"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiTag className="inline mr-1" style={{ color: "#e9cc9e" }} />{" "}
+								Nombre
 							</label>
 							<input
 								type="text"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+								className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+								style={{
+									backgroundColor: "#2a2a2a",
+									color: "#e9cc9e",
+									border: "1px solid #3a3a3a",
+								}}
 								placeholder="Nombre de la categoría"
 								autoFocus
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								<FiType className="inline mr-1 text-blue-600" /> Tipo
+							<label
+								className="block text-sm font-medium mb-1"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiType className="inline mr-1" style={{ color: "#e9cc9e" }} />{" "}
+								Tipo
 							</label>
 							<input
 								type="text"
 								value={type}
 								onChange={(e) => setType(e.target.value)}
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+								className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+								style={{
+									backgroundColor: "#2a2a2a",
+									color: "#e9cc9e",
+									border: "1px solid #3a3a3a",
+								}}
 								placeholder="Tipo de la categoría"
 							/>
 						</div>
@@ -96,7 +118,8 @@ const CategoryModal = ({
 						)}
 						<button
 							type="submit"
-							className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+							className="w-full py-2 rounded-lg font-semibold transition-colors"
+							style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 						>
 							{modoEdicion ? "Guardar Cambios" : "Crear Categoría"}
 						</button>

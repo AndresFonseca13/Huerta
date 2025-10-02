@@ -32,7 +32,8 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 				animate={{ y: 0, opacity: 1, scale: 1 }}
 				exit={{ y: 20, opacity: 0, scale: 0.98 }}
 				transition={{ duration: 0.22, ease: "easeOut" }}
-				className="bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-gray-100"
+				className="rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto"
+				style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 			>
 				<div className="relative bg-black">
 					{!imageLoaded && (
@@ -57,18 +58,25 @@ const PromotionEntryModal = ({ promotion, onClose }) => {
 					</button>
 				</div>
 				<div className="px-6 pt-5 pb-6 text-center">
-					<h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+					<h3
+						className="text-3xl font-extrabold tracking-tight"
+						style={{ color: "#e9cc9e" }}
+					>
 						{promotion.title}
 					</h3>
 					{promotion.description && (
-						<p className="mt-3 text-base md:text-lg text-gray-700 leading-relaxed whitespace-pre-line">
+						<p
+							className="mt-3 text-base md:text-lg leading-relaxed whitespace-pre-line"
+							style={{ color: "#b8b8b8" }}
+						>
 							{promotion.description}
 						</p>
 					)}
 					<div className="mt-7 flex justify-center">
 						<button
 							onClick={onClose}
-							className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-green-700 text-white hover:bg-green-800 shadow-sm"
+							className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full shadow-sm"
+							style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 						>
 							Cerrar
 						</button>

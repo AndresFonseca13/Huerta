@@ -53,24 +53,24 @@ const FloatingTypeSwitcher = () => {
 			key: "cocteles",
 			label: "Cócteles",
 			icon: FaCocktail,
-			color: "bg-green-600",
-			hoverColor: "hover:bg-green-700",
+			bgColor: "#e9cc9e",
+			textColor: "#191919",
 			path: "/bebidas",
 		},
 		{
 			key: "comida",
 			label: "Comida",
 			icon: FaUtensils,
-			color: "bg-orange-600",
-			hoverColor: "hover:bg-orange-700",
+			bgColor: "#e9cc9e",
+			textColor: "#191919",
 			path: "/comida",
 		},
 		{
 			key: "otras-bebidas",
 			label: "Otras Bebidas",
 			icon: FaWineBottle,
-			color: "bg-blue-600",
-			hoverColor: "hover:bg-blue-700",
+			bgColor: "#e9cc9e",
+			textColor: "#191919",
 			path: "/otras-bebidas",
 		},
 	];
@@ -98,9 +98,11 @@ const FloatingTypeSwitcher = () => {
 					e.stopPropagation();
 					setOpen(!open);
 				}}
-				className={`flex items-center justify-center w-14 h-14 rounded-full ${
-					open ? "bg-gray-700" : "bg-green-700"
-				} text-white shadow-xl hover:scale-110 transition-all duration-200 focus:outline-none`}
+				className="flex items-center justify-center w-14 h-14 rounded-full shadow-xl hover:scale-110 transition-all duration-200 focus:outline-none"
+				style={{
+					backgroundColor: open ? "#3a3a3a" : "#e9cc9e",
+					color: open ? "#e9cc9e" : "#191919",
+				}}
 				whileTap={{ scale: 0.95 }}
 			>
 				<AnimatePresence mode="wait">
@@ -147,11 +149,14 @@ const FloatingTypeSwitcher = () => {
 									key={option.key}
 									type="button"
 									onClick={() => handleNavigate(option.path)}
-									className={`flex items-center gap-3 ${option.color} ${
-										option.hoverColor
-									} text-white rounded-full shadow-lg pl-4 pr-5 py-3 transition-all ${
-										isActive ? "ring-2 ring-white ring-offset-2" : ""
+									className={`flex items-center gap-3 rounded-full shadow-lg pl-4 pr-5 py-3 transition-all ${
+										isActive ? "ring-2 ring-offset-2" : ""
 									}`}
+									style={{
+										backgroundColor: option.bgColor,
+										color: option.textColor,
+										ringColor: isActive ? "#e9cc9e" : "transparent",
+									}}
 									initial={{
 										x: 80,
 										opacity: 0,
@@ -178,8 +183,8 @@ const FloatingTypeSwitcher = () => {
 									</span>
 									{isActive && (
 										<motion.div
-											layoutId="active-indicator"
-											className="w-2 h-2 bg-white rounded-full"
+											className="w-2 h-2 rounded-full"
+											style={{ backgroundColor: "#191919" }}
 											initial={{ scale: 0 }}
 											animate={{ scale: 1 }}
 											transition={{ duration: 0.2 }}
