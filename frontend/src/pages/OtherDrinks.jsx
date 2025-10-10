@@ -120,7 +120,10 @@ const OtherDrinks = () => {
 	};
 
 	return (
-		<div className="py-8">
+		<div
+			className="py-8"
+			style={{ backgroundColor: "#191919", minHeight: "100vh" }}
+		>
 			{/* Botón flotante de navegación */}
 			<FloatingTypeSwitcher />
 
@@ -131,10 +134,13 @@ const OtherDrinks = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h1 className="text-3xl font-bold text-green-900 mb-2">
+				<h1
+					className="text-3xl md:text-4xl font-bold mb-2"
+					style={{ color: "#e9cc9e" }}
+				>
 					Otras bebidas
 				</h1>
-				<p className="text-gray-600">
+				<p className="text-gray-400">
 					{totalRecords > 0
 						? `Encontramos ${totalRecords} bebidas`
 						: "No se encontraron resultados"}
@@ -146,11 +152,12 @@ const OtherDrinks = () => {
 				<div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
 					{/* Filtro "Todos" siempre presente */}
 					<button
-						className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-colors shadow-sm ${
+						className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm ${
 							filter === "todos"
-								? "bg-green-900 text-white border-green-900"
-								: "bg-white text-gray-800 border-gray-200 hover:bg-green-50"
+								? "border-[#e9cc9e] text-[#191919]"
+								: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 						}`}
+						style={filter === "todos" ? { backgroundColor: "#e9cc9e" } : {}}
 						onClick={() => {
 							setFilter("todos");
 							setSubFilter(null);
@@ -163,11 +170,16 @@ const OtherDrinks = () => {
 					{beverageCategories.map((cat) => (
 						<button
 							key={cat.id}
-							className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-colors shadow-sm capitalize ${
+							className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm capitalize ${
 								filter === normalize(cat.name)
-									? "bg-green-900 text-white border-green-900"
-									: "bg-white text-gray-800 border-gray-200 hover:bg-green-50"
+									? "border-[#e9cc9e] text-[#191919]"
+									: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 							}`}
+							style={
+								filter === normalize(cat.name)
+									? { backgroundColor: "#e9cc9e" }
+									: {}
+							}
 							onClick={() => {
 								setFilter(normalize(cat.name));
 								setSubFilter(null);
@@ -183,14 +195,24 @@ const OtherDrinks = () => {
 			{/* Subfiltros de vino */}
 			{filter === "vino" && wineSubcategories.length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
-					<p className="text-xs text-gray-500 mb-2 px-1">Tipos de vino:</p>
+					<p
+						className="text-xs mb-2 px-1"
+						style={{ color: "#e9cc9e", opacity: 0.7 }}
+					>
+						Tipos de vino:
+					</p>
 					<div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
 						<button
-							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors ${
+							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
 								!subFilter
-									? "bg-green-700 text-white border-green-700"
-									: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+									? "border-[#e9cc9e] text-[#191919]"
+									: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 							}`}
+							style={
+								!subFilter
+									? { backgroundColor: "#e9cc9e" }
+									: { color: "#e9cc9e" }
+							}
 							onClick={() => {
 								setSubFilter(null);
 								setCurrentPage(1);
@@ -201,11 +223,16 @@ const OtherDrinks = () => {
 						{wineSubcategories.map((cat) => (
 							<button
 								key={cat.id}
-								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors capitalize ${
+								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
 									subFilter === normalize(cat.name)
-										? "bg-green-700 text-white border-green-700"
-										: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									subFilter === normalize(cat.name)
+										? { backgroundColor: "#e9cc9e" }
+										: { color: "#e9cc9e" }
+								}
 								onClick={() => {
 									setSubFilter(normalize(cat.name));
 									setCurrentPage(1);
@@ -221,14 +248,24 @@ const OtherDrinks = () => {
 			{/* Subfiltros de botellas - mostrar destilados */}
 			{filter === "botellas" && destiladoSubcategories.length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
-					<p className="text-xs text-gray-500 mb-2 px-1">Tipo de destilado:</p>
+					<p
+						className="text-xs mb-2 px-1"
+						style={{ color: "#e9cc9e", opacity: 0.7 }}
+					>
+						Tipo de destilado:
+					</p>
 					<div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
 						<button
-							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors ${
+							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
 								!subFilter
-									? "bg-green-700 text-white border-green-700"
-									: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+									? "border-[#e9cc9e] text-[#191919]"
+									: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 							}`}
+							style={
+								!subFilter
+									? { backgroundColor: "#e9cc9e" }
+									: { color: "#e9cc9e" }
+							}
 							onClick={() => {
 								setSubFilter(null);
 								setCurrentPage(1);
@@ -239,11 +276,16 @@ const OtherDrinks = () => {
 						{destiladoSubcategories.map((cat) => (
 							<button
 								key={cat.id}
-								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors capitalize ${
+								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
 									subFilter === normalize(cat.name)
-										? "bg-green-700 text-white border-green-700"
-										: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									subFilter === normalize(cat.name)
+										? { backgroundColor: "#e9cc9e" }
+										: { color: "#e9cc9e" }
+								}
 								onClick={() => {
 									setSubFilter(normalize(cat.name));
 									setCurrentPage(1);
@@ -259,14 +301,24 @@ const OtherDrinks = () => {
 			{/* Subfiltros de tragos - mostrar destilados */}
 			{filter === "tragos" && destiladoSubcategories.length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
-					<p className="text-xs text-gray-500 mb-2 px-1">Tipo de destilado:</p>
+					<p
+						className="text-xs mb-2 px-1"
+						style={{ color: "#e9cc9e", opacity: 0.7 }}
+					>
+						Tipo de destilado:
+					</p>
 					<div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
 						<button
-							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors ${
+							className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
 								!subFilter
-									? "bg-green-700 text-white border-green-700"
-									: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+									? "border-[#e9cc9e] text-[#191919]"
+									: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 							}`}
+							style={
+								!subFilter
+									? { backgroundColor: "#e9cc9e" }
+									: { color: "#e9cc9e" }
+							}
 							onClick={() => {
 								setSubFilter(null);
 								setCurrentPage(1);
@@ -277,11 +329,16 @@ const OtherDrinks = () => {
 						{destiladoSubcategories.map((cat) => (
 							<button
 								key={cat.id}
-								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors capitalize ${
+								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
 									subFilter === normalize(cat.name)
-										? "bg-green-700 text-white border-green-700"
-										: "bg-white text-gray-700 border-gray-300 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									subFilter === normalize(cat.name)
+										? { backgroundColor: "#e9cc9e" }
+										: { color: "#e9cc9e" }
+								}
 								onClick={() => {
 									setSubFilter(normalize(cat.name));
 									setCurrentPage(1);
@@ -299,13 +356,20 @@ const OtherDrinks = () => {
 				{filteredItems.map((p) => (
 					<div
 						key={p.id}
-						className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-4 md:p-5"
+						className="rounded-xl border shadow-sm hover:shadow-lg transition-all p-4 md:p-5"
+						style={{
+							backgroundColor: "#2a2a2a",
+							borderColor: "#3a3a3a",
+						}}
 					>
 						{/* Sección superior: Imagen horizontal + Info */}
 						<div className="flex gap-4">
 							{/* Imagen - object-contain para no cortar botellas */}
 							{p.images?.[0] && (
-								<div className="flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center">
+								<div
+									className="flex-shrink-0 rounded-lg flex items-center justify-center"
+									style={{ backgroundColor: "#1a1a1a" }}
+								>
 									<img
 										src={p.images[0]}
 										alt={p.name}
@@ -317,16 +381,25 @@ const OtherDrinks = () => {
 
 							{/* Info principal: Nombre y Precio */}
 							<div className="flex-1 min-w-0 flex flex-col justify-center">
-								<h3 className="text-lg md:text-xl font-bold text-gray-900 capitalize mb-2">
+								<h3
+									className="text-lg md:text-xl font-bold capitalize mb-2"
+									style={{ color: "#e9cc9e" }}
+								>
 									{p.name}
 								</h3>
-								<div className="text-xl md:text-2xl font-bold text-green-700 mb-2">
+								<div
+									className="text-xl md:text-2xl font-bold mb-2"
+									style={{ color: "#e9cc9e" }}
+								>
 									{currency(p.price)}
 								</div>
 
 								{/* Porcentaje de alcohol si existe */}
 								{p.alcohol_percentage && (
-									<span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded w-fit">
+									<span
+										className="inline-block px-2 py-0.5 text-xs font-semibold rounded w-fit"
+										style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
+									>
 										{p.alcohol_percentage}% Vol.
 									</span>
 								)}
@@ -335,7 +408,10 @@ const OtherDrinks = () => {
 
 						{/* Descripción */}
 						{p.description && (
-							<p className="text-sm text-gray-600 line-clamp-2 mt-3 mb-3">
+							<p
+								className="text-sm line-clamp-2 mt-3 mb-3"
+								style={{ color: "#b8b8b8" }}
+							>
 								{p.description}
 							</p>
 						)}
@@ -349,7 +425,12 @@ const OtherDrinks = () => {
 									.map((cat, idx) => (
 										<span
 											key={idx}
-											className="inline-block px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-200 capitalize"
+											className="inline-block px-2.5 py-1 text-xs font-medium rounded-full border capitalize"
+											style={{
+												backgroundColor: "#3a3a3a",
+												color: "#e9cc9e",
+												borderColor: "#4a4a4a",
+											}}
 										>
 											{cat.name}
 										</span>
@@ -357,7 +438,10 @@ const OtherDrinks = () => {
 								{p.categories.filter(
 									(cat) => cat.type === "clasificacion bebida"
 								).length > 4 && (
-									<span className="inline-block px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+									<span
+										className="inline-block px-2.5 py-1 text-xs font-medium rounded-full"
+										style={{ backgroundColor: "#3a3a3a", color: "#b8b8b8" }}
+									>
 										+
 										{p.categories.filter(
 											(cat) => cat.type === "clasificacion bebida"
@@ -376,7 +460,12 @@ const OtherDrinks = () => {
 					<button
 						disabled={currentPage === 1}
 						onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-						className="px-3 py-1 rounded disabled:opacity-50 text-black"
+						className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+						style={{
+							color: "#e9cc9e",
+							backgroundColor: "#2a2a2a",
+							border: "1px solid #3a3a3a",
+						}}
 					>
 						‹ Anterior
 					</button>
@@ -384,9 +473,18 @@ const OtherDrinks = () => {
 						<button
 							key={page}
 							onClick={() => handlePageChange(page)}
-							className={`px-3 py-1 rounded ${
-								page === currentPage ? "bg-green-700 text-white" : ""
+							className={`px-3 py-2 rounded-lg transition-all ${
+								page === currentPage ? "font-bold" : ""
 							}`}
+							style={
+								page === currentPage
+									? { backgroundColor: "#e9cc9e", color: "#191919" }
+									: {
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+									  }
+							}
 						>
 							{page}
 						</button>
@@ -396,7 +494,12 @@ const OtherDrinks = () => {
 						onClick={() =>
 							handlePageChange(Math.min(currentPage + 1, totalPages))
 						}
-						className="px-3 py-1 rounded disabled:opacity-50 text-black"
+						className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+						style={{
+							color: "#e9cc9e",
+							backgroundColor: "#2a2a2a",
+							border: "1px solid #3a3a3a",
+						}}
 					>
 						Siguiente ›
 					</button>

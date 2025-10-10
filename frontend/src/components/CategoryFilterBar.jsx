@@ -65,7 +65,6 @@ const CategoryFilterBar = () => {
 		return allCategories.filter((c) => c.type === tipo);
 	}, [allCategories, tipo]);
 
-
 	const handleSelectCategoria = (nombreCategoria) => {
 		if (!nombreCategoria) {
 			navigate(tipo === "destilado" ? "/bebidas" : "/comida");
@@ -117,25 +116,35 @@ const CategoryFilterBar = () => {
 					aria-label="Filtros por categoría"
 				>
 					<button
-						className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-colors shadow-sm ${
+						className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm ${
 							!categoria &&
 							(location.pathname === "/bebidas" ||
 								location.pathname === "/comida")
-								? "bg-green-900 text-white border-green-900"
-								: "bg-white text-gray-800 border-gray-200 hover:bg-green-50"
+								? "border-[#e9cc9e] text-[#191919]"
+								: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 						}`}
+						style={
+							!categoria &&
+							(location.pathname === "/bebidas" ||
+								location.pathname === "/comida")
+								? { backgroundColor: "#e9cc9e" }
+								: {}
+						}
 						onClick={() => handleSelectCategoria(null)}
 					>
 						{tipo === "destilado" ? "Todas las bebidas" : "Toda la comida"}
 					</button>
 
 					{loading && (
-						<span className="flex-shrink-0 text-sm text-gray-500">
+						<span
+							className="flex-shrink-0 text-sm"
+							style={{ color: "#b8b8b8" }}
+						>
 							Cargando...
 						</span>
 					)}
 					{error && (
-						<span className="flex-shrink-0 text-sm text-red-500">{error}</span>
+						<span className="flex-shrink-0 text-sm text-red-400">{error}</span>
 					)}
 
 					{!loading &&
@@ -143,11 +152,14 @@ const CategoryFilterBar = () => {
 						categoriasFiltradas.map((cat) => (
 							<button
 								key={cat.id}
-								className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base capitalize transition-colors shadow-sm ${
+								className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base capitalize transition-all shadow-sm ${
 									isSelected(cat.name)
-										? "bg-green-900 text-white border-green-900"
-										: "bg-white text-gray-800 border-gray-200 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									isSelected(cat.name) ? { backgroundColor: "#e9cc9e" } : {}
+								}
 								onClick={() => handleSelectCategoria(cat.name)}
 							>
 								{cat.name}

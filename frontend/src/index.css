@@ -33,7 +33,7 @@ h1 {
 input,
 textarea,
 select {
-	color: #111827 !important; /* text-gray-900 */
+	color: #ffffff !important; /* text-gray-900 */
 }
 
 @media (prefers-color-scheme: light) {
@@ -50,12 +50,7 @@ select {
 }
 
 body {
-	background-image: url("/src/assets/generated_image.png");
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	background-position: center;
-	background-color: #f5f5f5;
+	background-color: #191919;
 }
 
 /* Ocultar barra de scroll horizontal en contenedores específicos */

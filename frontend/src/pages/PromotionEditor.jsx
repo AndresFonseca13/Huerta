@@ -22,9 +22,11 @@ const PromotionEditor = () => {
 	}, [id, isEdit, promotion]);
 
 	return (
-		<div className="min-h-screen bg-gray-50">
+		<div className="min-h-screen" style={{ backgroundColor: "#191919" }}>
 			{loading ? (
-				<div className="p-6 text-gray-600">Cargando promoción...</div>
+				<div className="p-6" style={{ color: "#b8b8b8" }}>
+					Cargando promoción...
+				</div>
 			) : (
 				<PromotionFormModal
 					variant="page"

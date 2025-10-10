@@ -89,23 +89,66 @@ const UsersAdmin = () => {
 
 	const RoleDropdown = ({ value, onChange, disabled = false }) => {
 		const [open, setOpen] = useState(false);
+		const [openUp, setOpenUp] = useState(false);
+		const [menuMaxH, setMenuMaxH] = useState(200);
+		const btnRef = React.useRef(null);
 		const current = ROLES.includes(value) ? value : ROLES[0];
+
+		React.useEffect(() => {
+			if (!open) return;
+			const compute = () => {
+				if (!btnRef.current) return;
+				const rect = btnRef.current.getBoundingClientRect();
+				const gap = 8;
+				const spaceBelow = window.innerHeight - rect.bottom - gap;
+				const spaceAbove = rect.top - gap;
+				const desired = 200;
+				const shouldOpenUp = spaceBelow < desired && spaceAbove > spaceBelow;
+				setOpenUp(shouldOpenUp);
+				setMenuMaxH(
+					Math.max(140, (shouldOpenUp ? spaceAbove : spaceBelow) - 8)
+				);
+			};
+			compute();
+			window.addEventListener("resize", compute);
+			window.addEventListener("scroll", compute, true);
+			return () => {
+				window.removeEventListener("resize", compute);
+				window.removeEventListener("scroll", compute, true);
+			};
+		}, [open]);
+
 		return (
 			<div className="relative">
 				<button
+					ref={btnRef}
 					type="button"
 					onClick={() => !disabled && setOpen((v) => !v)}
-					className={`px-3 py-2 border rounded-lg inline-flex items-center gap-2 ${
-						disabled
-							? "text-gray-400 cursor-not-allowed bg-gray-50"
-							: "text-gray-900"
+					className={`px-3 py-2 rounded-lg inline-flex items-center gap-2 ${
+						disabled ? "cursor-not-allowed opacity-60" : ""
 					}`}
+					style={{
+						backgroundColor: "#2a2a2a",
+						color: "#e9cc9e",
+						border: "1px solid #3a3a3a",
+					}}
 				>
 					<span className="capitalize">{current}</span>
-					<FiChevronDown className="text-gray-500" />
+					<FiChevronDown style={{ color: "#b8b8b8" }} />
 				</button>
 				{open && !disabled && (
-					<div className="absolute z-10 mt-1 w-40 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+					<div
+						className="absolute z-10 w-40 rounded-xl shadow-lg overflow-auto"
+						style={{
+							backgroundColor: "#2a2a2a",
+							border: "1px solid #3a3a3a",
+							maxHeight: menuMaxH,
+							top: openUp ? "auto" : "100%",
+							bottom: openUp ? "100%" : "auto",
+							marginTop: openUp ? undefined : 4,
+							marginBottom: openUp ? 4 : undefined,
+						}}
+					>
 						{ROLES.map((r) => (
 							<button
 								key={r}
@@ -114,9 +157,12 @@ const UsersAdmin = () => {
 									onChange(r);
 									setOpen(false);
 								}}
-								className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 flex items-center justify-between ${
-									r === current ? "bg-green-50 text-green-800" : "text-gray-800"
-								}`}
+								className="w-full text-left px-3 py-2 text-sm capitalize flex items-center justify-between"
+								style={
+									r === current
+										? { backgroundColor: "#e9cc9e", color: "#191919" }
+										: { color: "#e9cc9e" }
+								}
 							>
 								{r}
 								{r === current && <FiCheck />}
@@ -132,14 +178,17 @@ const UsersAdmin = () => {
 		<button
 			type="button"
 			onClick={onChange}
-			className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-				checked ? "bg-green-600" : "bg-gray-300"
-			}`}
+			className="relative w-12 h-6 rounded-full transition-colors duration-300"
+			style={{
+				backgroundColor: checked ? "#e9cc9e" : "#3a3a3a",
+				border: "1px solid #3a3a3a",
+			}}
 		>
 			<span
-				className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300 ${
+				className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full shadow transition-transform duration-300 ${
 					checked ? "translate-x-6" : "translate-x-0"
 				}`}
+				style={{ backgroundColor: "#191919" }}
 			/>
 		</button>
 	);
@@ -227,20 +276,27 @@ const UsersAdmin = () => {
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6" style={{ backgroundColor: "#191919" }}>
 			{/* Header */}
-			<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-				<h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+			<div
+				className="rounded-2xl border shadow-sm p-6"
+				style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+			>
+				<h2
+					className="text-2xl md:text-3xl font-bold"
+					style={{ color: "#e9cc9e" }}
+				>
 					Gestión de Usuarios
 				</h2>
-				<p className="text-gray-600 mt-1">
+				<p className="mt-1" style={{ color: "#b8b8b8" }}>
 					Administra los usuarios que tienen control
 				</p>
 				<div className="mt-4">
 					<button
 						onClick={() => setIsModalOpen(true)}
 						type="button"
-						className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800"
+						className="inline-flex items-center gap-2 px-4 py-2 rounded-lg"
+						style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 					>
 						<FiUserPlus />
 						Nuevo usuario
@@ -250,46 +306,78 @@ const UsersAdmin = () => {
 			</div>
 
 			{/* Search + counters */}
-			<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+			<div
+				className="rounded-2xl border shadow-sm p-4"
+				style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+			>
 				<div className="flex flex-col md:flex-row md:items-center gap-3">
 					<div className="relative flex-1">
-						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+						<FiSearch
+							className="absolute left-3 top-1/2 -translate-y-1/2"
+							style={{ color: "#b8b8b8" }}
+						/>
 						<input
 							type="text"
 							value={filter}
 							onChange={(e) => setFilter(e.target.value)}
 							placeholder="Buscar por usuario o rol..."
-							className="w-full pl-9 pr-3 py-2 border rounded-lg text-gray-900"
+							className="w-full pl-9 pr-3 py-2 border rounded-lg placeholder-[#b8b8b8] caret-[#e9cc9e]"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 						/>
 					</div>
 					<div className="flex items-center gap-2">
 						<button
 							onClick={() => setStatusFilter("all")}
 							className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-								statusFilter === "all"
-									? "bg-gray-900 text-white"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+								statusFilter === "all" ? "font-semibold" : ""
 							}`}
+							style={
+								statusFilter === "all"
+									? { backgroundColor: "#e9cc9e", color: "#191919" }
+									: {
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+									  }
+							}
 						>
 							Total: {totalUsers}
 						</button>
 						<button
 							onClick={() => setStatusFilter("active")}
 							className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-								statusFilter === "active"
-									? "bg-green-600 text-white"
-									: "bg-green-50 text-green-700 hover:bg-green-100"
+								statusFilter === "active" ? "font-semibold" : ""
 							}`}
+							style={
+								statusFilter === "active"
+									? { backgroundColor: "#e9cc9e", color: "#191919" }
+									: {
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+									  }
+							}
 						>
 							Activos: {activeUsers}
 						</button>
 						<button
 							onClick={() => setStatusFilter("inactive")}
 							className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-								statusFilter === "inactive"
-									? "bg-gray-700 text-white"
-									: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+								statusFilter === "inactive" ? "font-semibold" : ""
 							}`}
+							style={
+								statusFilter === "inactive"
+									? { backgroundColor: "#e9cc9e", color: "#191919" }
+									: {
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+									  }
+							}
 						>
 							Inactivos: {inactiveUsers}
 						</button>
@@ -304,14 +392,21 @@ const UsersAdmin = () => {
 						className="absolute inset-0 bg-black/50"
 						onClick={() => !creating && setIsModalOpen(false)}
 					/>
-					<div className="relative bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-green-100">
+					<div
+						className="relative w-full max-w-md mx-4 rounded-2xl shadow-2xl"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+					>
 						<div className="flex items-center justify-between px-5 py-3 border-b">
-							<h3 className="text-lg font-semibold text-gray-900">
+							<h3
+								className="text-lg font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
 								Nuevo usuario
 							</h3>
 							<button
 								onClick={() => !creating && setIsModalOpen(false)}
-								className="p-2 text-gray-500 hover:text-gray-700"
+								className="p-2"
+								style={{ color: "#b8b8b8" }}
 								aria-label="Cerrar"
 							>
 								<FiX />
@@ -319,41 +414,66 @@ const UsersAdmin = () => {
 						</div>
 						<form onSubmit={handleCreateUser} className="px-5 py-4 space-y-3">
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Usuario
 								</label>
 								<div className="relative">
-									<FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+									<FiUser
+										className="absolute left-3 top-1/2 -translate-y-1/2"
+										style={{ color: "#b8b8b8" }}
+									/>
 									<input
 										type="text"
 										value={newUser.username}
 										onChange={(e) =>
 											setNewUser((s) => ({ ...s, username: e.target.value }))
 										}
-										className="w-full pl-9 pr-3 py-2 border rounded-lg text-gray-900"
+										className="w-full pl-9 pr-3 py-2 border rounded-lg placeholder-[#b8b8b8] caret-[#e9cc9e]"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 										placeholder="jdoe"
 									/>
 								</div>
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Contraseña
 								</label>
 								<div className="relative">
-									<FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+									<FiLock
+										className="absolute left-3 top-1/2 -translate-y-1/2"
+										style={{ color: "#b8b8b8" }}
+									/>
 									<input
 										type="password"
 										value={newUser.password}
 										onChange={(e) =>
 											setNewUser((s) => ({ ...s, password: e.target.value }))
 										}
-										className="w-full pl-9 pr-3 py-2 border rounded-lg text-gray-900"
+										className="w-full pl-9 pr-3 py-2 border rounded-lg placeholder-[#b8b8b8] caret-[#e9cc9e]"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 										placeholder="••••••••"
 									/>
 								</div>
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Rol
 								</label>
 								<RoleDropdown
@@ -365,14 +485,16 @@ const UsersAdmin = () => {
 								<button
 									type="button"
 									onClick={() => !creating && setIsModalOpen(false)}
-									className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+									className="px-4 py-2 rounded-lg"
+									style={{ border: "1px solid #3a3a3a", color: "#e9cc9e" }}
 								>
 									Cancelar
 								</button>
 								<button
 									type="submit"
 									disabled={creating}
-									className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800 disabled:bg-gray-400"
+									className="inline-flex items-center gap-2 px-4 py-2 rounded-lg"
+									style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 								>
 									<FiUserPlus />
 									{creating ? "Creando..." : "Crear usuario"}
@@ -399,18 +521,30 @@ const UsersAdmin = () => {
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.95 }}
 							transition={{ type: "spring", stiffness: 260, damping: 20 }}
-							className="relative bg-white w-full max-w-sm mx-4 rounded-2xl shadow-2xl border border-gray-100 p-5"
+							className="relative w-full max-w-sm mx-4 rounded-2xl shadow-2xl p-5"
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
-							<h4 className="text-lg font-semibold text-gray-900">
+							<h4
+								className="text-lg font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
 								Eliminar usuario
 							</h4>
-							<p className="text-sm text-gray-600 mt-1">
+							<p className="text-sm mt-1" style={{ color: "#b8b8b8" }}>
 								Esta acción no se puede deshacer.
 							</p>
 							<div className="mt-4 flex justify-end gap-2">
 								<button
 									onClick={() => setConfirmId(null)}
-									className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+									className="px-4 py-2 rounded-lg"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								>
 									Cancelar
 								</button>
@@ -419,7 +553,12 @@ const UsersAdmin = () => {
 										await handleDelete(confirmId);
 										setConfirmId(null);
 									}}
-									className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+									className="px-4 py-2 rounded-lg"
+									style={{
+										backgroundColor: "#b91c1c",
+										color: "#ffffff",
+										border: "1px solid #7f1d1d",
+									}}
 								>
 									Eliminar
 								</button>
@@ -431,31 +570,36 @@ const UsersAdmin = () => {
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				{loading ? (
-					<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+					<div
+						className="rounded-2xl border shadow-sm p-4"
+						style={{
+							backgroundColor: "#2a2a2a",
+							borderColor: "#3a3a3a",
+							color: "#b8b8b8",
+						}}
+					>
 						Cargando...
 					</div>
 				) : (
 					filtered.map((u) => (
 						<div
 							key={u.id}
-							className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3"
+							className="rounded-2xl border shadow-sm p-4 flex flex-col gap-3"
+							style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
 						>
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-3">
 									<div
-										className={`w-10 h-10 rounded-full flex items-center justify-center ${
-											u.is_active
-												? "bg-green-50 text-green-700"
-												: "bg-gray-100 text-gray-600"
-										}`}
+										className={`w-10 h-10 rounded-full flex items-center justify-center`}
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										<FiShield />
 									</div>
 									<div>
-										<div className="font-semibold text-gray-900">
+										<div className="font-semibold" style={{ color: "#e9cc9e" }}>
 											{u.username}
 										</div>
-										<div className="text-xs text-gray-500">
+										<div className="text-xs" style={{ color: "#9a9a9a" }}>
 											ID: {u.id.slice(0, 8)}…
 										</div>
 									</div>
@@ -463,7 +607,10 @@ const UsersAdmin = () => {
 								<div className="flex items-center gap-2">
 									<div className="flex items-center gap-2">
 										{u.id === currentUserId ? (
-											<span className="text-[11px] px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+											<span
+												className="text-[11px] px-2 py-1 rounded-full"
+												style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+											>
 												Tu usuario
 											</span>
 										) : (
@@ -472,11 +619,7 @@ const UsersAdmin = () => {
 													checked={u.is_active}
 													onChange={() => handleToggleActive(u.id, u.is_active)}
 												/>
-												<span
-													className={`text-xs ${
-														u.is_active ? "text-green-700" : "text-gray-600"
-													}`}
-												>
+												<span className="text-xs" style={{ color: "#b8b8b8" }}>
 													{u.is_active ? "Activo" : "Inactivo"}
 												</span>
 											</>
@@ -485,10 +628,22 @@ const UsersAdmin = () => {
 									<button
 										onClick={() => setConfirmId(u.id)}
 										className={`px-2 py-1 text-xs rounded-full ${
-											u.id === currentUserId
-												? "bg-gray-100 text-gray-400 cursor-not-allowed"
-												: "bg-red-50 text-red-700 hover:bg-red-100"
+											u.id === currentUserId ? "" : ""
 										}`}
+										style={
+											u.id === currentUserId
+												? {
+														backgroundColor: "#2a2a2a",
+														color: "#b8b8b8",
+														border: "1px solid #3a3a3a",
+														cursor: "not-allowed",
+												  }
+												: {
+														backgroundColor: "#2a2a2a",
+														color: "#e9cc9e",
+														border: "1px solid #3a3a3a",
+												  }
+										}
 										disabled={u.id === currentUserId}
 									>
 										<FiTrash2 />
@@ -503,7 +658,8 @@ const UsersAdmin = () => {
 								/>
 								<button
 									onClick={() => openEdit(u)}
-									className="px-3 py-2 rounded-lg border text-gray-700 hover:bg-gray-50"
+									className="px-3 py-2 rounded-lg"
+									style={{ border: "1px solid #3a3a3a", color: "#e9cc9e" }}
 									disabled={u.id === currentUserId}
 								>
 									<FiEdit2 />
@@ -530,15 +686,26 @@ const UsersAdmin = () => {
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.95 }}
 							transition={{ type: "spring", stiffness: 260, damping: 20 }}
-							className="relative bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100"
+							className="relative w-full max-w-md mx-4 rounded-2xl shadow-2xl"
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
-							<div className="flex items-center justify-between px-5 py-3 border-b">
-								<h3 className="text-lg font-semibold text-gray-900">
+							<div
+								className="flex items-center justify-between px-5 py-3 border-b"
+								style={{ borderColor: "#3a3a3a" }}
+							>
+								<h3
+									className="text-lg font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
 									Editar usuario
 								</h3>
 								<button
 									onClick={() => !savingEdit && setEditUser(null)}
-									className="p-2 text-gray-500 hover:text-gray-700"
+									className="p-2"
+									style={{ color: "#b8b8b8" }}
 									aria-label="Cerrar"
 								>
 									<FiX />
@@ -546,26 +713,31 @@ const UsersAdmin = () => {
 							</div>
 							<div className="px-5 py-4 space-y-4">
 								<div>
-									<div className="text-sm text-gray-600">Usuario</div>
-									<div className="font-semibold text-gray-900">
+									<div className="text-sm" style={{ color: "#b8b8b8" }}>
+										Usuario
+									</div>
+									<div className="font-semibold" style={{ color: "#e9cc9e" }}>
 										{editUser.username}
 									</div>
 								</div>
 								<div className="flex items-center justify-between gap-3">
 									<div className="flex-1">
-										<div className="text-sm text-gray-700 mb-1">Rol</div>
+										<div className="text-sm mb-1" style={{ color: "#e9cc9e" }}>
+											Rol
+										</div>
 										<RoleDropdown value={editRole} onChange={setEditRole} />
 									</div>
 									<div className="flex items-center gap-3">
-										<div className="text-sm text-gray-700">Estado</div>
+										<div className="text-sm" style={{ color: "#e9cc9e" }}>
+											Estado
+										</div>
 										<ToggleSwitch
 											checked={editActive}
 											onChange={() => setEditActive((v) => !v)}
 										/>
 										<span
-											className={`text-xs ${
-												editActive ? "text-green-700" : "text-gray-600"
-											}`}
+											className="text-xs"
+											style={{ color: editActive ? "#22c55e" : "#b8b8b8" }}
 										>
 											{editActive ? "Activo" : "Inactivo"}
 										</span>
@@ -574,14 +746,20 @@ const UsersAdmin = () => {
 								<div className="pt-2 flex gap-2 justify-end">
 									<button
 										onClick={() => !savingEdit && setEditUser(null)}
-										className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+										className="px-4 py-2 rounded-lg"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
 									>
 										Cancelar
 									</button>
 									<button
 										onClick={saveEdit}
 										disabled={savingEdit}
-										className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800 disabled:bg-gray-400"
+										className="inline-flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
+										style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 									>
 										{savingEdit ? "Guardando..." : "Guardar cambios"}
 									</button>

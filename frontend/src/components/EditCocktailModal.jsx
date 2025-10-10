@@ -31,12 +31,27 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 	const [error, setError] = useState(null);
 	const [isSuccess, setIsSuccess] = useState(false);
 
-	const formatPrice = (value) => {
-		// Extraer solo los dígitos del valor ingresado
-		const numbers = String(value).replace(/\D/g, "");
-		if (!numbers) return "";
-		// Formatear con separador de miles
-		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	// Formateo de precio para dos contextos:
+	// - fromBackend: valores tipo "46000.00" → 46.000 sin multiplicar por 100
+	// - typing (default): extraer dígitos para no romper el cursor al escribir
+	const formatPrice = (value, { fromBackend = false } = {}) => {
+		if (fromBackend) {
+			let num;
+			if (typeof value === "number") {
+				num = value;
+			} else {
+				const normalized = String(value)
+					.trim()
+					.replace(/[^0-9.,]/g, "")
+					.replace(/,/g, ".");
+				num = parseFloat(normalized);
+			}
+			if (!isFinite(num)) return "";
+			return new Intl.NumberFormat("es-CO").format(Math.round(num));
+		}
+		const numbersOnly = String(value).replace(/\D/g, "");
+		if (!numbersOnly) return "";
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbersOnly));
 	};
 
 	const handlePriceChange = (e) => {
@@ -53,9 +68,11 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 	useEffect(() => {
 		if (cocktail) {
 			setName(cocktail.name || "");
-			// Formatear el precio al cargar
+			// Formatear el precio al cargar desde backend (puede venir "46000.00")
 			const priceValue = cocktail.price || "";
-			setPrice(priceValue ? formatPrice(String(priceValue)) : "");
+			setPrice(
+				priceValue ? formatPrice(priceValue, { fromBackend: true }) : ""
+			);
 			setDescription(cocktail.description || "");
 			setIngredients(
 				cocktail.ingredients
@@ -238,12 +255,18 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 			{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			{isSuccess && (
 				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
-					<div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
-						<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<div
+						className="rounded-lg shadow-xl p-8 max-w-md w-full text-center"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+					>
+						<div
+							className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+							style={{ backgroundColor: "#3a3a3a" }}
+						>
 							<svg
-								className="w-8 h-8 text-green-600"
+								className="w-8 h-8"
 								fill="none"
-								stroke="currentColor"
+								stroke="#e9cc9e"
 								viewBox="0 0 24 24"
 							>
 								<path
@@ -254,14 +277,17 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 								/>
 							</svg>
 						</div>
-						<h3 className="text-xl font-bold text-gray-800 mb-2">
+						<h3 className="text-xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
 							¡Cóctel Actualizado!
 						</h3>
-						<p className="text-gray-600">
+						<p style={{ color: "#b8b8b8" }}>
 							El cóctel "{name}" ha sido actualizado exitosamente.
 						</p>
 						<div className="mt-6">
-							<div className="w-8 h-1 bg-green-500 rounded-full mx-auto animate-pulse"></div>
+							<div
+								className="w-8 h-1 rounded-full mx-auto animate-pulse"
+								style={{ backgroundColor: "#e9cc9e" }}
+							></div>
 						</div>
 					</div>
 				</div>
@@ -269,21 +295,26 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 			{!isSuccess && (
 				<div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
 					<div
-						className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
+						className="rounded-lg shadow-xl p-8 max-w-2xl w-full relative"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 						onClick={(e) => e.stopPropagation()}
 					>
 						<button
 							onClick={onClose}
-							className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+							className="absolute top-4 right-4"
+							style={{ color: "#e9cc9e" }}
 							aria-label="Cerrar modal"
 						>
 							<FiX size={24} />
 						</button>
 
-						<h2 className="text-2xl font-bold text-gray-800 mb-2">
+						<h2
+							className="text-2xl font-bold mb-2"
+							style={{ color: "#e9cc9e" }}
+						>
 							Editar Cóctel
 						</h2>
-						<p className="text-gray-500 mb-4">
+						<p className="mb-4" style={{ color: "#b8b8b8" }}>
 							Actualiza la información del cóctel. Los campos no enviados se
 							mantienen.
 						</p>
@@ -295,7 +326,8 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 							<div>
 								<label
 									htmlFor="name"
-									className="block text-sm font-medium text-gray-700"
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
 								>
 									Nombre
 								</label>
@@ -304,13 +336,19 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									type="text"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
 								<label
 									htmlFor="price"
-									className="block text-sm font-medium text-gray-700"
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
 								>
 									Precio
 								</label>
@@ -320,14 +358,24 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									value={price}
 									onChange={handlePriceChange}
 									placeholder="0"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{price && (
-									<p className="text-xs text-gray-500 mt-1">${price} COP</p>
+									<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
+										${price} COP
+									</p>
 								)}
 							</div>
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									% Porcentaje de Alcohol (opcional)
 								</label>
 								<input
@@ -337,14 +385,20 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									step="0.1"
 									value={alcoholPercentage}
 									onChange={(e) => setAlcoholPercentage(e.target.value)}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Ej. 40"
 								/>
 							</div>
 							<div>
 								<label
 									htmlFor="description"
-									className="block text-sm font-medium text-gray-700"
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
 								>
 									Descripción
 								</label>
@@ -353,12 +407,20 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
 									rows={3}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 
 							<div className="relative">
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Ingredientes
 								</label>
 								<input
@@ -366,15 +428,27 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									value={ingredientInput}
 									onChange={(e) => handleIngredientSearch(e.target.value)}
 									placeholder="Buscar y agregar ingredientes"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{ingredientSuggestions.length > 0 && (
-									<ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+									<ul
+										className="absolute z-10 w-full rounded-md shadow-lg max-h-40 overflow-y-auto"
+										style={{
+											backgroundColor: "#2a2a2a",
+											border: "1px solid #3a3a3a",
+										}}
+									>
 										{ingredientSuggestions.map((s) => (
 											<li
 												key={s.id}
 												onClick={() => addIngredient(s)}
-												className="px-4 py-2 cursor-pointer hover:bg-gray-100 capitalize text-gray-900"
+												className="px-4 py-2 cursor-pointer capitalize"
+												style={{ color: "#e9cc9e" }}
 											>
 												{s.name}
 											</li>
@@ -402,9 +476,17 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 														setIngredientSuggestions([]);
 													}
 												}}
-												className="w-full px-4 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer rounded-lg border-2 border-blue-200 transition-colors duration-150 text-blue-800 font-medium"
+												className="w-full px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 font-medium"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													border: "1px solid #4a4a4a",
+												}}
 											>
-												<FiPlus className="inline mr-2 text-blue-600" />
+												<FiPlus
+													className="inline mr-2"
+													style={{ color: "#e9cc9e" }}
+												/>
 												Agregar nuevo ingrediente: "{ingredientInput}"
 											</button>
 										</div>
@@ -413,13 +495,15 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									{ingredients.map((ing, index) => (
 										<div
 											key={index}
-											className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm"
+											className="flex items-center px-2 py-1 rounded-full text-sm"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											<span>{ing.name}</span>
 											<button
 												type="button"
 												onClick={() => removeIngredient(index)}
-												className="ml-2 text-green-600 hover:text-green-800"
+												className="ml-2"
+												style={{ color: "#e9cc9e" }}
 											>
 												<FiTrash size={14} />
 											</button>
@@ -429,7 +513,10 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 							</div>
 
 							<div className="relative">
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Categorías
 								</label>
 								<input
@@ -437,18 +524,33 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									value={categoryInput}
 									onChange={(e) => handleCategorySearch(e.target.value)}
 									placeholder="Buscar y agregar categorías"
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 text-gray-900"
+									className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 								{categorySuggestions.length > 0 && (
-									<ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+									<ul
+										className="absolute z-10 w-full rounded-md shadow-lg max-h-40 overflow-y-auto"
+										style={{
+											backgroundColor: "#2a2a2a",
+											border: "1px solid #3a3a3a",
+										}}
+									>
 										{categorySuggestions.map((s) => (
 											<li
 												key={s.id}
 												onClick={() => addCategory(s)}
-												className="px-4 py-2 cursor-pointer hover:bg-gray-100 capitalize text-gray-900"
+												className="px-4 py-2 cursor-pointer capitalize"
+												style={{ color: "#e9cc9e" }}
 											>
 												<span className="font-medium">{s.name}</span>
-												<span className="text-gray-500 text-sm ml-2">
+												<span
+													className="text-sm ml-2"
+													style={{ color: "#b8b8b8" }}
+												>
 													({s.type})
 												</span>
 											</li>
@@ -476,9 +578,17 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 														setCategorySuggestions([]);
 													}
 												}}
-												className="w-full px-4 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer rounded-lg border-2 border-blue-200 transition-colors duration-150 text-blue-800 font-medium"
+												className="w-full px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 font-medium"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+													border: "1px solid #4a4a4a",
+												}}
 											>
-												<FiPlus className="inline mr-2 text-blue-600" />
+												<FiPlus
+													className="inline mr-2"
+													style={{ color: "#e9cc9e" }}
+												/>
 												Agregar nueva categoría: "{categoryInput}"
 											</button>
 										</div>
@@ -487,16 +597,21 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									{categories.map((cat, index) => (
 										<div
 											key={index}
-											className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm"
+											className="flex items-center px-2 py-1 rounded-full text-sm"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											<span className="font-medium">{cat.name}</span>
-											<span className="text-blue-600 text-xs ml-1">
+											<span
+												className="text-xs ml-1"
+												style={{ color: "#b8b8b8" }}
+											>
 												({cat.type})
 											</span>
 											<button
 												type="button"
 												onClick={() => removeCategory(index)}
-												className="ml-2 text-blue-600 hover:text-blue-800"
+												className="ml-2"
+												style={{ color: "#e9cc9e" }}
 											>
 												<FiTrash size={14} />
 											</button>
@@ -506,7 +621,10 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium text-gray-700">
+								<label
+									className="block text-sm font-medium"
+									style={{ color: "#e9cc9e" }}
+								>
 									Imágenes Actuales
 								</label>
 								{images.length > 0 ? (
@@ -521,7 +639,12 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 												<button
 													type="button"
 													onClick={() => handleRemoveImage(url)}
-													className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 leading-none shadow-lg hover:bg-red-600 transition-colors"
+													className="absolute -top-2 -right-2 rounded-full p-1 leading-none shadow-lg transition-colors"
+													style={{
+														backgroundColor: "#2a2a2a",
+														border: "1px solid #3a3a3a",
+														color: "#e9cc9e",
+													}}
 													aria-label="Eliminar imagen"
 												>
 													<FiX size={14} />
@@ -537,24 +660,34 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mt-4">
+								<label
+									className="block text-sm font-medium mt-4"
+									style={{ color: "#e9cc9e" }}
+								>
 									Agregar Nuevas Imágenes {images.length + newImageFiles.length}
 									/5
 								</label>
-								<p className="text-xs text-gray-500 mb-2">
+								<p className="text-xs mb-2" style={{ color: "#9a9a9a" }}>
 									Las nuevas imágenes se agregarán a las existentes (máximo 5
 									imágenes en total).
 								</p>
 								<div className="mt-2">
 									<label
 										htmlFor="images"
-										className={`cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-md ${
-											images.length + newImageFiles.length >= 5
-												? "border-gray-200 bg-gray-50 cursor-not-allowed"
-												: "border-gray-300 hover:border-green-500"
-										}`}
+										className={`cursor-pointer flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-md`}
+										style={{
+											borderColor:
+												images.length + newImageFiles.length >= 5
+													? "#4a4a4a"
+													: "#3a3a3a",
+											color: "#e9cc9e",
+											backgroundColor:
+												images.length + newImageFiles.length >= 5
+													? "#2a2a2a"
+													: "transparent",
+										}}
 									>
-										<FiUpload className="mr-2" />
+										<FiUpload className="mr-2" style={{ color: "#e9cc9e" }} />
 										<span>
 											{images.length + newImageFiles.length >= 5
 												? "Máximo de imágenes alcanzado"
@@ -583,7 +716,12 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 												<button
 													type="button"
 													onClick={() => handleRemoveNewImage(index)}
-													className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600"
+													className="absolute -top-2 -right-2 rounded-full p-1 shadow-lg"
+													style={{
+														backgroundColor: "#2a2a2a",
+														border: "1px solid #3a3a3a",
+														color: "#e9cc9e",
+													}}
 													aria-label="Eliminar imagen nueva"
 												>
 													<FiX size={14} />
@@ -598,14 +736,20 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 								<button
 									type="button"
 									onClick={onClose}
-									className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+									className="px-4 py-2 rounded-md transition-colors"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								>
 									Cancelar
 								</button>
 								<button
 									type="submit"
 									disabled={isSubmitting}
-									className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+									className="px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+									style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 								>
 									{isSubmitting ? "Actualizando..." : "Guardar Cambios"}
 								</button>

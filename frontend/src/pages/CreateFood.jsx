@@ -28,11 +28,13 @@ const CreateFood = () => {
 	const [ingredientSuggestions, setIngredientSuggestions] = useState([]);
 	// Incluye automáticamente la clasificación base para comida
 	const [categories, setCategories] = useState([
-		{ name: "comida", type: "clasificacion comida" },
+		{ name: "comida", type: "clasificacion" },
 	]);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
-	const [categoryType] = useState("clasificacion comida");
+	// Tipos de categoría
+	const BASE_CATEGORY_TYPE = "clasificacion"; // define que es comida
+	const FOOD_CATEGORY_TYPE = "clasificacion comida"; // subclasificación (Entrada, Fuerte, etc.)
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [createdItem, setCreatedItem] = useState(null);
 	const [isCreating, setIsCreating] = useState(false);
@@ -40,6 +42,22 @@ const CreateFood = () => {
 	const [showValidation, setShowValidation] = useState(false);
 
 	const navigate = useNavigate();
+
+	// Formateo de precio como en crear bebidas (separador de miles)
+	const formatPrice = (value) => {
+		const numbers = String(value).replace(/\D/g, "");
+		if (!numbers) return "";
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	};
+
+	const handlePriceChange = (e) => {
+		const inputValue = e.target.value;
+		if (inputValue === "") {
+			setPrice("");
+			return;
+		}
+		setPrice(formatPrice(inputValue));
+	};
 
 	const overlayVariants = {
 		hidden: { opacity: 0 },
@@ -64,7 +82,7 @@ const CreateFood = () => {
 		setPrice("");
 		setDescription("");
 		setIngredients([]);
-		setCategories([{ name: "comida", type: "clasificacion comida" }]);
+		setCategories([{ name: "comida", type: BASE_CATEGORY_TYPE }]);
 		setSelectedFiles([]);
 		setIngredientInput("");
 		setCategoryInput("");
@@ -106,15 +124,16 @@ const CreateFood = () => {
 			const imageUrls = await uploadImages(selectedFiles, name.trim());
 			const foodData = {
 				name: name.trim(),
-				price: parseFloat(price),
+				price: parseFloat(String(price).replace(/\./g, "")),
 				description: description.trim(),
 				ingredients: ingredients.map((ing) =>
 					typeof ing === "string" ? ing : ing.name
 				),
 				images: imageUrls,
+				// Preservar el type de cada categoría (evita duplicar "comida")
 				categories: categories.map((cat) => ({
 					name: cat.name,
-					type: categoryType,
+					type: cat.type,
 				})),
 			};
 			const result = await createProduct(foodData);
@@ -148,14 +167,16 @@ const CreateFood = () => {
 					animate="visible"
 				>
 					<motion.div
-						className="bg-white rounded-lg p-8 max-w-md mx-4 relative"
+						className="rounded-lg p-8 max-w-md mx-4 relative"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 						variants={cardVariants}
 						initial="hidden"
 						animate="visible"
 					>
 						<button
 							onClick={handleCreateAnother}
-							className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
+							className="absolute top-4 right-4 text-xl"
+							style={{ color: "#e9cc9e" }}
 						>
 							×
 						</button>
@@ -164,14 +185,23 @@ const CreateFood = () => {
 								initial={{ scale: 0 }}
 								animate={{ scale: 1 }}
 								transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-								className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+								className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+								style={{
+									backgroundColor: "#122114",
+									border: "1px solid #22c55e",
+								}}
 							>
-								<span className="text-green-600 text-2xl">✓</span>
+								<span className="text-2xl" style={{ color: "#22c55e" }}>
+									✓
+								</span>
 							</motion.div>
-							<h2 className="text-2xl font-bold text-green-900 mb-2">
+							<h2
+								className="text-2xl font-bold mb-2"
+								style={{ color: "#e9cc9e" }}
+							>
 								¡Plato Creado!
 							</h2>
-							<p className="text-gray-600">
+							<p style={{ color: "#b8b8b8" }}>
 								Tu plato ha sido creado exitosamente
 							</p>
 						</div>
@@ -183,7 +213,8 @@ const CreateFood = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleBackToPanel}
-								className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
 								Volver al Panel
 							</motion.button>
@@ -191,7 +222,12 @@ const CreateFood = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleCreateAnother}
-								className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								style={{
+									backgroundColor: "#2a2a2a",
+									color: "#e9cc9e",
+									border: "1px solid #3a3a3a",
+								}}
 							>
 								Crear Otro Plato
 							</motion.button>
@@ -203,7 +239,7 @@ const CreateFood = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-green-50 to-amber-50 py-8">
+		<div className="min-h-screen py-8" style={{ backgroundColor: "#191919" }}>
 			<AnimatePresence>
 				{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			</AnimatePresence>
@@ -217,7 +253,8 @@ const CreateFood = () => {
 					<div className="flex justify-between items-center mb-4">
 						<button
 							onClick={handleBackToPanel}
-							className="flex items-center text-green-600 hover:text-green-700 font-medium"
+							className="flex items-center font-medium"
+							style={{ color: "#e9cc9e" }}
 						>
 							← Volver al Panel
 						</button>
@@ -226,20 +263,22 @@ const CreateFood = () => {
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-						className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+						className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+						style={{ backgroundColor: "#3a3a3a" }}
 					>
-						<FiEdit3 className="text-green-600 text-3xl" />
+						<FiEdit3 className="text-3xl" style={{ color: "#e9cc9e" }} />
 					</motion.div>
-					<h1 className="text-4xl font-bold text-green-900 mb-2">
+					<h1 className="text-4xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
 						Crear Nuevo Plato
 					</h1>
-					<p className="text-gray-600 text-lg">
+					<p className="text-lg" style={{ color: "#b8b8b8" }}>
 						Completa la información para crear tu plato
 					</p>
 				</div>
 
 				<motion.div
-					className="bg-white rounded-2xl shadow-xl p-8"
+					className="rounded-2xl shadow-xl p-8"
+					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ delay: 0.3 }}
@@ -247,49 +286,81 @@ const CreateFood = () => {
 					<form onSubmit={handleSubmit} className="space-y-8">
 						<div className="grid md:grid-cols-2 gap-6">
 							<div className="space-y-2">
-								<label className="flex items-center text-gray-700 font-semibold">
-									<FiEdit3 className="mr-2 text-green-600" />
+								<label
+									className="flex items-center font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									<FiEdit3 className="mr-2" style={{ color: "#e9cc9e" }} />
 									Nombre del Plato
 								</label>
 								<input
 									type="text"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Ej. Hamburguesa"
 								/>
 							</div>
 							<div className="space-y-2">
-								<label className="flex items-center text-gray-700 font-semibold">
-									<FiDollarSign className="mr-2 text-green-600" />
+								<label
+									className="flex items-center font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									<FiDollarSign className="mr-2" style={{ color: "#e9cc9e" }} />
 									Precio
 								</label>
 								<input
-									type="number"
+									type="text"
 									value={price}
-									onChange={(e) => setPrice(e.target.value)}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
-									placeholder="Ej. 25.000"
+									onChange={handlePriceChange}
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
+									placeholder="0"
 								/>
+								{price && (
+									<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
+										${price} COP
+									</p>
+								)}
 							</div>
 						</div>
 
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiEdit3 className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiEdit3 className="mr-2" style={{ color: "#e9cc9e" }} />
 								Descripción
 							</label>
 							<textarea
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 h-24 text-gray-900"
+								className="w-full px-4 py-2 border rounded-lg focus:outline-none h-24 placeholder-[#b8b8b8] caret-[#e9cc9e]"
+								style={{
+									backgroundColor: "#2a2a2a",
+									color: "#e9cc9e",
+									border: "1px solid #3a3a3a",
+								}}
 								placeholder="Describe tu plato..."
 							/>
 						</div>
 
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiPlus className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiPlus className="mr-2" style={{ color: "#e9cc9e" }} />
 								Ingredientes
 							</label>
 							<div className="flex items-center gap-2">
@@ -310,7 +381,12 @@ const CreateFood = () => {
 											setIngredientSuggestions([]);
 										}
 									}}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Busca ingredientes..."
 									onKeyDown={(e) => {
 										if (e.key === "Enter") {
@@ -333,11 +409,18 @@ const CreateFood = () => {
 								/>
 							</div>
 							{ingredientSuggestions.length > 0 && (
-								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white capitalize">
+								<ul
+									className="rounded-lg mt-1 max-h-40 overflow-y-auto capitalize"
+									style={{
+										backgroundColor: "#2a2a2a",
+										border: "1px solid #3a3a3a",
+									}}
+								>
 									{ingredientSuggestions.map((s, i) => (
 										<li
 											key={i}
-											className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900"
+											className="px-4 py-2 cursor-pointer"
+											style={{ color: "#e9cc9e" }}
 											onClick={() => {
 												const name = typeof s === "string" ? s : s.name;
 												if (
@@ -377,9 +460,17 @@ const CreateFood = () => {
 													setIngredientSuggestions([]);
 												}
 											}}
-											className="w-full px-4 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer rounded-lg border-2 border-blue-200 transition-colors duration-150 text-blue-800 font-medium"
+											className="w-full px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 font-medium"
+											style={{
+												backgroundColor: "#3a3a3a",
+												color: "#e9cc9e",
+												border: "1px solid #4a4a4a",
+											}}
 										>
-											<FiPlus className="inline mr-2 text-blue-600" />
+											<FiPlus
+												className="inline mr-2"
+												style={{ color: "#e9cc9e" }}
+											/>
 											Agregar nuevo ingrediente: "{ingredientInput}"
 										</button>
 									</div>
@@ -388,7 +479,8 @@ const CreateFood = () => {
 								{ingredients.map((ingredient, index) => (
 									<div
 										key={index}
-										className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2 capitalize"
+										className="px-3 py-1 rounded-full flex items-center gap-2 capitalize"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										<span>
 											{typeof ingredient === "string"
@@ -401,7 +493,8 @@ const CreateFood = () => {
 												const upd = ingredients.filter((_, i) => i !== index);
 												setIngredients(upd);
 											}}
-											className="text-green-800 hover:text-red-500"
+											className="hover:text-red-500"
+											style={{ color: "#e9cc9e" }}
 										>
 											<FiTrash />
 										</button>
@@ -411,8 +504,11 @@ const CreateFood = () => {
 						</div>
 
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiTag className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiTag className="mr-2" style={{ color: "#e9cc9e" }} />
 								Clasificación
 							</label>
 							<div className="flex items-center gap-2">
@@ -433,22 +529,40 @@ const CreateFood = () => {
 											setCategorySuggestions([]);
 										}
 									}}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Busca clasificación (Entrada, Postre, Fuerte...)"
 									onKeyDown={(e) => {
 										if (e.key === "Enter") {
 											e.preventDefault();
 											const value = e.target.value.trim();
-											if (
-												value &&
-												!categories.find(
-													(c) => c.name === value && c.type === categoryType
-												)
-											) {
-												setCategories([
-													...categories,
-													{ name: value, type: categoryType },
-												]);
+											if (value) {
+												// No permitir duplicar la base "comida"; si escribe comida, usar la existente
+												if (
+													value.toLowerCase() === "comida" &&
+													categories.some(
+														(c) =>
+															c.name.toLowerCase() === "comida" &&
+															c.type === BASE_CATEGORY_TYPE
+													)
+												) {
+													// ya está presente, no agregar
+												} else if (
+													!categories.find(
+														(c) =>
+															c.name.toLowerCase() === value.toLowerCase() &&
+															c.type === FOOD_CATEGORY_TYPE
+													)
+												) {
+													setCategories([
+														...categories,
+														{ name: value, type: FOOD_CATEGORY_TYPE },
+													]);
+												}
 												setCategoryInput("");
 												setCategorySuggestions([]);
 											}
@@ -457,26 +571,39 @@ const CreateFood = () => {
 								/>
 							</div>
 							{categorySuggestions.length > 0 && (
-								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white">
+								<ul
+									className="rounded-lg mt-1 max-h-40 overflow-y-auto"
+									style={{
+										backgroundColor: "#2a2a2a",
+										border: "1px solid #3a3a3a",
+									}}
+								>
 									{categorySuggestions.map((s, i) => (
 										<li
 											key={i}
-											className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900"
+											className="px-4 py-2 cursor-pointer"
+											style={{ color: "#e9cc9e" }}
 											onClick={() => {
+												const suggestedName = (s.name || "").toLowerCase();
+												const resolvedType =
+													s.type ||
+													(suggestedName === "comida"
+														? BASE_CATEGORY_TYPE
+														: FOOD_CATEGORY_TYPE);
 												if (
 													!categories.find(
 														(c) =>
-															c.name === s.name &&
-															c.type === (s.type || categoryType)
+															c.name.toLowerCase() === suggestedName &&
+															c.type === resolvedType
 													)
 												) {
 													setCategories([
 														...categories,
-														{ name: s.name, type: s.type || categoryType },
+														{ name: s.name, type: resolvedType },
 													]);
-													setCategoryInput("");
-													setCategorySuggestions([]);
 												}
+												setCategoryInput("");
+												setCategorySuggestions([]);
 											}}
 										>
 											<span className="font-medium">{s.name}</span>
@@ -491,17 +618,21 @@ const CreateFood = () => {
 								{categories.map((cat, index) => (
 									<div
 										key={index}
-										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
+										className="px-3 py-1 rounded-full flex items-center gap-2"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										<span className="font-medium">{cat.name}</span>
-										<span className="text-blue-600 text-xs">({cat.type})</span>
+										<span className="text-xs" style={{ color: "#b8b8b8" }}>
+											({cat.type})
+										</span>
 										<button
 											type="button"
 											onClick={() => {
 												const upd = categories.filter((_, i) => i !== index);
 												setCategories(upd);
 											}}
-											className="text-blue-800 hover:text-red-500"
+											className="hover:text-red-500"
+											style={{ color: "#e9cc9e" }}
 										>
 											<FiTrash />
 										</button>
@@ -511,16 +642,26 @@ const CreateFood = () => {
 						</div>
 
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiImage className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiImage className="mr-2" style={{ color: "#e9cc9e" }} />
 								Imágenes
 							</label>
 							<div
-								className={`border-2 border-dashed rounded-lg p-6 text-center ${
-									showValidation && selectedFiles.length === 0
-										? "border-red-400 bg-red-50"
-										: "border-gray-300"
-								}`}
+								className={`border-2 border-dashed rounded-lg p-6 text-center`}
+								style={{
+									borderColor:
+										showValidation && selectedFiles.length === 0
+											? "#b91c1c"
+											: "#3a3a3a",
+									backgroundColor:
+										showValidation && selectedFiles.length === 0
+											? "#2a1414"
+											: "transparent",
+									color: "#e9cc9e",
+								}}
 							>
 								<input
 									type="file"
@@ -532,9 +673,13 @@ const CreateFood = () => {
 								/>
 								<label
 									htmlFor="file-upload"
-									className="cursor-pointer text-green-600 hover:text-green-800"
+									className="cursor-pointer hover:brightness-110"
+									style={{ color: "#e9cc9e" }}
 								>
-									<FiUpload className="mx-auto text-3xl mb-2" />
+									<FiUpload
+										className="mx-auto text-3xl mb-2"
+										style={{ color: "#e9cc9e" }}
+									/>
 									<span>Selecciona o arrastra las imágenes aquí</span>
 								</label>
 							</div>
@@ -572,7 +717,8 @@ const CreateFood = () => {
 								disabled={isCreating}
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
-								className="bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-green-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+								className="px-8 py-3 rounded-lg font-semibold text-lg transition-colors disabled:cursor-not-allowed"
+								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
 								{isCreating ? "Creando..." : "Crear Plato"}
 							</motion.button>

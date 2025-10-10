@@ -28,27 +28,28 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				<h3
 					className={
 						isModal
-							? "text-3xl font-bold capitalize text-gray-900 text-left mb-4"
-							: "text-xl font-semibold capitalize text-black text-center mb-2"
+							? "text-3xl font-bold capitalize text-left mb-4"
+							: "text-xl font-semibold capitalize text-center mb-2"
 					}
+					style={{ color: "#e9cc9e" }}
 				>
 					{name}
 				</h3>
 				<p
 					className={
-						isModal
-							? "text-lg text-gray-700 mb-4 text-left"
-							: "text-sm text-gray-600 mb-3 text-center"
+						isModal ? "text-lg mb-4 text-left" : "text-sm mb-3 text-center"
 					}
+					style={{ color: "#b8b8b8" }}
 				>
 					{description}
 				</p>
 				<p
 					className={
 						isModal
-							? "text-2xl font-bold mb-6 text-green-600 text-left"
-							: "text-lg font-bold mb-4 text-green-600 text-center"
+							? "text-2xl font-bold mb-6 text-left"
+							: "text-lg font-bold mb-4 text-center"
 					}
+					style={{ color: "#e9cc9e" }}
 				>
 					${Number(price).toLocaleString()}
 				</p>
@@ -57,8 +58,11 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				{ingredients && ingredients.length > 0 && (
 					<div className="mb-6">
 						<div className="flex items-center mb-2">
-							<FiList className="text-green-600 mr-2 text-lg" />
-							<h4 className="text-lg font-semibold text-gray-800">
+							<FiList className="mr-2 text-lg" style={{ color: "#e9cc9e" }} />
+							<h4
+								className="text-lg font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
 								Ingredientes:
 							</h4>
 						</div>
@@ -66,7 +70,8 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 							{ingredients.map((ingredient, index) => (
 								<span
 									key={index}
-									className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+									className="px-3 py-1 text-sm rounded-full"
+									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									{(() => {
 										const value =
@@ -86,8 +91,11 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				{categories && categories.length > 0 && (
 					<div className="mb-2">
 						<div className="flex items-center mb-2">
-							<FiTag className="text-blue-600 mr-2 text-lg" />
-							<h4 className="text-lg font-semibold text-gray-800">
+							<FiTag className="mr-2 text-lg" style={{ color: "#e9cc9e" }} />
+							<h4
+								className="text-lg font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
 								Categorías:
 							</h4>
 						</div>
@@ -95,7 +103,8 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 							{categories.map((category, index) => (
 								<span
 									key={index}
-									className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+									className="px-3 py-1 text-sm rounded-full"
+									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									{typeof category === "string" ? category : category.name}
 								</span>
@@ -109,7 +118,10 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 
 	if (!isModal)
 		return (
-			<div className="w-80 bg-white shadow-md rounded-lg overflow-hidden">
+			<div
+				className="w-80 shadow-md rounded-lg overflow-hidden"
+				style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+			>
 				{content}
 			</div>
 		);
@@ -121,14 +133,16 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 			onClick={onClose}
 		>
 			<div
-				className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col items-center"
+				className="rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col items-center"
+				style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 				onClick={(e) => e.stopPropagation()}
 			>
 				<button
 					onClick={onClose}
-					className="absolute top-4 right-4 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
+					className="absolute top-4 right-4 z-10 rounded-full p-2 transition-all duration-200 hover:scale-110"
+					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 				>
-					<FiX className="text-gray-600 text-xl" />
+					<FiX className="text-xl" style={{ color: "#e9cc9e" }} />
 				</button>
 				{content}
 			</div>

@@ -364,21 +364,22 @@ const PromotionFormModal = ({
 					? { type: "spring", stiffness: 220, damping: 22 }
 					: { duration: 0.18 }
 			}
-			className={`bg-white rounded-2xl shadow-2xl w-full max-w-2xl ${
+			className={`rounded-2xl shadow-2xl w-full max-w-2xl ${
 				isPage ? "max-h-[calc(100vh-2rem)]" : "max-h-[90vh]"
 			} overflow-hidden flex flex-col`}
+			style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 		>
-			<div className="p-4 border-b flex items-center justify-between">
+			<div
+				className="p-4 border-b flex items-center justify-between"
+				style={{ borderColor: "#3a3a3a" }}
+			>
 				<div className="flex items-center gap-2">
 					<motion.span
 						initial={{ scale: 0.8, opacity: 0 }}
 						animate={{ scale: 1, opacity: 1 }}
 						transition={{ type: "spring", stiffness: 260, damping: 18 }}
-						className={`inline-flex items-center justify-center w-9 h-9 rounded-full ${
-							promotion
-								? "bg-blue-100 text-blue-700"
-								: "bg-green-100 text-green-700"
-						}`}
+						className={`inline-flex items-center justify-center w-9 h-9 rounded-full`}
+						style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 					>
 						{promotion ? <IconPencil /> : <IconPlus />}
 					</motion.span>
@@ -391,7 +392,8 @@ const PromotionFormModal = ({
 							damping: 22,
 							delay: 0.05,
 						}}
-						className="text-xl font-bold text-gray-900"
+						className="text-xl font-bold"
+						style={{ color: "#e9cc9e" }}
 					>
 						{promotion ? "Editar promoción" : "Nueva promoción"}
 					</motion.h2>
@@ -399,7 +401,12 @@ const PromotionFormModal = ({
 				<motion.button
 					onClick={onClose}
 					whileTap={{ scale: 0.96 }}
-					className="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+					className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+					style={{
+						backgroundColor: "#2a2a2a",
+						color: "#e9cc9e",
+						border: "1px solid #3a3a3a",
+					}}
 					aria-label="Cerrar"
 				>
 					<IconClose />
@@ -416,7 +423,12 @@ const PromotionFormModal = ({
 				{errorMsg && (
 					<motion.div
 						variants={itemVariants}
-						className="bg-red-50 text-red-700 text-sm p-2.5 rounded-lg border border-red-200"
+						className="text-sm p-2.5 rounded-lg border"
+						style={{
+							backgroundColor: "#2a1414",
+							color: "#fca5a5",
+							borderColor: "#b91c1c",
+						}}
 					>
 						{errorMsg}
 					</motion.div>
@@ -424,34 +436,53 @@ const PromotionFormModal = ({
 
 				<motion.div variants={itemVariants} className="grid grid-cols-1 gap-4">
 					<div>
-						<label className="block text-sm font-medium mb-1 text-gray-700">
+						<label
+							className="block text-sm font-medium mb-1"
+							style={{ color: "#e9cc9e" }}
+						>
 							Título <span className="text-red-600">*</span>
 						</label>
 						<input
 							value={title}
 							onChange={(e) => setTitle(e.target.value)}
 							placeholder="Ej. 2x1 en cócteles"
-							className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300 placeholder:text-gray-400"
+							className="w-full rounded-xl px-3 py-2.5 focus:outline-none placeholder:text-[#b8b8b8]"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							required
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-medium mb-1 text-gray-700">
+						<label
+							className="block text-sm font-medium mb-1"
+							style={{ color: "#e9cc9e" }}
+						>
 							Descripción
 						</label>
 						<textarea
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							placeholder="Texto que verán los clientes"
-							className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300 placeholder:text-gray-400"
+							className="w-full rounded-xl px-3 py-2.5 focus:outline-none placeholder:text-[#b8b8b8]"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							rows={3}
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-medium mb-2 text-gray-700">
+						<label
+							className="block text-sm font-medium mb-2"
+							style={{ color: "#e9cc9e" }}
+						>
 							<span className="inline-flex items-center gap-2">
-								<IconImage className="text-gray-600" /> Imagen de la promoción{" "}
-								<span className="text-red-600">*</span>
+								<IconImage style={{ color: "#e9cc9e" }} /> Imagen de la
+								promoción <span className="text-red-600">*</span>
 							</span>
 						</label>
 						<div className="flex items-center gap-3">
@@ -464,7 +495,9 @@ const PromotionFormModal = ({
 						</div>
 						{(imageUrl || (fileList && fileList.length > 0)) && (
 							<div className="mt-3">
-								<div className="text-xs text-gray-500 mb-1">Vista previa</div>
+								<div className="text-xs mb-1" style={{ color: "#b8b8b8" }}>
+									Vista previa
+								</div>
 								<img
 									src={imageUrl || URL.createObjectURL(fileList[0])}
 									alt="promo"
@@ -472,7 +505,7 @@ const PromotionFormModal = ({
 								/>
 							</div>
 						)}
-						<p className="text-xs text-gray-500 mt-1">
+						<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
 							La imagen se subirá a Azure usando el título como nombre base.
 						</p>
 					</div>
@@ -482,15 +515,13 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={() => setUseFixedDates((v) => !v)}
-						className="flex items-center gap-2 mb-3 text-gray-800"
+						className="flex items-center gap-2 mb-3"
+						style={{ color: "#e9cc9e" }}
 						whileTap={{ scale: 0.98 }}
 					>
 						<span
-							className={`w-8 h-8 inline-flex items-center justify-center rounded-full ${
-								useFixedDates
-									? "bg-blue-100 text-blue-700"
-									: "bg-gray-100 text-gray-600"
-							}`}
+							className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+							style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 						>
 							<IconCalendar />
 						</span>
@@ -499,25 +530,41 @@ const PromotionFormModal = ({
 					{useFixedDates && (
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Desde (fecha)
 								</label>
 								<input
 									type="date"
 									value={validFrom}
 									onChange={(e) => setValidFrom(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Hasta (fecha)
 								</label>
 								<input
 									type="date"
 									value={validTo}
 									onChange={(e) => setValidTo(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 						</div>
@@ -528,15 +575,13 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={() => setUseTimeWindow((v) => !v)}
-						className="flex items-center gap-2 mb-3 text-gray-800"
+						className="flex items-center gap-2 mb-3"
+						style={{ color: "#e9cc9e" }}
 						whileTap={{ scale: 0.98 }}
 					>
 						<span
-							className={`w-8 h-8 inline-flex items-center justify-center rounded-full ${
-								useTimeWindow
-									? "bg-blue-100 text-blue-700"
-									: "bg-gray-100 text-gray-600"
-							}`}
+							className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+							style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 						>
 							<IconClock />
 						</span>
@@ -545,25 +590,41 @@ const PromotionFormModal = ({
 					{useTimeWindow && (
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Inicio (hora)
 								</label>
 								<input
 									type="time"
 									value={startTime}
 									onChange={(e) => setStartTime(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Fin (hora)
 								</label>
 								<input
 									type="time"
 									value={endTime}
 									onChange={(e) => setEndTime(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 						</div>
@@ -574,15 +635,13 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={() => setUseSpecificDays((v) => !v)}
-						className="flex items-center gap-2 mb-3 text-gray-800"
+						className="flex items-center gap-2 mb-3"
+						style={{ color: "#e9cc9e" }}
 						whileTap={{ scale: 0.98 }}
 					>
 						<span
-							className={`w-8 h-8 inline-flex items-center justify-center rounded-full ${
-								useSpecificDays
-									? "bg-blue-100 text-blue-700"
-									: "bg-gray-100 text-gray-600"
-							}`}
+							className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+							style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 						>
 							<IconDays />
 						</span>
@@ -604,18 +663,27 @@ const PromotionFormModal = ({
 										type="button"
 										key={d}
 										onClick={() => handleToggleDay(d)}
-										className={`px-3 py-1.5 rounded-full border text-sm ${
+										className={`px-3 py-1.5 rounded-full border text-sm`}
+										style={
 											daysOfWeek.includes(d)
-												? "bg-green-600 text-white border-green-600"
-												: "border-gray-300 text-gray-700"
-										}`}
+												? {
+														backgroundColor: "#e9cc9e",
+														color: "#191919",
+														borderColor: "#e9cc9e",
+												  }
+												: {
+														backgroundColor: "#2a2a2a",
+														color: "#e9cc9e",
+														borderColor: "#3a3a3a",
+												  }
+										}
 										whileTap={{ scale: 0.97 }}
 									>
 										{l}
 									</motion.button>
 								))}
 							</div>
-							<p className="text-xs text-gray-500 mt-1">
+							<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
 								Si no eliges días, la promoción aplica todos los días.
 							</p>
 						</div>
@@ -629,28 +697,35 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={() => setIsActive((v) => !v)}
-						className={`flex items-center justify-between w-full px-3 py-2 rounded-lg border ${
-							isActive
-								? "bg-green-50 border-green-200"
-								: "bg-white border-gray-200"
-						}`}
+						className={`flex items-center justify-between w-full px-3 py-2 rounded-lg border`}
+						style={{
+							backgroundColor: "#2a2a2a",
+							borderColor: "#3a3a3a",
+							color: "#e9cc9e",
+						}}
 						whileTap={{ scale: 0.98 }}
 					>
-						<span className="inline-flex items-center gap-2 text-sm text-gray-800">
-							<span className="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+						<span className="inline-flex items-center gap-2 text-sm">
+							<span
+								className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<IconFlag />
 							</span>
 							Activa
 						</span>
 						<span
-							className={`inline-block h-5 w-10 rounded-full transition-colors ${
-								isActive ? "bg-green-600" : "bg-gray-300"
-							}`}
+							className="inline-block h-5 w-10 rounded-full transition-colors"
+							style={{
+								backgroundColor: isActive ? "#e9cc9e" : "#3a3a3a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
 							<span
-								className={`block h-5 w-5 bg-white rounded-full transform transition-transform ${
+								className={`block h-5 w-5 rounded-full transform transition-transform ${
 									isActive ? "translate-x-5" : "translate-x-0"
 								}`}
+								style={{ backgroundColor: "#191919" }}
 							/>
 						</span>
 					</motion.button>
@@ -658,28 +733,35 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={() => setIsPriority((v) => !v)}
-						className={`flex items-center justify-between w-full px-3 py-2 rounded-lg border ${
-							isPriority
-								? "bg-amber-50 border-amber-200"
-								: "bg-white border-gray-200"
-						}`}
+						className={`flex items-center justify-between w-full px-3 py-2 rounded-lg border`}
+						style={{
+							backgroundColor: "#2a2a2a",
+							borderColor: "#3a3a3a",
+							color: "#e9cc9e",
+						}}
 						whileTap={{ scale: 0.98 }}
 					>
-						<span className="inline-flex items-center gap-2 text-sm text-gray-800">
-							<span className="w-8 h-8 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700">
+						<span className="inline-flex items-center gap-2 text-sm">
+							<span
+								className="w-8 h-8 inline-flex items-center justify-center rounded-full"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<IconBolt />
 							</span>
 							Alta prioridad
 						</span>
 						<span
-							className={`inline-block h-5 w-10 rounded-full transition-colors ${
-								isPriority ? "bg-amber-500" : "bg-gray-300"
-							}`}
+							className="inline-block h-5 w-10 rounded-full transition-colors"
+							style={{
+								backgroundColor: isPriority ? "#e9cc9e" : "#3a3a3a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
 							<span
-								className={`block h-5 w-5 bg-white rounded-full transform transition-transform ${
+								className={`block h-5 w-5 rounded-full transform transition-transform ${
 									isPriority ? "translate-x-5" : "translate-x-0"
 								}`}
+								style={{ backgroundColor: "#191919" }}
 							/>
 						</span>
 					</motion.button>
@@ -692,7 +774,12 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={onClose}
-						className="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+						className="px-4 py-2 rounded-md"
+						style={{
+							backgroundColor: "#2a2a2a",
+							color: "#e9cc9e",
+							border: "1px solid #3a3a3a",
+						}}
 						whileTap={{ scale: 0.98 }}
 					>
 						Cancelar
@@ -700,7 +787,8 @@ const PromotionFormModal = ({
 					<motion.button
 						disabled={saving}
 						type="submit"
-						className="px-4 py-2 rounded-md bg-green-700 text-white hover:bg-green-800"
+						className="px-4 py-2 rounded-md"
+						style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 						whileTap={{ scale: 0.98 }}
 					>
 						{saving ? "Guardando..." : "Guardar"}
@@ -716,7 +804,7 @@ const PromotionFormModal = ({
 				initial={{ opacity: 0, y: 12 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: 12 }}
-				className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-start justify-center"
+				className="min-h-screen p-4 sm:p-6 flex items-start justify-center"
 			>
 				{Card}
 				<AlertModal
