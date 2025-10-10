@@ -32,7 +32,9 @@ const CreateFood = () => {
 	]);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [categorySuggestions, setCategorySuggestions] = useState([]);
-	const [categoryType] = useState("clasificacion");
+	// Tipos de categoría
+	const BASE_CATEGORY_TYPE = "clasificacion"; // define que es comida
+	const FOOD_CATEGORY_TYPE = "clasificacion comida"; // subclasificación (Entrada, Fuerte, etc.)
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [createdItem, setCreatedItem] = useState(null);
 	const [isCreating, setIsCreating] = useState(false);
@@ -80,7 +82,7 @@ const CreateFood = () => {
 		setPrice("");
 		setDescription("");
 		setIngredients([]);
-		setCategories([{ name: "comida", type: "clasificacion" }]);
+		setCategories([{ name: "comida", type: BASE_CATEGORY_TYPE }]);
 		setSelectedFiles([]);
 		setIngredientInput("");
 		setCategoryInput("");
@@ -128,9 +130,10 @@ const CreateFood = () => {
 					typeof ing === "string" ? ing : ing.name
 				),
 				images: imageUrls,
+				// Preservar el type de cada categoría (evita duplicar "comida")
 				categories: categories.map((cat) => ({
 					name: cat.name,
-					type: categoryType,
+					type: cat.type,
 				})),
 			};
 			const result = await createProduct(foodData);
@@ -537,16 +540,29 @@ const CreateFood = () => {
 										if (e.key === "Enter") {
 											e.preventDefault();
 											const value = e.target.value.trim();
-											if (
-												value &&
-												!categories.find(
-													(c) => c.name === value && c.type === categoryType
-												)
-											) {
-												setCategories([
-													...categories,
-													{ name: value, type: categoryType },
-												]);
+											if (value) {
+												// No permitir duplicar la base "comida"; si escribe comida, usar la existente
+												if (
+													value.toLowerCase() === "comida" &&
+													categories.some(
+														(c) =>
+															c.name.toLowerCase() === "comida" &&
+															c.type === BASE_CATEGORY_TYPE
+													)
+												) {
+													// ya está presente, no agregar
+												} else if (
+													!categories.find(
+														(c) =>
+															c.name.toLowerCase() === value.toLowerCase() &&
+															c.type === FOOD_CATEGORY_TYPE
+													)
+												) {
+													setCategories([
+														...categories,
+														{ name: value, type: FOOD_CATEGORY_TYPE },
+													]);
+												}
 												setCategoryInput("");
 												setCategorySuggestions([]);
 											}
@@ -568,20 +584,26 @@ const CreateFood = () => {
 											className="px-4 py-2 cursor-pointer"
 											style={{ color: "#e9cc9e" }}
 											onClick={() => {
+												const suggestedName = (s.name || "").toLowerCase();
+												const resolvedType =
+													s.type ||
+													(suggestedName === "comida"
+														? BASE_CATEGORY_TYPE
+														: FOOD_CATEGORY_TYPE);
 												if (
 													!categories.find(
 														(c) =>
-															c.name === s.name &&
-															c.type === (s.type || categoryType)
+															c.name.toLowerCase() === suggestedName &&
+															c.type === resolvedType
 													)
 												) {
 													setCategories([
 														...categories,
-														{ name: s.name, type: s.type || categoryType },
+														{ name: s.name, type: resolvedType },
 													]);
-													setCategoryInput("");
-													setCategorySuggestions([]);
 												}
+												setCategoryInput("");
+												setCategorySuggestions([]);
 											}}
 										>
 											<span className="font-medium">{s.name}</span>

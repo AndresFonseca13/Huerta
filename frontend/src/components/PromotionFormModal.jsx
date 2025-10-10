@@ -530,25 +530,41 @@ const PromotionFormModal = ({
 					{useFixedDates && (
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Desde (fecha)
 								</label>
 								<input
 									type="date"
 									value={validFrom}
 									onChange={(e) => setValidFrom(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Hasta (fecha)
 								</label>
 								<input
 									type="date"
 									value={validTo}
 									onChange={(e) => setValidTo(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 						</div>
@@ -574,25 +590,41 @@ const PromotionFormModal = ({
 					{useTimeWindow && (
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Inicio (hora)
 								</label>
 								<input
 									type="time"
 									value={startTime}
 									onChange={(e) => setStartTime(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700">
+								<label
+									className="block text-sm font-medium mb-1"
+									style={{ color: "#e9cc9e" }}
+								>
 									Fin (hora)
 								</label>
 								<input
 									type="time"
 									value={endTime}
 									onChange={(e) => setEndTime(e.target.value)}
-									className="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-300"
+									className="w-full rounded-xl px-3 py-2.5 focus:outline-none"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 								/>
 							</div>
 						</div>
@@ -631,18 +663,27 @@ const PromotionFormModal = ({
 										type="button"
 										key={d}
 										onClick={() => handleToggleDay(d)}
-										className={`px-3 py-1.5 rounded-full border text-sm ${
+										className={`px-3 py-1.5 rounded-full border text-sm`}
+										style={
 											daysOfWeek.includes(d)
-												? "bg-green-600 text-white border-green-600"
-												: "border-gray-300 text-gray-700"
-										}`}
+												? {
+														backgroundColor: "#e9cc9e",
+														color: "#191919",
+														borderColor: "#e9cc9e",
+												  }
+												: {
+														backgroundColor: "#2a2a2a",
+														color: "#e9cc9e",
+														borderColor: "#3a3a3a",
+												  }
+										}
 										whileTap={{ scale: 0.97 }}
 									>
 										{l}
 									</motion.button>
 								))}
 							</div>
-							<p className="text-xs text-gray-500 mt-1">
+							<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
 								Si no eliges días, la promoción aplica todos los días.
 							</p>
 						</div>
@@ -733,7 +774,12 @@ const PromotionFormModal = ({
 					<motion.button
 						type="button"
 						onClick={onClose}
-						className="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+						className="px-4 py-2 rounded-md"
+						style={{
+							backgroundColor: "#2a2a2a",
+							color: "#e9cc9e",
+							border: "1px solid #3a3a3a",
+						}}
 						whileTap={{ scale: 0.98 }}
 					>
 						Cancelar
@@ -741,7 +787,8 @@ const PromotionFormModal = ({
 					<motion.button
 						disabled={saving}
 						type="submit"
-						className="px-4 py-2 rounded-md bg-green-700 text-white hover:bg-green-800"
+						className="px-4 py-2 rounded-md"
+						style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 						whileTap={{ scale: 0.98 }}
 					>
 						{saving ? "Guardando..." : "Guardar"}

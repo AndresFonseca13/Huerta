@@ -30,10 +30,15 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	const [error, setError] = useState(null);
 	const [isSuccess, setIsSuccess] = useState(false);
 
-	const formatPrice = (value) => {
-		const numbers = String(value).replace(/\D/g, "");
-		if (!numbers) return "";
-		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	const formatPrice = (value, { fromBackend = false } = {}) => {
+		if (fromBackend) {
+			const numeric = Number(String(value).replace(/[^\d.-]/g, ""));
+			if (!isFinite(numeric)) return "";
+			return new Intl.NumberFormat("es-CO").format(Math.round(numeric));
+		}
+		const digitsOnly = String(value).replace(/\D/g, "");
+		if (!digitsOnly) return "";
+		return new Intl.NumberFormat("es-CO").format(parseInt(digitsOnly, 10));
 	};
 
 	const handlePriceChange = (e) => {
@@ -63,8 +68,10 @@ const EditFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 	useEffect(() => {
 		if (item) {
 			setName(item.name || "");
-			const priceValue = item.price || "";
-			setPrice(priceValue ? formatPrice(String(priceValue)) : "");
+			const priceValue = item.price ?? "";
+			setPrice(
+				priceValue !== "" ? formatPrice(priceValue, { fromBackend: true }) : ""
+			);
 			setDescription(item.description || "");
 			setIngredients(
 				item.ingredients
