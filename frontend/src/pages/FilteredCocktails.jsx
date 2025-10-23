@@ -29,37 +29,15 @@ const FilteredCocktails = () => {
 		const fetchData = async () => {
 			setIsLoading(true);
 			try {
-				console.log("[DEBUG] FilteredCocktails - Iniciando fetchData con:", {
-					currentPage,
-					pageSize,
-					categoria,
-					tipo,
-				});
-
 				const data = await getProducts(currentPage, pageSize, categoria, tipo);
-
-				// El backend devuelve 'cocteles' y 'paginacion'
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
 				const totalPages = data.paginacion?.totalPages || 0;
 				const totalRecords = data.paginacion?.totalRecords || 0;
-
-				console.log("[DEBUG] FilteredCocktails - Datos recibidos:", {
-					items,
-					totalPages,
-					totalRecords,
-				});
-
 				setCocktails(items);
 				setTotalPages(totalPages);
 				setTotalRecords(totalRecords);
-
-				console.log("[DEBUG] FilteredCocktails - Estado actualizado:", {
-					cocktailsCount: items.length,
-					totalPages,
-					totalRecords,
-				});
-			} catch (error) {
-				console.error("[DEBUG] FilteredCocktails - Error:", error);
+			} catch (_error) {
+				// noop
 			} finally {
 				setIsLoading(false);
 			}
@@ -91,38 +69,32 @@ const FilteredCocktails = () => {
 		hidden: { opacity: 0 },
 		visible: {
 			opacity: 1,
-			transition: {
-				staggerChildren: 0.1,
-			},
+			transition: { staggerChildren: 0.1 },
 		},
 	};
 
 	const itemVariants = {
-		hidden: {
-			opacity: 0,
-			y: 20,
-			scale: 0.95,
-		},
+		hidden: { opacity: 0, y: 20, scale: 0.95 },
 		visible: {
 			opacity: 1,
 			y: 0,
 			scale: 1,
-			transition: {
-				duration: 0.3,
-				ease: "easeOut",
-			},
+			transition: { duration: 0.3, ease: "easeOut" },
 		},
 	};
 
 	const getFilterTitle = () => {
 		if (!categoria) {
-			return tipo === "destilado" ? "Todas las bebidas" : "Toda la comida";
+			return tipo === "destilado" ? "Todos los cocteles" : "Toda la comida";
 		}
 		return categoria;
 	};
 
 	return (
-		<div className="py-8">
+		<div
+			className="py-8"
+			style={{ backgroundColor: "#191919", minHeight: "100vh" }}
+		>
 			<div ref={topRef} />
 			<CategoryFilterBar />
 			<motion.div
@@ -131,10 +103,13 @@ const FilteredCocktails = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h1 className="text-3xl font-bold text-green-900 mb-2 capitalize">
+				<h1
+					className="text-3xl md:text-4xl font-bold mb-2 capitalize"
+					style={{ color: "#e9cc9e" }}
+				>
 					{getFilterTitle()}
 				</h1>
-				<p className="text-gray-600">
+				<p className="text-gray-400">
 					{totalRecords > 0
 						? `Encontramos ${totalRecords} ${
 								tipo === "destilado" ? "bebidas" : "platos"
@@ -164,7 +139,7 @@ const FilteredCocktails = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.3, delay: 0.2 }}
 				>
-					<div className="text-sm text-gray-600">
+					<div className="text-sm" style={{ color: "#b8b8b8" }}>
 						Mostrando {cocktails.length} de {totalRecords}{" "}
 						{tipo === "destilado" ? "bebidas" : "platos"} (Página {currentPage}{" "}
 						de {totalPages})
@@ -175,7 +150,12 @@ const FilteredCocktails = () => {
 							whileTap={{ scale: 0.95 }}
 							disabled={currentPage === 1}
 							onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-							className="px-3 py-1 rounded disabled:opacity-50 text-black transition-colors"
+							className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+							style={{
+								color: "#e9cc9e",
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
 							‹ Anterior
 						</motion.button>
@@ -185,9 +165,18 @@ const FilteredCocktails = () => {
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={() => handlePageChange(page)}
-								className={`px-3 py-1 rounded transition-colors ${
-									page === currentPage ? "bg-green-700 text-white" : ""
+								className={`px-3 py-2 rounded-lg transition-all ${
+									page === currentPage ? "font-bold" : ""
 								}`}
+								style={
+									page === currentPage
+										? { backgroundColor: "#e9cc9e", color: "#191919" }
+										: {
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+										  }
+								}
 							>
 								{page}
 							</motion.button>
@@ -199,7 +188,12 @@ const FilteredCocktails = () => {
 							onClick={() =>
 								handlePageChange(Math.min(currentPage + 1, totalPages))
 							}
-							className="px-3 py-1 rounded disabled:opacity-50 text-black transition-colors"
+							className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+							style={{
+								color: "#e9cc9e",
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 						>
 							Siguiente ›
 						</motion.button>

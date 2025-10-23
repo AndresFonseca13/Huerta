@@ -46,6 +46,36 @@ const CreateCocktail = () => {
 
 	const navigate = useNavigate();
 
+	const formatPrice = (value) => {
+		// Extraer solo los dígitos del valor ingresado
+		const numbers = String(value).replace(/\D/g, "");
+		if (!numbers) return "";
+		// Formatear con separador de miles
+		return new Intl.NumberFormat("es-CO").format(parseInt(numbers));
+	};
+
+	const handlePriceChange = (e) => {
+		const inputValue = e.target.value;
+		// Solo formatear si hay contenido
+		if (inputValue === "") {
+			setPrice("");
+			return;
+		}
+		const formatted = formatPrice(inputValue);
+		setPrice(formatted);
+	};
+
+	const handleFileChange = (e) => {
+		const files = Array.from(e.target.files);
+		if (selectedFiles.length + files.length > 5) {
+			setError(
+				`Solo puedes subir máximo 5 imágenes. Actualmente tienes ${selectedFiles.length}.`
+			);
+			return;
+		}
+		setSelectedFiles([...selectedFiles, ...files]);
+	};
+
 	useEffect(() => {
 		try {
 			window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -75,17 +105,13 @@ const CreateCocktail = () => {
 			validationErrors.push("La descripción es obligatoria");
 		}
 
-		if (ingredients.length === 0) {
-			validationErrors.push("Debes agregar al menos un ingrediente");
-		}
+		// Ingredientes ahora son opcionales para otras bebidas
 
 		if (categories.length === 0) {
 			validationErrors.push("Debes agregar al menos una categoría");
 		}
 
-		if (selectedFiles.length === 0) {
-			validationErrors.push("Debes seleccionar al menos una imagen");
-		}
+		// Imágenes ahora son opcionales para otras bebidas
 
 		// Validación de alcohol si fue diligenciado
 		if (alcoholPercentage !== "") {
@@ -116,19 +142,26 @@ const CreateCocktail = () => {
 				"[CreateBeverage] starting uploadImages",
 				selectedFiles.length
 			);
-			// 1. Subir imágenes (solo si la validación pasó)
-			const imageUrls = await uploadImages(selectedFiles, name.trim());
-			console.log("[CreateBeverage] uploadImages OK", imageUrls);
+			// 1. Subir imágenes si fueron seleccionadas
+			const imageUrls = selectedFiles.length
+				? await uploadImages(selectedFiles, name.trim())
+				: [];
+			if (selectedFiles.length) {
+				console.log("[CreateBeverage] uploadImages OK", imageUrls);
+			}
 
 			// 2. Preparar objeto de la bebida
 			const cocktailData = {
 				name: name.trim(),
-				price: parseFloat(price),
+				price: parseFloat(price.replace(/\./g, "")),
 				description: description.trim(),
-				ingredients: ingredients.map((ing) =>
-					typeof ing === "string" ? ing : ing.name
-				),
-				images: imageUrls,
+				// Solo incluimos ingredientes si hay
+				...(ingredients.length > 0 && {
+					ingredients: ingredients.map((ing) =>
+						typeof ing === "string" ? ing : ing.name
+					),
+				}),
+				images: imageUrls, // puede ser []
 				categories: categories.map((cat) => ({
 					name: cat.name,
 					type: cat.type,
@@ -239,7 +272,8 @@ const CreateCocktail = () => {
 					animate="visible"
 				>
 					<motion.div
-						className="bg-white rounded-lg p-8 max-w-md mx-4 relative"
+						className="rounded-lg p-8 max-w-md mx-4 relative"
+						style={{ backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a' }}
 						variants={cardVariants}
 						initial="hidden"
 						animate="visible"
@@ -247,7 +281,8 @@ const CreateCocktail = () => {
 						{/* Botón de cerrar */}
 						<button
 							onClick={handleCreateAnother}
-							className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
+							className="absolute top-4 right-4 text-xl"
+							style={{ color: '#e9cc9e' }}
 						>
 							×
 						</button>
@@ -257,15 +292,16 @@ const CreateCocktail = () => {
 							<motion.div
 								initial={{ scale: 0 }}
 								animate={{ scale: 1 }}
-								transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-								className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+								transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+								className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+								style={{ backgroundColor: '#122114', border: '1px solid #22c55e' }}
 							>
-								<span className="text-green-600 text-2xl">✓</span>
+								<span className="text-2xl" style={{ color: '#22c55e' }}>✓</span>
 							</motion.div>
-							<h2 className="text-2xl font-bold text-green-900 mb-2">
+							<h2 className="text-2xl font-bold mb-2" style={{ color: '#e9cc9e' }}>
 								¡Bebida Creada!
 							</h2>
-							<p className="text-gray-600">
+							<p style={{ color: '#b8b8b8' }}>
 								Tu bebida ha sido creada exitosamente
 							</p>
 						</div>
@@ -281,7 +317,8 @@ const CreateCocktail = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleViewCocktails}
-								className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-900 transition-colors font-medium"
+								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								style={{ backgroundColor: '#e9cc9e', color: '#191919' }}
 							>
 								Ver Todas las Bebidas
 							</motion.button>
@@ -289,7 +326,8 @@ const CreateCocktail = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleBackToPanel}
-								className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								style={{ backgroundColor: '#2a2a2a', color: '#e9cc9e', border: '1px solid #3a3a3a' }}
 							>
 								Volver al Panel
 							</motion.button>
@@ -297,7 +335,8 @@ const CreateCocktail = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleCreateAnother}
-								className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								style={{ backgroundColor: '#2a2a2a', color: '#e9cc9e', border: '1px solid #3a3a3a' }}
 							>
 								Crear Otra Bebida
 							</motion.button>
@@ -309,7 +348,7 @@ const CreateCocktail = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-green-50 to-amber-50 py-8">
+		<div className="min-h-screen py-8" style={{ backgroundColor: "#191919" }}>
 			<AnimatePresence>
 				{error && <ErrorModal message={error} onClose={() => setError(null)} />}
 			</AnimatePresence>
@@ -324,7 +363,8 @@ const CreateCocktail = () => {
 					<div className="flex justify-between items-center mb-4">
 						<button
 							onClick={handleBackToPanel}
-							className="flex items-center text-green-600 hover:text-green-700 font-medium"
+							className="flex items-center font-medium"
+							style={{ color: "#e9cc9e" }}
 						>
 							← Volver al Panel
 						</button>
@@ -333,21 +373,23 @@ const CreateCocktail = () => {
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-						className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+						className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+						style={{ backgroundColor: "#3a3a3a" }}
 					>
-						<FiEdit3 className="text-green-600 text-3xl" />
+						<FiEdit3 className="text-3xl" style={{ color: "#e9cc9e" }} />
 					</motion.div>
-					<h1 className="text-4xl font-bold text-green-900 mb-2">
+					<h1 className="text-4xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
 						Crear Nueva Bebida
 					</h1>
-					<p className="text-gray-600 text-lg">
+					<p className="text-lg" style={{ color: "#b8b8b8" }}>
 						Completa la información para crear tu bebida
 					</p>
 				</div>
 
 				{/* Formulario */}
 				<motion.div
-					className="bg-white rounded-2xl shadow-xl p-8"
+					className="rounded-2xl shadow-xl p-8"
+					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ delay: 0.3 }}
@@ -357,38 +399,64 @@ const CreateCocktail = () => {
 						<div className="grid md:grid-cols-2 gap-6">
 							{/* Nombre */}
 							<div className="space-y-2">
-								<label className="flex items-center text-gray-700 font-semibold">
-									<FiEdit3 className="mr-2 text-green-600" />
+								<label
+									className="flex items-center font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									<FiEdit3 className="mr-2" style={{ color: "#e9cc9e" }} />
 									Nombre de la Bebida
 								</label>
 								<input
 									type="text"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Ej. Mojito"
 								/>
 							</div>
 
 							{/* Precio */}
 							<div className="space-y-2">
-								<label className="flex items-center text-gray-700 font-semibold">
-									<FiDollarSign className="mr-2 text-green-600" />
+								<label
+									className="flex items-center font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									<FiDollarSign className="mr-2" style={{ color: "#e9cc9e" }} />
 									Precio
 								</label>
 								<input
-									type="number"
+									type="text"
 									value={price}
-									onChange={(e) => setPrice(e.target.value)}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
-									placeholder="Ej. 8.50"
+									onChange={handlePriceChange}
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
+									placeholder="0"
 								/>
+								{price && (
+									<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
+										${price} COP
+									</p>
+								)}
 							</div>
 
 							{/* Porcentaje de alcohol (opcional) */}
 							<div className="space-y-2">
-								<label className="flex items-center text-gray-700 font-semibold">
-									<span className="mr-2 text-green-600">%</span>
+								<label
+									className="flex items-center font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									<span className="mr-2" style={{ color: "#e9cc9e" }}>
+										%
+									</span>
 									Porcentaje de Alcohol (opcional)
 								</label>
 								<input
@@ -398,7 +466,12 @@ const CreateCocktail = () => {
 									step="0.1"
 									value={alcoholPercentage}
 									onChange={(e) => setAlcoholPercentage(e.target.value)}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Ej. 40"
 								/>
 							</div>
@@ -406,24 +479,42 @@ const CreateCocktail = () => {
 
 						{/* Descripción */}
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiEdit3 className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiEdit3 className="mr-2" style={{ color: "#e9cc9e" }} />
 								Descripción
 							</label>
 							<textarea
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 h-24 text-gray-900"
+								className="w-full px-4 py-2 border rounded-lg focus:outline-none h-24 placeholder-[#b8b8b8] caret-[#e9cc9e]"
+								style={{
+									backgroundColor: "#2a2a2a",
+									color: "#e9cc9e",
+									border: "1px solid #3a3a3a",
+								}}
 								placeholder="Describe tu cóctel..."
 							></textarea>
 						</div>
 
 						{/* Ingredientes */}
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiPlus className="mr-2 text-green-600" />
-								Ingredientes
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiPlus className="mr-2" style={{ color: "#e9cc9e" }} />
+								Ingredientes{" "}
+								<span className="ml-1 text-gray-500 font-normal text-sm">
+									(opcional)
+								</span>
 							</label>
+							<p className="text-xs" style={{ color: "#9a9a9a" }}>
+								Puedes dejar este campo vacío para otras bebidas como agua,
+								sodas, vinos o cervezas.
+							</p>
 							<div className="flex items-center gap-2">
 								<input
 									type="text"
@@ -443,7 +534,12 @@ const CreateCocktail = () => {
 											setIngredientSuggestions([]);
 										}
 									}}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Busca ingredientes..."
 									onKeyDown={async (e) => {
 										if (e.key === "Enter") {
@@ -466,11 +562,18 @@ const CreateCocktail = () => {
 								/>
 							</div>
 							{ingredientSuggestions.length > 0 && (
-								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white capitalize">
+								<ul
+									className="rounded-lg mt-1 max-h-40 overflow-y-auto capitalize"
+									style={{
+										backgroundColor: "#2a2a2a",
+										border: "1px solid #3a3a3a",
+									}}
+								>
 									{ingredientSuggestions.map((suggestion, index) => (
 										<li
 											key={index}
-											className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900"
+											className="px-4 py-2 cursor-pointer"
+											style={{ color: "#e9cc9e" }}
 											onClick={() => {
 												const ingredientName =
 													typeof suggestion === "string"
@@ -516,9 +619,17 @@ const CreateCocktail = () => {
 													setIngredientSuggestions([]);
 												}
 											}}
-											className="w-full px-4 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer rounded-lg border-2 border-blue-200 transition-colors duration-150 text-blue-800 font-medium"
+											className="w-full px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 font-medium"
+											style={{
+												backgroundColor: "#3a3a3a",
+												color: "#e9cc9e",
+												border: "1px solid #4a4a4a",
+											}}
 										>
-											<FiPlus className="inline mr-2 text-blue-600" />
+											<FiPlus
+												className="inline mr-2"
+												style={{ color: "#e9cc9e" }}
+											/>
 											Agregar nuevo ingrediente: "{ingredientInput}"
 										</button>
 									</div>
@@ -527,7 +638,8 @@ const CreateCocktail = () => {
 								{ingredients.map((ingredient, index) => (
 									<div
 										key={index}
-										className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-2 capitalize"
+										className="px-3 py-1 rounded-full flex items-center gap-2 capitalize"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										<span>
 											{typeof ingredient === "string"
@@ -542,7 +654,8 @@ const CreateCocktail = () => {
 												);
 												setIngredients(updated);
 											}}
-											className="text-green-800 hover:text-red-500"
+											className="hover:text-red-500"
+											style={{ color: "#e9cc9e" }}
 										>
 											<FiTrash />
 										</button>
@@ -553,8 +666,11 @@ const CreateCocktail = () => {
 
 						{/* Categorías */}
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiTag className="mr-2 text-green-600" />
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiTag className="mr-2" style={{ color: "e9cc9e" }} />
 								Categorías
 							</label>
 							<div className="flex items-center gap-2">
@@ -576,7 +692,12 @@ const CreateCocktail = () => {
 											setCategorySuggestions([]);
 										}
 									}}
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+									className="w-full px-4 py-2 border rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+									style={{
+										backgroundColor: "#2a2a2a",
+										color: "#e9cc9e",
+										border: "1px solid #3a3a3a",
+									}}
 									placeholder="Busca categorías..."
 									onKeyDown={async (e) => {
 										if (e.key === "Enter") {
@@ -600,11 +721,18 @@ const CreateCocktail = () => {
 								/>
 							</div>
 							{categorySuggestions.length > 0 && (
-								<ul className="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white">
+								<ul
+									className="rounded-lg mt-1 max-h-40 overflow-y-auto"
+									style={{
+										backgroundColor: "#2a2a2a",
+										border: "1px solid #3a3a3a",
+									}}
+								>
 									{categorySuggestions.map((suggestion, index) => (
 										<li
 											key={index}
-											className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-900"
+											className="px-4 py-2 cursor-pointer"
+											style={{ color: "#e9cc9e" }}
 											onClick={() => {
 												if (
 													!categories.find(
@@ -631,10 +759,11 @@ const CreateCocktail = () => {
 								{categories.map((category, index) => (
 									<div
 										key={index}
-										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
+										className="px-3 py-1 rounded-full flex items-center gap-2"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 									>
 										<span className="font-medium">{category.name}</span>
-										<span className="text-blue-600 text-xs">
+										<span className="text-xs" style={{ color: "#b8b8b8" }}>
 											({category.type})
 										</span>
 										<button
@@ -645,7 +774,8 @@ const CreateCocktail = () => {
 												);
 												setCategories(updated);
 											}}
-											className="text-blue-800 hover:text-red-500"
+											className="hover:text-red-500"
+											style={{ color: "#e9cc9e" }}
 										>
 											<FiTrash />
 										</button>
@@ -656,38 +786,54 @@ const CreateCocktail = () => {
 
 						{/* Imágenes */}
 						<div className="space-y-2">
-							<label className="flex items-center text-gray-700 font-semibold">
-								<FiImage className="mr-2 text-green-600" />
-								Imágenes
+							<label
+								className="flex items-center font-semibold"
+								style={{ color: "#e9cc9e" }}
+							>
+								<FiImage className="mr-2" style={{ color: "#e9cc9e" }} />
+								Imágenes{" "}
+								<span className="ml-1 text-gray-500 font-normal text-sm">
+									(opcional)
+								</span>
 							</label>
+							<p className="text-xs text-gray-500">
+								Puedes omitir imágenes en otras bebidas si no las necesitas.
+							</p>
 							<div
-								className={`border-2 border-dashed rounded-lg p-6 text-center ${
-									showValidation && selectedFiles.length === 0
-										? "border-red-400 bg-red-50"
-										: "border-gray-300"
-								}`}
+								className={`border-2 border-dashed rounded-lg p-6 text-center`}
+								style={{
+									borderColor:
+										showValidation && selectedFiles.length === 0
+											? "#b91c1c"
+											: "#3a3a3a",
+									backgroundColor:
+										showValidation && selectedFiles.length === 0
+											? "#2a1414"
+											: "transparent",
+									color: "#e9cc9e",
+								}}
 							>
 								<input
 									type="file"
 									multiple
 									accept="image/*"
-									onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
+									onChange={handleFileChange}
+									disabled={selectedFiles.length >= 5}
 									className="hidden"
 									id="file-upload"
 								/>
 								<label
 									htmlFor="file-upload"
-									className="cursor-pointer text-green-600 hover:text-green-800"
+									className="cursor-pointer hover:brightness-110"
+									style={{ color: "#e9cc9e" }}
 								>
-									<FiUpload className="mx-auto text-3xl mb-2" />
+									<FiUpload
+										className="mx-auto text-3xl mb-2"
+										style={{ color: "#e9cc9e" }}
+									/>
 									<span>Selecciona o arrastra las imágenes aquí</span>
 								</label>
 							</div>
-							{showValidation && selectedFiles.length === 0 && (
-								<p className="text-sm text-red-600 mt-1">
-									Debes seleccionar al menos una imagen.
-								</p>
-							)}
 							<div className="grid grid-cols-3 gap-4 mt-4">
 								{selectedFiles.map((file, index) => (
 									<div key={index} className="relative">
@@ -720,9 +866,10 @@ const CreateCocktail = () => {
 								disabled={isCreating}
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
-								className="bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-green-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+								className="px-8 py-3 rounded-lg font-semibold text-lg transition-colors disabled:cursor-not-allowed"
+								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
-								{isCreating ? "Creando..." : "Crear Cóctel"}
+								{isCreating ? "Creando..." : "Crear Bebida"}
 							</motion.button>
 						</div>
 					</form>

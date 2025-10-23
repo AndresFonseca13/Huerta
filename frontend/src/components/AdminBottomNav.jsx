@@ -73,7 +73,8 @@ const NavItem = ({ active, label, icon: Icon, onClick, disabled }) => (
 		{active && (
 			<Motion.div
 				layoutId="bottomActive"
-				className="absolute -top-1 left-2 right-2 h-[3px] rounded-full bg-green-600"
+				className="absolute -top-1 left-2 right-2 h-[3px] rounded-full"
+				style={{ backgroundColor: "#e9cc9e" }}
 				transition={{ type: "spring", stiffness: 500, damping: 40 }}
 			/>
 		)}
@@ -81,8 +82,9 @@ const NavItem = ({ active, label, icon: Icon, onClick, disabled }) => (
 			onClick={onClick}
 			disabled={disabled}
 			className={`relative flex flex-col items-center justify-center w-full py-2 ${
-				active ? "text-green-700" : "text-gray-500"
+				active ? "font-semibold" : ""
 			} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+			style={{ color: active ? "#e9cc9e" : "#b8b8b8" }}
 		>
 			{Icon && <Icon size={18} />}
 			<span className="text-[11px] mt-1">{label}</span>
@@ -120,8 +122,12 @@ const AdminBottomNav = () => {
 			initial={{ y: 40, opacity: 0 }}
 			animate={{ y: 0, opacity: 1 }}
 			transition={{ duration: 0.25 }}
-			className="fixed inset-x-0 bottom-0 bg-white border-t border-gray-200 shadow-md z-[100] lg:hidden pb-2 h-16"
-			style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+			className="fixed inset-x-0 bottom-0 z-[100] lg:hidden pb-2 h-16"
+			style={{
+				paddingBottom: "env(safe-area-inset-bottom)",
+				backgroundColor: "#121212",
+				borderTop: "1px solid #3a3a3a",
+			}}
 		>
 			<div className="max-w-5xl mx-auto px-2 flex">
 				{menuOptions.map((option) => (

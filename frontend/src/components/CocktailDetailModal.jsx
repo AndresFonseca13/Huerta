@@ -46,7 +46,8 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 				onClick={onClose}
 			>
 				<Motion.div
-					className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+					className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					initial={{
 						opacity: 0,
 						scale: 0.8,
@@ -71,9 +72,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					{/* Botón de cerrar */}
 					<button
 						onClick={onClose}
-						className="absolute top-4 right-4 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
+						className="absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					>
-						<FiX className="text-gray-600 text-xl" />
+						<FiX className="text-xl" style={{ color: "#e9cc9e" }} />
 					</button>
 
 					{/* Carrusel de imágenes */}
@@ -140,12 +142,18 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							transition={{ delay: 0.2 }}
 							className="mb-6"
 						>
-							<h2 className="text-3xl font-bold text-gray-900 mb-2 capitalize">
+							<h2
+								className="text-3xl font-bold mb-2 capitalize"
+								style={{ color: "#e9cc9e" }}
+							>
 								{name}
 							</h2>
 							<div className="flex items-center justify-between">
-								<div className="flex items-center text-green-600">
-									<span className="text-2xl font-bold">
+								<div className="flex items-center">
+									<span
+										className="text-2xl font-bold"
+										style={{ color: "#e9cc9e" }}
+									>
 										${Number(price).toLocaleString()}
 									</span>
 								</div>
@@ -153,12 +161,18 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							{/* Etiquetas secundarias */}
 							<div className="mt-3 flex flex-wrap gap-2">
 								{(foodClass || destilado) && (
-									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium capitalize">
+									<span
+										className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium capitalize"
+										style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
+									>
 										<FiTag /> {foodClass || destilado}
 									</span>
 								)}
 								{alcoholPct !== null && (
-									<span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+									<span
+										className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+									>
 										<FaWineBottle /> {Number(alcoholPct).toFixed(0)}%
 									</span>
 								)}
@@ -172,7 +186,10 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							transition={{ delay: 0.3 }}
 							className="mb-6"
 						>
-							<p className="text-gray-700 text-lg leading-relaxed">
+							<p
+								className="text-lg leading-relaxed"
+								style={{ color: "#b8b8b8" }}
+							>
 								{description}
 							</p>
 						</Motion.div>
@@ -186,8 +203,14 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 								className="mb-6"
 							>
 								<div className="flex items-center mb-3">
-									<FiList className="text-green-600 mr-2 text-xl" />
-									<h3 className="text-xl font-semibold text-gray-800">
+									<FiList
+										className="mr-2 text-xl"
+										style={{ color: "#e9cc9e" }}
+									/>
+									<h3
+										className="text-xl font-semibold"
+										style={{ color: "#e9cc9e" }}
+									>
 										Ingredientes
 									</h3>
 								</div>
@@ -195,7 +218,8 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 									{ingredients.map((ingredient, index) => (
 										<span
 											key={index}
-											className="px-3 py-2 bg-green-100 text-green-800 text-sm rounded-lg font-medium text-center"
+											className="px-3 py-2 text-sm rounded-lg font-medium text-center"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											{(() => {
 												const value =
@@ -216,11 +240,15 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.6 }}
-							className="pt-4 border-t border-gray-200"
+							className="pt-4"
+							style={{
+								borderTop: "1px solid #3a2a2a".replace("#3a2a2a", "#3a3a3a"),
+							}}
 						>
 							<button
 								onClick={onClose}
-								className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+								className="w-full py-3 px-6 rounded-lg font-semibold transition-colors duration-200"
+								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
 								Cerrar
 							</button>

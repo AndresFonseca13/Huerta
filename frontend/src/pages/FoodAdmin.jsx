@@ -37,7 +37,12 @@ const FoodAdmin = () => {
 	useEffect(() => {
 		const fetchFood = async () => {
 			try {
-				const response = await getProductsAdmin(1, 100, null, "clasificacion");
+				const response = await getProductsAdmin(
+					1,
+					100,
+					null,
+					"clasificacion comida"
+				);
 				setItems(response.cocteles || []); // backend mantiene clave 'cocteles'
 			} catch {
 				setError("No se pudieron cargar los productos de comida.");
@@ -51,7 +56,12 @@ const FoodAdmin = () => {
 	const refresh = async () => {
 		setLoading(true);
 		try {
-			const response = await getProductsAdmin(1, 100, null, "clasificacion");
+			const response = await getProductsAdmin(
+				1,
+				100,
+				null,
+				"clasificacion comida"
+			);
 			setItems(response.cocteles || []);
 		} catch {
 			setError("No se pudieron cargar los productos de comida.");
@@ -156,20 +166,48 @@ const FoodAdmin = () => {
 
 	if (loading) {
 		return (
-			<div className="p-6 md:p-10 min-h-screen bg-gray-50">
+			<div
+				className="p-6 md:p-10 min-h-screen"
+				style={{ backgroundColor: "#191919" }}
+			>
 				<div className="max-w-6xl mx-auto">
-					<div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-4" />
-					<div className="h-5 w-72 bg-gray-200 rounded animate-pulse mb-6" />
+					<div
+						className="h-8 w-48 rounded animate-pulse mb-4"
+						style={{ backgroundColor: "#2a2a2a" }}
+					/>
+					<div
+						className="h-5 w-72 rounded animate-pulse mb-6"
+						style={{ backgroundColor: "#2a2a2a" }}
+					/>
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
 						{Array.from({ length: 3 }).map((_, i) => (
-							<div key={i} className="h-20 bg-white rounded-xl shadow-sm p-4">
-								<div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-2" />
-								<div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
+							<div
+								key={i}
+								className="h-20 rounded-xl shadow-sm p-4"
+								style={{
+									backgroundColor: "#2a2a2a",
+									border: "1px solid #3a3a3a",
+								}}
+							>
+								<div
+									className="h-4 w-24 rounded animate-pulse mb-2"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
+								<div
+									className="h-6 w-16 rounded animate-pulse"
+									style={{ backgroundColor: "#3a3a3a" }}
+								/>
 							</div>
 						))}
 					</div>
-					<div className="h-10 bg-white rounded-t-xl shadow-sm" />
-					<div className="h-64 bg-white rounded-b-xl shadow-sm mt-2" />
+					<div
+						className="h-10 rounded-t-xl shadow-sm"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+					/>
+					<div
+						className="h-64 rounded-b-xl shadow-sm mt-2"
+						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+					/>
 				</div>
 			</div>
 		);
@@ -178,7 +216,10 @@ const FoodAdmin = () => {
 	if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
 	return (
-		<div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+		<div
+			className="p-4 md:p-8 min-h-screen"
+			style={{ backgroundColor: "#191919" }}
+		>
 			<header className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center w-full">
 				<div className="flex-1">
 					<div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -187,17 +228,21 @@ const FoodAdmin = () => {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.35 }}
 						>
-							<h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
+							<h1
+								className="text-3xl md:text-4xl font-extrabold mb-1 tracking-tight"
+								style={{ color: "#e9cc9e" }}
+							>
 								Gestión de Comida
 							</h1>
-							<p className="text-gray-600">
+							<p style={{ color: "#b8b8b8" }}>
 								Administra los productos de comida
 							</p>
 						</Motion.div>
 						<div className="mt-4 md:mt-0">
 							<button
 								onClick={() => navigate("/admin/food/create")}
-								className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
+								className="flex items-center px-4 py-2 rounded-lg transition-transform font-medium shadow-sm hover:shadow md:active:scale-95"
+								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
 								<FiPlus className="mr-2" /> Crear Plato
 							</button>
@@ -209,13 +254,22 @@ const FoodAdmin = () => {
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.0 }}
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === null ? "ring-2 ring-green-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === null ? "ring-2" : ""
 							}`}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter(null)}
 						>
-							<div className="text-sm text-gray-500">Total</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Total
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{total}</span>
 							</div>
 						</Motion.div>
@@ -223,13 +277,22 @@ const FoodAdmin = () => {
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.05 }}
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === "active" ? "ring-2 ring-blue-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "active" ? "ring-2" : ""
 							}`}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter("active")}
 						>
-							<div className="text-sm text-gray-500">Activos</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Activos
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{activos}</span>
 							</div>
 						</Motion.div>
@@ -237,13 +300,22 @@ const FoodAdmin = () => {
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.1 }}
-							className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer ${
-								statusFilter === "inactive" ? "ring-2 ring-yellow-200" : ""
+							className={`rounded-xl shadow-sm p-4 cursor-pointer ${
+								statusFilter === "inactive" ? "ring-2" : ""
 							}`}
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
 							onClick={() => setStatusFilter("inactive")}
 						>
-							<div className="text-sm text-gray-500">Inactivos</div>
-							<div className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+							<div className="text-sm" style={{ color: "#b8b8b8" }}>
+								Inactivos
+							</div>
+							<div
+								className="inline-flex items-center gap-2 mt-1 px-3 py-1 rounded-full text-sm"
+								style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+							>
 								<span className="font-semibold text-base">{inactivos}</span>
 							</div>
 						</Motion.div>
@@ -255,13 +327,21 @@ const FoodAdmin = () => {
 				{/* Buscador y filtros */}
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
 					<div className="relative w-full sm:w-80">
-						<FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+						<FiSearch
+							className="absolute left-3 top-1/2 -translate-y-1/2"
+							style={{ color: "#b8b8b8" }}
+						/>
 						<input
 							type="text"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 							placeholder="Buscar producto..."
-							className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-200"
+							className="pl-10 pr-4 py-2 w-full rounded-lg focus:outline-none placeholder-[#b8b8b8] caret-[#e9cc9e]"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 						/>
 					</div>
 					{/* Píldoras de clasificación/categorías */}
@@ -271,9 +351,12 @@ const FoodAdmin = () => {
 								onClick={() => setCategoryFilter(null)}
 								className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${
 									categoryFilter === null
-										? "bg-green-600 text-white border-green-600"
-										: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+										? "border-[#e9cc9e] text-[#191919]"
+										: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
+								style={
+									categoryFilter === null ? { backgroundColor: "#e9cc9e" } : {}
+								}
 							>
 								Todas
 							</button>
@@ -283,9 +366,12 @@ const FoodAdmin = () => {
 									onClick={() => setCategoryFilter(cat)}
 									className={`px-3 py-1.5 rounded-full border text-sm capitalize whitespace-nowrap ${
 										categoryFilter === cat
-											? "bg-green-600 text-white border-green-600"
-											: "bg-white text-gray-700 border-gray-200 hover:bg-green-50"
+											? "border-[#e9cc9e] text-[#191919]"
+											: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 									}`}
+									style={
+										categoryFilter === cat ? { backgroundColor: "#e9cc9e" } : {}
+									}
 								>
 									{cat}
 								</button>
@@ -299,7 +385,14 @@ const FoodAdmin = () => {
 
 				{/* Grid de cards */}
 				{filtered.length === 0 ? (
-					<div className="p-10 text-center text-gray-400 bg-white rounded-xl">
+					<div
+						className="p-10 text-center bg-white rounded-xl"
+						style={{
+							backgroundColor: "#2a2a2a",
+							color: "#b8b8b8",
+							border: "1px solid #3a3a3a",
+						}}
+					>
 						No hay productos para mostrar.
 					</div>
 				) : (
@@ -308,7 +401,7 @@ const FoodAdmin = () => {
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.2 }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
 					>
 						{paginated.map((it) => {
 							const classification =
@@ -333,15 +426,28 @@ const FoodAdmin = () => {
 							return (
 								<div
 									key={it.id}
-									className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+									className="rounded-2xl shadow-sm p-5 md:p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+									style={{
+										backgroundColor: "#2a2a2a",
+										border: "1px solid #3a3a3a",
+									}}
 								>
 									<div className="flex items-start justify-between gap-2">
 										<div>
-											<h3 className="text-lg font-semibold text-gray-900 capitalize">
+											<h3
+												className="text-lg font-semibold capitalize"
+												style={{ color: "#e9cc9e" }}
+											>
 												{it.name}
 											</h3>
 											{classification && (
-												<span className="inline-flex text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full capitalize mt-1 mr-2">
+												<span
+													className="inline-flex text-xs px-2 py-1 rounded-full capitalize mt-1 mr-2"
+													style={{
+														backgroundColor: "#3a3a3a",
+														color: "#e9cc9e",
+													}}
+												>
 													{classification}
 												</span>
 											)}
@@ -350,13 +456,20 @@ const FoodAdmin = () => {
 													{visibleCats.map((c) => (
 														<span
 															key={c}
-															className="text-[11px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full capitalize"
+															className="text-[11px] px-2 py-0.5 rounded-full capitalize"
+															style={{
+																backgroundColor: "#3a3a3a",
+																color: "#e9cc9e",
+															}}
 														>
 															{c}
 														</span>
 													))}
 													{remainingCats > 0 && (
-														<span className="text-[11px] text-gray-500">
+														<span
+															className="text-[11px]"
+															style={{ color: "#b8b8b8" }}
+														>
 															+{remainingCats} más
 														</span>
 													)}
@@ -364,38 +477,48 @@ const FoodAdmin = () => {
 											)}
 										</div>
 										<span
-											className={`text-xs px-2 py-1 rounded-full ${
-												it.is_active
-													? "bg-green-100 text-green-700"
-													: "bg-red-100 text-red-700"
-											}`}
+											className="text-xs px-2 py-1 rounded-full"
+											style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 										>
 											{it.is_active ? "Activo" : "Inactivo"}
 										</span>
 									</div>
 
 									<div className="flex items-center justify-between mt-3">
-										<div className="text-base text-gray-900 font-semibold">
+										<div
+											className="text-base font-semibold"
+											style={{ color: "#e9cc9e" }}
+										>
 											${Number(it.price).toLocaleString("es-CO")}
 										</div>
 									</div>
 									{Array.isArray(it.ingredients) &&
 										it.ingredients.length > 0 && (
 											<div className="mt-3">
-												<div className="text-xs text-gray-500 mb-1">
+												<div
+													className="text-xs mb-1"
+													style={{ color: "#b8b8b8" }}
+												>
 													Ingredientes:
 												</div>
 												<div className="flex flex-wrap gap-1">
 													{it.ingredients.slice(0, 3).map((ing, idx) => (
 														<span
 															key={idx}
-															className="text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full capitalize"
+															className="text-[11px] px-2 py-0.5 rounded-full capitalize"
+															style={{
+																backgroundColor: "#3a3a3a",
+																color: "#e9cc9e",
+															}}
 														>
 															{typeof ing === "string" ? ing : ing.name}
 														</span>
 													))}
 													{it.ingredients.length > 3 && (
-														<span className="text-[11px] text-gray-500">
+														<span
+															className="text-[11px]"
+															style={{ color: "#b8b8b8" }}
+														>
 															+{it.ingredients.length - 3} más
 														</span>
 													)}
@@ -406,24 +529,35 @@ const FoodAdmin = () => {
 									<div className="flex items-center justify-between mt-4">
 										<button
 											onClick={() => openDetailModal(it)}
-											className="inline-flex items-center text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium px-3 py-1.5 rounded-full"
+											className="inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full"
+											style={{
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
 										>
 											<FiSearch className="mr-1" /> Ver
 										</button>
 										<div className="flex items-center gap-2">
 											<button
 												onClick={() => openEditModal(it)}
-												className="inline-flex items-center text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+												className="inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full"
+												style={{
+													backgroundColor: "#2a2a2a",
+													color: "#e9cc9e",
+													border: "1px solid #3a3a3a",
+												}}
 											>
 												<FiEdit className="mr-1" /> Editar
 											</button>
 											<button
 												onClick={() => openManageModal(it)}
-												className={`inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full ${
-													it.is_active
-														? "text-red-700 bg-red-50 hover:bg-red-100"
-														: "text-green-800 bg-green-50 hover:bg-green-100"
-												}`}
+												className="inline-flex items-center text-sm font-medium px-3 py-1.5 rounded-full"
+												style={{
+													backgroundColor: "#2a2a2a",
+													color: "#e9cc9e",
+													border: "1px solid #3a3a3a",
+												}}
 											>
 												{it.is_active ? (
 													<FiEyeOff className="mr-1" />
@@ -445,18 +579,28 @@ const FoodAdmin = () => {
 					<div className="flex items-center justify-center gap-2 mt-6">
 						<button
 							onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							className="px-3 py-1.5 rounded-lg"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							disabled={safeCurrentPage === 1}
 						>
 							Anterior
 						</button>
-						<div className="text-sm text-gray-600">
+						<div className="text-sm" style={{ color: "#b8b8b8" }}>
 							Página <span className="font-semibold">{safeCurrentPage}</span> de{" "}
 							{totalPages}
 						</div>
 						<button
 							onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-							className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+							className="px-3 py-1.5 rounded-lg"
+							style={{
+								backgroundColor: "#2a2a2a",
+								color: "#e9cc9e",
+								border: "1px solid #3a3a3a",
+							}}
 							disabled={safeCurrentPage === totalPages}
 						>
 							Siguiente

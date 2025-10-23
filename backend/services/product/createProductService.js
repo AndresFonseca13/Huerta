@@ -15,11 +15,13 @@ const createProductService = async (
     !name ||
 		!price ||
 		!description ||
-		!ingredients ||
-		!images ||
-		!categories
+		!categories ||
+		!Array.isArray(categories) ||
+		categories.length === 0
   ) {
-    throw new ValidationError('Todos los campos son obligatorios');
+    throw new ValidationError(
+      'Nombre, precio, descripción y categorías son obligatorios',
+    );
   }
 
   const checkQuery = 'SELECT * FROM products WHERE name = $1';
@@ -40,8 +42,9 @@ const createProductService = async (
     ]);
     const productId = productResult.rows[0].id;
 
+    const safeIngredients = Array.isArray(ingredients) ? ingredients : [];
     const ingredientsIds = [];
-    for (const ingredient of ingredients) {
+    for (const ingredient of safeIngredients) {
       const ingredientQuery = `
                 INSERT INTO ingredients (name) 
                 VALUES ($1) 
@@ -99,7 +102,8 @@ const createProductService = async (
       );
     }
 
-    for (const url of images) {
+    const safeImages = Array.isArray(images) ? images : [];
+    for (const url of safeImages) {
       const insertPhotoQuery = `
             INSERT INTO images (product_id, url)
             VALUES ($1, $2)

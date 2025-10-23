@@ -1,64 +1,85 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiAlertTriangle } from "react-icons/fi";
 
 const ConfirmModal = ({
-	isOpen,
-	onClose,
-	onConfirm,
+	isOpen = false,
+	title = "Confirmar",
 	message,
-	title = "Confirmar acción",
+	onConfirm,
+	onCancel,
+	onClose,
+	confirmText = "Confirmar",
+	cancelText = "Cancelar",
 }) => {
+	const handleCancel = onCancel || onClose || (() => {});
+	const handleConfirm = onConfirm || (() => {});
+
 	if (!isOpen) return null;
 
 	return (
-		<AnimatePresence>
-			<motion.div
-				className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				exit={{ opacity: 0 }}
+		<div className="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4">
+			<div
+				className="rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center"
+				style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 			>
-				<motion.div
-					className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md relative"
-					initial={{ scale: 0.9, y: 40 }}
-					animate={{ scale: 1, y: 0 }}
-					exit={{ scale: 0.9, y: 40 }}
-					transition={{ duration: 0.2 }}
+				<div
+					className="mx-auto w-14 h-14 rounded-full flex items-center justify-center"
+					style={{ backgroundColor: "#2a1414", border: "1px solid #b91c1c" }}
 				>
-					<button
-						onClick={onClose}
-						className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full p-2"
-						aria-label="Cerrar modal"
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="none"
+						className="w-7 h-7"
+						style={{ color: "#b91c1c" }}
 					>
-						<FiX size={20} />
+						<path
+							d="M12 8v5"
+							stroke="currentColor"
+							strokeWidth="1.8"
+							strokeLinecap="round"
+						/>
+						<circle cx="12" cy="16.5" r="1" fill="currentColor" />
+						<path
+							d="M10.29 3.86 1.82 18.02A2 2 0 0 0 3.55 21h16.9a2 2 0 0 0 1.73-2.98L13.71 3.86a2 2 0 0 0-3.42 0Z"
+							stroke="currentColor"
+							strokeWidth="1.2"
+						/>
+					</svg>
+				</div>
+				<h3 className="mt-4 text-lg font-semibold" style={{ color: "#e9cc9e" }}>
+					{title}
+				</h3>
+				{message ? (
+					<p className="mt-2 text-sm" style={{ color: "#b8b8b8" }}>
+						{message}
+					</p>
+				) : null}
+				<div className="mt-6 flex items-center justify-center gap-3">
+					<button
+						onClick={handleCancel}
+						className="px-4 py-2 rounded-md"
+						style={{
+							backgroundColor: "#2a2a2a",
+							color: "#e9cc9e",
+							border: "1px solid #3a3a3a",
+						}}
+					>
+						{cancelText}
 					</button>
-					<div className="flex flex-col items-center">
-						<FiAlertTriangle className="text-amber-500 text-4xl mb-4" />
-						<h2 className="text-lg font-bold text-gray-800 mb-3 text-center">
-							{title}
-						</h2>
-						<p className="text-gray-700 text-center mb-6">{message}</p>
-
-						{/* Botones de acción */}
-						<div className="flex gap-3 w-full">
-							<button
-								onClick={onClose}
-								className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-							>
-								Cancelar
-							</button>
-							<button
-								onClick={onConfirm}
-								className="flex-1 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
-							>
-								Confirmar
-							</button>
-						</div>
-					</div>
-				</motion.div>
-			</motion.div>
-		</AnimatePresence>
+					<button
+						onClick={handleConfirm}
+						className="px-4 py-2 rounded-md"
+						style={{
+							backgroundColor: "#b91c1c",
+							color: "#ffffff",
+							border: "1px solid #7f1d1d",
+						}}
+					>
+						{confirmText}
+					</button>
+				</div>
+			</div>
+		</div>
 	);
 };
 

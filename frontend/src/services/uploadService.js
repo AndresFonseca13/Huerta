@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "./authService";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const uploadImages = async (files, productName) => {
 	const formData = new FormData();

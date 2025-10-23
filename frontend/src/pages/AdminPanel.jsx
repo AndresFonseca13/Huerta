@@ -6,6 +6,8 @@ import { getProductsAdmin } from "../services/productService";
 import { getAllCategories } from "../services/categoryService";
 import { FiPlus, FiTag, FiUserPlus, FiGift, FiCoffee } from "react-icons/fi";
 import { usePermissions } from "../hooks/usePermissions";
+import { listPromotions } from "../services/promotionService";
+import { getUsers } from "../services/userService";
 // Bottom nav vive en el layout; no lo dupliquemos aquí
 
 // Función para obtener las tarjetas permitidas según los permisos
@@ -50,9 +52,8 @@ const getDashboardCards = (permissions, stats) => {
 			id: "users",
 			title: "Usuarios",
 			stats: [
-				{ label: "Total usuarios", value: "3" },
-				{ label: "Activos", value: "2" },
-				{ label: "Admins", value: "1" },
+				{ label: "Total usuarios", value: stats.totalUsers },
+				{ label: "Activos", value: stats.activeUsers },
 			],
 			navigate: "/admin/users",
 			roles: ["admin", "ventas"],
@@ -83,9 +84,8 @@ const getDashboardCards = (permissions, stats) => {
 			id: "promotions",
 			title: "Promociones",
 			stats: [
-				{ label: "Total promos", value: "3" },
-				{ label: "Activas", value: "2" },
-				{ label: "Usos totales", value: "338" },
+				{ label: "Total promos", value: stats.totalPromotions },
+				{ label: "Activas", value: stats.activePromotions },
 			],
 			navigate: "/admin/promotions",
 			roles: ["admin", "ventas", "chef", "barmanager"],
@@ -180,6 +180,10 @@ const AdminPanel = () => {
 		activeFood: 0,
 		totalCategories: 0,
 		activeCategories: 0,
+		totalPromotions: 0,
+		activePromotions: 0,
+		totalUsers: 0,
+		activeUsers: 0,
 	});
 
 	useEffect(() => {
@@ -251,6 +255,18 @@ const AdminPanel = () => {
 					console.log("AdminPanel - No tiene permisos para comida");
 				}
 
+				// Cargar promociones si tiene permiso
+				if (permissions.canAccessPromotions) {
+					console.log("AdminPanel - Cargando promociones...");
+					promises.push(listPromotions(1, 200));
+				}
+
+				// Cargar usuarios si tiene permiso
+				if (permissions.canAccessUsers) {
+					console.log("AdminPanel - Cargando usuarios...");
+					promises.push(getUsers());
+				}
+
 				console.log("AdminPanel - Promesas a ejecutar:", promises.length);
 				const results = await Promise.all(promises);
 				console.log("AdminPanel - Resultados obtenidos:", results.length);
@@ -260,28 +276,35 @@ const AdminPanel = () => {
 				let cocktails = [];
 				let food = [];
 				let catsApi = [];
+				let promos = [];
+				let users = [];
 
-				// El primer resultado siempre son las categorías
-				catsApi = Array.isArray(results[0]) ? results[0] : [];
-				console.log("AdminPanel - Categorías cargadas:", catsApi.length);
-				console.log("AdminPanel - Datos de categorías:", results[0]);
+				// Índice base de resultados
+				let idx = 0;
+				catsApi = Array.isArray(results[idx]) ? results[idx] : [];
+				idx += 1;
 
-				// Procesar bebidas si se cargaron
-				if (permissions.canAccessBeverages && results.length > 1) {
-					const resCocktails = results[1];
-					cocktails = resCocktails.cocteles || [];
-					console.log("AdminPanel - Bebidas cargadas:", cocktails.length);
+				if (permissions.canAccessBeverages) {
+					const resCocktails = results[idx];
+					cocktails = (resCocktails && resCocktails.cocteles) || [];
+					idx += 1;
 				}
 
-				// Procesar comida si se cargó
-				if (
-					permissions.canAccessFood &&
-					results.length > (permissions.canAccessBeverages ? 2 : 1)
-				) {
-					const resFood = results[permissions.canAccessBeverages ? 2 : 1];
-					food = resFood.cocteles || [];
-					console.log("AdminPanel - Comida cargada:", food.length);
-					console.log("AdminPanel - Datos de comida:", resFood);
+				if (permissions.canAccessFood) {
+					const resFood = results[idx];
+					food = (resFood && resFood.cocteles) || [];
+					idx += 1;
+				}
+
+				if (permissions.canAccessPromotions) {
+					const resPromos = results[idx];
+					promos = (resPromos && resPromos.promotions) || [];
+					idx += 1;
+				}
+
+				if (permissions.canAccessUsers) {
+					users = Array.isArray(results[idx]) ? results[idx] : [];
+					idx += 1;
 				}
 
 				const newStats = {
@@ -291,6 +314,10 @@ const AdminPanel = () => {
 					activeFood: food.filter((c) => c.is_active).length,
 					totalCategories: catsApi.length,
 					activeCategories: catsApi.filter((c) => c.is_active).length,
+					totalPromotions: promos.length,
+					activePromotions: promos.filter((p) => p.is_active).length,
+					totalUsers: users.length,
+					activeUsers: users.filter((u) => u.is_active).length,
 				};
 
 				console.log("AdminPanel - Stats finales:", newStats);
@@ -311,11 +338,14 @@ const AdminPanel = () => {
 		<>
 			{/* Main solo contenido - la navegación vive en AdminLayout */}
 			<main>
-				<div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-					<h2 className="text-2xl font-bold text-gray-900">
+				<div
+					className="rounded-2xl border shadow-sm p-6 mb-6"
+					style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+				>
+					<h2 className="text-2xl font-bold" style={{ color: "#e9cc9e" }}>
 						¡Bienvenido, {username}! 👋
 					</h2>
-					<p className="text-gray-600 mt-1">
+					<p className="mt-1" style={{ color: "#b8b8b8" }}>
 						{userRole === "admin" &&
 							"Tienes el rol de administrador. Puedes gestionar todo el sistema."}
 						{userRole === "ventas" &&
@@ -332,15 +362,18 @@ const AdminPanel = () => {
 					{dashboardCards.map((card) => (
 						<div
 							key={card.id}
-							className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+							className="rounded-2xl border shadow-sm p-6"
+							style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
 						>
 							<div className="flex items-center justify-between">
-								<h3 className="font-semibold text-gray-900">{card.title}</h3>
-								<span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
-									Activa
-								</span>
+								<h3 className="font-semibold" style={{ color: "#e9cc9e" }}>
+									{card.title}
+								</h3>
 							</div>
-							<div className="mt-4 space-y-2 text-sm text-gray-700">
+							<div
+								className="mt-4 space-y-2 text-sm"
+								style={{ color: "#b8b8b8" }}
+							>
 								{card.stats.map((stat, index) => (
 									<SkeletonRow
 										key={index}
@@ -353,7 +386,8 @@ const AdminPanel = () => {
 							<div className="mt-4">
 								<button
 									onClick={() => navigate(card.navigate)}
-									className="text-sm text-green-700 bg-green-50 hover:bg-green-100 font-medium px-3 py-1.5 rounded-full"
+									className="text-sm font-medium px-3 py-1.5 rounded-full"
+									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									Ir a {card.title}
 								</button>
@@ -362,22 +396,30 @@ const AdminPanel = () => {
 					))}
 				</div>
 			</main>
-			<section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+			<section
+				className="rounded-2xl border shadow-sm p-6 mt-6"
+				style={{ backgroundColor: "#2a2a2a", borderColor: "#3a3a3a" }}
+			>
 				<div className="flex items-center gap-2 mb-4">
-					<FiPlus className="text-gray-500" />
-					<h3 className="font-semibold text-gray-900">Atajos rápidos</h3>
+					<FiPlus style={{ color: "#e9cc9e" }} />
+					<h3 className="font-semibold" style={{ color: "#e9cc9e" }}>
+						Atajos rápidos
+					</h3>
 				</div>
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					{quickAccessButtons.map((button) => (
 						<button
 							key={button.id}
 							onClick={() => navigate(button.navigate)}
-							className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 hover:bg-green-50 transition-colors"
+							className="flex items-center justify-center gap-2 rounded-xl py-3 transition-colors"
+							style={{
+								backgroundColor: "#3a3a3a",
+								color: "#e9cc9e",
+								border: "1px solid #4a4a4a",
+							}}
 						>
 							<button.icon className={button.iconColor} />
-							<span className="text-sm font-medium text-gray-800">
-								{button.label}
-							</span>
+							<span className="text-sm font-medium">{button.label}</span>
 						</button>
 					))}
 				</div>

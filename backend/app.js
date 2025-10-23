@@ -6,6 +6,7 @@ import usersRoutes from './routes/users.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import ingredientRoutes from './routes/ingredients.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import promotionsRoutes from './routes/promotions.routes.js';
 import cors from 'cors';
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/ingredient', ingredientRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/promotions', promotionsRoutes);
 
 app.get('/bienvenido', (req, res) => {
   const mensaje = 'Bienvenido a Huerta';

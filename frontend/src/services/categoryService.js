@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Usamos el proxy de Vite: todas las rutas del backend están bajo `/api`
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const searchCategories = async (term) => {
 	const response = await axios.get(
@@ -22,7 +22,7 @@ export const getAllCategories = async (showAll = false) => {
 	}
 };
 
-// Obtener solo categorías de comida (type=clasificacion) asociadas a productos de comida
+// Obtener solo categorías de comida (type=clasificacion comida) asociadas a productos de comida
 export const getFoodCategories = async () => {
 	try {
 		const response = await axios.get(
@@ -31,6 +31,19 @@ export const getFoodCategories = async () => {
 		return response.data;
 	} catch (error) {
 		console.error("Error fetching food categories:", error);
+		throw error;
+	}
+};
+
+// Obtener solo categorías de bebidas (type=clasificacion bebida)
+export const getBeverageCategories = async () => {
+	try {
+		const response = await axios.get(
+			`${API_BASE_URL}/categories?onlyBeverage=true`
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching beverage categories:", error);
 		throw error;
 	}
 };
