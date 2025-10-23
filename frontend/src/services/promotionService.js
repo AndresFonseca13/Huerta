@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "./authService";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const getEligiblePromotionNow = async () => {
 	const url = `${API_BASE_URL}/promotions/eligible-now?_t=${Date.now()}`;

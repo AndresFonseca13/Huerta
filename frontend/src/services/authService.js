@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Usamos el proxy de Vite: backend expone auth bajo "/api/auth"
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const loginUser = async (username, password) => {
 	try {

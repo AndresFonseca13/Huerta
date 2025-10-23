@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Usamos el proxy de Vite: todas las rutas del backend están bajo `/api`
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const searchCategories = async (term) => {
 	const response = await axios.get(
