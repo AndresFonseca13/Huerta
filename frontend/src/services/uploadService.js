@@ -1,6 +1,5 @@
 import { getAuthHeaders } from "./authService";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+import { apiConfig } from "../config/api";
 
 export const uploadImages = async (files, productName) => {
 	const formData = new FormData();
@@ -11,7 +10,7 @@ export const uploadImages = async (files, productName) => {
 		formData.append("cocktailName", productName);
 	}
 
-	const response = await fetch(`${API_BASE_URL}/upload/upload`, {
+	const response = await fetch(`${apiConfig.baseURL}/upload/upload`, {
 		method: "POST",
 		headers: {
 			Authorization: getAuthHeaders().Authorization,

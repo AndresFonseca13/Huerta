@@ -1,24 +1,23 @@
 import axios from "axios";
 import { getAuthHeaders } from "./authService";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+import { apiConfig } from "../config/api";
 
 export const getUsers = async () => {
 	const headers = getAuthHeaders();
-	const { data } = await axios.get(`${API_BASE_URL}/users`, { headers });
+	const { data } = await axios.get(`${apiConfig.baseURL}/users`, { headers });
 	return data.users || [];
 };
 
 export const getUserById = async (id) => {
 	const headers = getAuthHeaders();
-	const { data } = await axios.get(`${API_BASE_URL}/users/${id}`, { headers });
+	const { data } = await axios.get(`${apiConfig.baseURL}/users/${id}`, { headers });
 	return data;
 };
 
 export const updateUserRole = async (id, role) => {
 	const headers = getAuthHeaders();
 	const { data } = await axios.patch(
-		`${API_BASE_URL}/users/${id}/role`,
+		`${apiConfig.baseURL}/users/${id}/role`,
 		{ role },
 		{ headers }
 	);
@@ -28,7 +27,7 @@ export const updateUserRole = async (id, role) => {
 export const createUser = async ({ username, password, role }) => {
 	const headers = getAuthHeaders();
 	const { data } = await axios.post(
-		`${API_BASE_URL}/auth/signup`,
+		`${apiConfig.baseURL}/auth/signup`,
 		{ username, password, role },
 		{ headers }
 	);
@@ -38,7 +37,7 @@ export const createUser = async ({ username, password, role }) => {
 export const updateUserStatus = async (id, isActive) => {
 	const headers = getAuthHeaders();
 	const { data } = await axios.patch(
-		`${API_BASE_URL}/users/${id}/status`,
+		`${apiConfig.baseURL}/users/${id}/status`,
 		{ isActive },
 		{ headers }
 	);
@@ -47,7 +46,7 @@ export const updateUserStatus = async (id, isActive) => {
 
 export const deleteUser = async (id) => {
 	const headers = getAuthHeaders();
-	const { data } = await axios.delete(`${API_BASE_URL}/users/${id}`, {
+	const { data } = await axios.delete(`${apiConfig.baseURL}/users/${id}`, {
 		headers,
 	});
 	return data;

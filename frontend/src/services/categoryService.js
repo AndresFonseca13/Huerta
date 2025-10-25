@@ -1,11 +1,11 @@
 import axios from "axios";
-
+import { apiConfig } from "../config/api"
 // Usamos el proxy de Vite: todas las rutas del backend están bajo `/api`
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 
 export const searchCategories = async (term) => {
 	const response = await axios.get(
-		`${API_BASE_URL}/categories/search?searchTerm=${term}`
+		`${apiConfig.baseURL}/categories/search?searchTerm=${term}`
 	);
 	return response.data;
 };
@@ -13,7 +13,7 @@ export const searchCategories = async (term) => {
 export const getAllCategories = async (showAll = false) => {
 	try {
 		const response = await axios.get(
-			`${API_BASE_URL}/categories?showAll=${showAll}`
+			`${apiConfig.baseURL}/categories?showAll=${showAll}`
 		);
 		return response.data;
 	} catch (error) {
@@ -26,7 +26,7 @@ export const getAllCategories = async (showAll = false) => {
 export const getFoodCategories = async () => {
 	try {
 		const response = await axios.get(
-			`${API_BASE_URL}/categories?onlyFood=true`
+			`${apiConfig.baseURL}/categories?onlyFood=true`
 		);
 		return response.data;
 	} catch (error) {
@@ -39,7 +39,7 @@ export const getFoodCategories = async () => {
 export const getBeverageCategories = async () => {
 	try {
 		const response = await axios.get(
-			`${API_BASE_URL}/categories?onlyBeverage=true`
+			`${apiConfig.baseURL}/categories?onlyBeverage=true`
 		);
 		return response.data;
 	} catch (error) {
@@ -51,7 +51,7 @@ export const getBeverageCategories = async () => {
 export const createCategory = async (data) => {
 	try {
 		const token = localStorage.getItem("token");
-		const response = await axios.post(`${API_BASE_URL}/categories`, data, {
+		const response = await axios.post(`${apiConfig.baseURL}/categories`, data, {
 			headers: {
 				Authorization: token ? `Bearer ${token}` : undefined,
 			},
@@ -65,7 +65,7 @@ export const createCategory = async (data) => {
 export const updateCategory = async (id, data) => {
 	try {
 		const token = localStorage.getItem("token");
-		const response = await axios.put(`${API_BASE_URL}/categories/${id}`, data, {
+		const response = await axios.put(`${apiConfig.baseURL}/categories/${id}`, data, {
 			headers: {
 				Authorization: token ? `Bearer ${token}` : undefined,
 			},
@@ -80,7 +80,7 @@ export const toggleCategoryActive = async (id, is_active) => {
 	try {
 		const token = localStorage.getItem("token");
 		const response = await axios.patch(
-			`${API_BASE_URL}/categories/${id}/active`,
+			`${apiConfig.baseURL}/categories/${id}/active`,
 			{ is_active },
 			{
 				headers: {
@@ -98,7 +98,7 @@ export const deleteCategory = async (id) => {
 	try {
 		const token = localStorage.getItem("token");
 		const response = await axios.delete(
-			`${API_BASE_URL}/categories/${id}?logical=false`,
+			`${apiConfig.baseURL}/categories/${id}?logical=false`,
 			{
 				headers: {
 					Authorization: token ? `Bearer ${token}` : undefined,

@@ -1,9 +1,9 @@
 import { getAuthHeaders } from "./authService";
+import { apiConfig } from "../config/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const getEligiblePromotionNow = async () => {
-	const url = `${API_BASE_URL}/promotions/eligible-now?_t=${Date.now()}`;
+	const url = `${apiConfig.baseURL}/promotions/eligible-now?_t=${Date.now()}`;
 	console.log("[Promo] Fetch elegible-now:", url);
 	const res = await fetch(url, { headers: { "Cache-Control": "no-cache" } });
 	console.log("[Promo] HTTP status:", res.status);
@@ -19,7 +19,7 @@ export const listPromotions = async (page = 1, limit = 20) => {
 		page: String(page),
 		limit: String(limit),
 	});
-	const res = await fetch(`${API_BASE_URL}/promotions?${params}`, {
+	const res = await fetch(`${apiConfig.baseURL}/promotions?${params}`, {
 		headers: getAuthHeaders(),
 	});
 	const data = await res.json();
@@ -28,7 +28,7 @@ export const listPromotions = async (page = 1, limit = 20) => {
 };
 
 export const getPromotionById = async (id) => {
-	const res = await fetch(`${API_BASE_URL}/promotions/${id}`, {
+	const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
 		headers: getAuthHeaders(),
 	});
 	const data = await res.json();
@@ -37,7 +37,7 @@ export const getPromotionById = async (id) => {
 };
 
 export const createPromotion = async (payload) => {
-	const res = await fetch(`${API_BASE_URL}/promotions`, {
+	const res = await fetch(`${apiConfig.baseURL}/promotions`, {
 		method: "POST",
 		headers: getAuthHeaders(),
 		body: JSON.stringify(payload),
@@ -48,7 +48,7 @@ export const createPromotion = async (payload) => {
 };
 
 export const updatePromotion = async (id, payload) => {
-	const res = await fetch(`${API_BASE_URL}/promotions/${id}`, {
+	const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
 		method: "PUT",
 		headers: getAuthHeaders(),
 		body: JSON.stringify(payload),
@@ -62,7 +62,7 @@ export const updatePromotion = async (id, payload) => {
 };
 
 export const deletePromotion = async (id) => {
-	const res = await fetch(`${API_BASE_URL}/promotions/${id}`, {
+	const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
 		method: "DELETE",
 		headers: getAuthHeaders(),
 	});

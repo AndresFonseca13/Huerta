@@ -1,11 +1,10 @@
 import axios from "axios";
-
+import { apiConfig } from "../config/api"
 // Usamos el proxy de Vite: backend expone auth bajo "/api/auth"
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const loginUser = async (username, password) => {
 	try {
-		const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+		const response = await axios.post(`${apiConfig.baseURL}/auth/login`, {
 			username,
 			password,
 		});
@@ -51,7 +50,7 @@ export const loginUser = async (username, password) => {
 // Función para login de administrador
 export const loginAdmin = async (username, password) => {
 	try {
-		const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+		const response = await axios.post(`${apiConfig.baseURL}/auth/login`, {
 			username,
 			password,
 		});

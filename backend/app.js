@@ -13,7 +13,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Esto habilita CORS para todos los dominios (en desarrollo está bien)
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      'https://frontendhuerta-xxx.azurestaticapps.net', // Frontend en producción
+      'http://localhost:5173', // Desarrollo local
+    ],
+    credentials: true,
+  }),
+);
 
 // Tu configuración actual
 app.use(express.json());

@@ -1,6 +1,5 @@
 import { getAuthHeaders } from "./authService";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+import { apiConfig } from "../config/api";
 
 // Públicas
 export const getProducts = async (
@@ -21,7 +20,7 @@ export const getProducts = async (
 	if (!isFood && tipo) params.append("tipo", tipo);
 
 	const endpoint = isFood ? "/products/food" : "/products";
-	const response = await fetch(`${API_BASE_URL}${endpoint}?${params}`, {
+	const response = await fetch(`${apiConfig.baseURL}${endpoint}?${params}`, {
 		headers: { "Content-Type": "application/json" },
 	});
 	const data = await response.json();
@@ -46,7 +45,7 @@ export const getProductsAdmin = async (
 	if (categoria) params.append("categoria", categoria);
 	if (tipo) params.append("tipo", tipo);
 
-	const response = await fetch(`${API_BASE_URL}/products/admin/all?${params}`, {
+	const response = await fetch(`${apiConfig.baseURL}/products/admin/all?${params}`, {
 		headers: getAuthHeaders(),
 	});
 	const data = await response.json();
@@ -62,7 +61,7 @@ export const getProductsAdmin = async (
 };
 
 export const createProduct = async (productData) => {
-	const response = await fetch(`${API_BASE_URL}/products`, {
+	const response = await fetch(`${apiConfig.baseURL}/products`, {
 		method: "POST",
 		headers: getAuthHeaders(),
 		body: JSON.stringify(productData),
@@ -80,7 +79,7 @@ export const createProduct = async (productData) => {
 };
 
 export const updateProduct = async (id, productData) => {
-	const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+	const response = await fetch(`${apiConfig.baseURL}/products/${id}`, {
 		method: "PUT",
 		headers: getAuthHeaders(),
 		body: JSON.stringify(productData),
@@ -98,7 +97,7 @@ export const updateProduct = async (id, productData) => {
 };
 
 export const updateProductStatus = async (id, isActive) => {
-	const response = await fetch(`${API_BASE_URL}/products/${id}/status`, {
+	const response = await fetch(`${apiConfig.baseURL}/products/${id}/status`, {
 		method: "PATCH",
 		headers: getAuthHeaders(),
 		body: JSON.stringify({ isActive }),
@@ -116,7 +115,7 @@ export const updateProductStatus = async (id, isActive) => {
 };
 
 export const deleteProduct = async (id) => {
-	const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+	const response = await fetch(`${apiConfig.baseURL}/products/${id}`, {
 		method: "DELETE",
 		headers: getAuthHeaders(),
 	});
