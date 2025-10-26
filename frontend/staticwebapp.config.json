@@ -2,5 +2,12 @@
 	"navigationFallback": {
 		"rewrite": "/index.html",
 		"exclude": ["/assets/*", "/*.{js,css,png,jpg,jpeg,gif,ico,svg}"]
-	}
+	},
+	"routes": [
+		{
+			"route": "/api/*",
+			"allowedRoles": ["anonymous"],
+			"rewrite": "https://backendhuerta.azurewebsites.net/api/*"
+		}
+	]
 }

@@ -16,7 +16,7 @@ const port = process.env.PORT || 3000;
 app.use(
   cors({
     origin: [
-      'https://frontendhuerta-xxx.azurestaticapps.net', // Frontend en producción
+      'https://happy-bush-09337730f.3.azurestaticapps.net', // Frontend en producción
       'http://localhost:5173', // Desarrollo local
     ],
     credentials: true,
