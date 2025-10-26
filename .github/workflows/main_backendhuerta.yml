@@ -1,16 +1,14 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - backendhuerta
+name: Build and deploy Node.js app to Azure Web App - backendhuerta (disabled)
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
   build:
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
@@ -21,7 +19,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: "22.x"
 
       - name: npm install, build, and test
         run: |
@@ -36,6 +34,7 @@ jobs:
           path: .
 
   deploy:
+    if: false
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -47,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +54,10 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_795F4DF572AD49C4BD20AA97C5D501BB }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4BA007B33E0340DD80ED87F41192FC41 }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'backendhuerta'
-          slot-name: 'Production'
+          app-name: "backendhuerta"
+          slot-name: "Production"
           package: .
-          
