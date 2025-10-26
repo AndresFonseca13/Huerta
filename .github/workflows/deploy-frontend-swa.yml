@@ -46,5 +46,5 @@ jobs:
           action: upload
           app_location: frontend/dist
           output_location: ""
-          config_file_location: frontend/staticwebapp.config.json
+          config_file_location: frontend
           skip_app_build: true
