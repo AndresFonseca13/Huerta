@@ -7,7 +7,7 @@
 		{
 			"route": "/api/*",
 			"allowedRoles": ["anonymous"],
-			"rewrite": "backendhuerta-cresbshzffbweyez.eastus-01.azurewebsites.net/api/*"
+			"rewrite": "https://backendhuertamenu.azurewebsites.net/api/*"
 		}
 	]
 }
