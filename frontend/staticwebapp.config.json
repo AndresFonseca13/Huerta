@@ -1,13 +1,12 @@
 {
 	"navigationFallback": {
 		"rewrite": "/index.html",
-		"exclude": ["/assets/*", "/*.{js,css,png,jpg,jpeg,gif,ico,svg}"]
+		"exclude": ["/assets/*", "/*.{js,css,png,jpg,jpeg,gif,ico,svg}", "/api/*"]
 	},
-	"routes": [
-		{
-			"route": "/api/*",
-			"allowedRoles": ["anonymous"],
-			"rewrite": "https://backendhuertamenu.azurewebsites.net/api/*"
+	"responseOverrides": {
+		"404": {
+			"rewrite": "/index.html",
+			"statusCode": 200
 		}
-	]
+	}
 }
