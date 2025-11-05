@@ -302,7 +302,11 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 						<button
 							onClick={onClose}
 							className="absolute top-4 right-4"
-							style={{ color: "#e9cc9e" }}
+							style={{ 
+								color: "#e9cc9e",
+								WebkitAppearance: "none",
+								WebkitTapHighlightColor: "transparent",
+							}}
 							aria-label="Cerrar modal"
 						>
 							<FiX size={24} />
@@ -721,6 +725,8 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 														backgroundColor: "#2a2a2a",
 														border: "1px solid #3a3a3a",
 														color: "#e9cc9e",
+														WebkitAppearance: "none",
+														WebkitTapHighlightColor: "transparent",
 													}}
 													aria-label="Eliminar imagen nueva"
 												>
@@ -741,6 +747,8 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 										backgroundColor: "#2a2a2a",
 										color: "#e9cc9e",
 										border: "1px solid #3a3a3a",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 								>
 									Cancelar
@@ -749,7 +757,12 @@ const EditCocktailModal = ({ cocktail, isOpen, onClose, onUpdateSuccess }) => {
 									type="submit"
 									disabled={isSubmitting}
 									className="px-4 py-2 rounded-md transition-colors disabled:opacity-50"
-									style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
+									style={{ 
+										backgroundColor: "#e9cc9e", 
+										color: "#191919",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
+									}}
 								>
 									{isSubmitting ? "Actualizando..." : "Guardar Cambios"}
 								</button>

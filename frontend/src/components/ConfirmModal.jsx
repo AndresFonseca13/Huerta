@@ -62,6 +62,8 @@ const ConfirmModal = ({
 							backgroundColor: "#2a2a2a",
 							color: "#e9cc9e",
 							border: "1px solid #3a3a3a",
+							WebkitAppearance: "none",
+							WebkitTapHighlightColor: "transparent",
 						}}
 					>
 						{cancelText}
@@ -73,6 +75,8 @@ const ConfirmModal = ({
 							backgroundColor: "#b91c1c",
 							color: "#ffffff",
 							border: "1px solid #7f1d1d",
+							WebkitAppearance: "none",
+							WebkitTapHighlightColor: "transparent",
 						}}
 					>
 						{confirmText}

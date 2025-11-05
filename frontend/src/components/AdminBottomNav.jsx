@@ -84,7 +84,11 @@ const NavItem = ({ active, label, icon: Icon, onClick, disabled }) => (
 			className={`relative flex flex-col items-center justify-center w-full py-2 ${
 				active ? "font-semibold" : ""
 			} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-			style={{ color: active ? "#e9cc9e" : "#b8b8b8" }}
+			style={{ 
+				color: active ? "#e9cc9e" : "#b8b8b8",
+				WebkitAppearance: "none",
+				WebkitTapHighlightColor: "transparent",
+			}}
 		>
 			{Icon && <Icon size={18} />}
 			<span className="text-[11px] mt-1">{label}</span>

@@ -127,8 +127,15 @@ const CategoryFilterBar = () => {
 							!categoria &&
 							(location.pathname === "/bebidas" ||
 								location.pathname === "/comida")
-								? { backgroundColor: "#e9cc9e" }
-								: {}
+								? { 
+									backgroundColor: "#e9cc9e",
+									WebkitAppearance: "none",
+									WebkitTapHighlightColor: "transparent"
+								}
+								: {
+									WebkitAppearance: "none",
+									WebkitTapHighlightColor: "transparent"
+								}
 						}
 						onClick={() => handleSelectCategoria(null)}
 					>
@@ -158,7 +165,16 @@ const CategoryFilterBar = () => {
 										: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
 								}`}
 								style={
-									isSelected(cat.name) ? { backgroundColor: "#e9cc9e" } : {}
+									isSelected(cat.name) 
+										? { 
+											backgroundColor: "#e9cc9e",
+											WebkitAppearance: "none",
+											WebkitTapHighlightColor: "transparent"
+										} 
+										: {
+											WebkitAppearance: "none",
+											WebkitTapHighlightColor: "transparent"
+										}
 								}
 								onClick={() => handleSelectCategoria(cat.name)}
 							>

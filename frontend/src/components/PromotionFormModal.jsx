@@ -779,6 +779,8 @@ const PromotionFormModal = ({
 							backgroundColor: "#2a2a2a",
 							color: "#e9cc9e",
 							border: "1px solid #3a3a3a",
+							WebkitAppearance: "none",
+							WebkitTapHighlightColor: "transparent",
 						}}
 						whileTap={{ scale: 0.98 }}
 					>
@@ -788,7 +790,12 @@ const PromotionFormModal = ({
 						disabled={saving}
 						type="submit"
 						className="px-4 py-2 rounded-md"
-						style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
+						style={{ 
+							backgroundColor: "#e9cc9e", 
+							color: "#191919",
+							WebkitAppearance: "none",
+							WebkitTapHighlightColor: "transparent",
+						}}
 						whileTap={{ scale: 0.98 }}
 					>
 						{saving ? "Guardando..." : "Guardar"}

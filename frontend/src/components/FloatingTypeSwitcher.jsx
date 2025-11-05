@@ -102,6 +102,8 @@ const FloatingTypeSwitcher = () => {
 				style={{
 					backgroundColor: open ? "#3a3a3a" : "#e9cc9e",
 					color: open ? "#e9cc9e" : "#191919",
+					WebkitAppearance: "none",
+					WebkitTapHighlightColor: "transparent",
 				}}
 				whileTap={{ scale: 0.95 }}
 			>
@@ -156,6 +158,8 @@ const FloatingTypeSwitcher = () => {
 										backgroundColor: option.bgColor,
 										color: option.textColor,
 										ringColor: isActive ? "#e9cc9e" : "transparent",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 									initial={{
 										x: 80,
