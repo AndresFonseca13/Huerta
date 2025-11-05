@@ -73,7 +73,12 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					<button
 						onClick={onClose}
 						className="absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
-						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
+						style={{ 
+							backgroundColor: "#2a2a2a", 
+							border: "1px solid #3a3a3a",
+							WebkitAppearance: "none",
+							WebkitTapHighlightColor: "transparent",
+						}}
 					>
 						<FiX className="text-xl" style={{ color: "#e9cc9e" }} />
 					</button>
