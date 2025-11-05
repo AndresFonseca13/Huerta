@@ -10,26 +10,18 @@
 .swiper-button-prev {
   width: 40px !important;
   height: 40px !important;
-  background-color: rgba(
-    34,
-    197,
-    94,
-    0.9
-  ) !important; /* Verde con transparencia */
+  background-color: rgba(233, 204, 158, 0.9) !important; /* Dorado con transparencia (#e9cc9e) */
   border-radius: 50% !important;
-  color: white !important;
+  color: #191919 !important;
   font-size: 16px !important;
   transition: all 0.3s ease !important;
+  -webkit-appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-  background-color: rgba(
-    34,
-    197,
-    94,
-    1
-  ) !important; /* Verde sólido al hacer hover */
+  background-color: rgba(233, 204, 158, 1) !important; /* Dorado sólido al hacer hover */
   transform: scale(1.1) !important;
 }
 
@@ -52,18 +44,18 @@
 .swiper-pagination-bullet {
   width: 8px !important;
   height: 8px !important;
-  background-color: rgba(34, 197, 94, 0.5) !important; /* Verde claro */
+  background-color: rgba(233, 204, 158, 0.5) !important; /* Dorado claro (#e9cc9e) */
   opacity: 1 !important;
   transition: all 0.3s ease !important;
 }
 
 .swiper-pagination-bullet-active {
-  background-color: rgb(34, 197, 94) !important; /* Verde sólido */
+  background-color: rgb(233, 204, 158) !important; /* Dorado sólido (#e9cc9e) */
   transform: scale(1.2) !important;
 }
 
 .swiper-pagination-bullet:hover {
-  background-color: rgba(34, 197, 94, 0.8) !important;
+  background-color: rgba(233, 204, 158, 0.8) !important;
 }
 
 /* Contenedor de paginación */
