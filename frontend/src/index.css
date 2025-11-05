@@ -44,9 +44,8 @@ select {
 	a:hover {
 		color: #747bff;
 	}
-	button {
-		background-color: #f9f9f9;
-	}
+	/* Removido el background-color genérico para botones 
+	   para evitar conflictos con estilos específicos en iOS */
 }
 
 body {
@@ -60,4 +59,24 @@ body {
 .no-scrollbar {
 	-ms-overflow-style: none; /* IE and Edge */
 	scrollbar-width: none; /* Firefox */
+}
+
+/* Fixes específicos para iOS Safari */
+button {
+	-webkit-appearance: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+/* Prevenir que iOS Safari modifique el color de fondo de los botones */
+button:active,
+button:focus {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Asegurar que los elementos con colores específicos no sean modificados por iOS */
+[style*="backgroundColor"],
+[style*="background-color"] {
+	-webkit-appearance: none !important;
 }

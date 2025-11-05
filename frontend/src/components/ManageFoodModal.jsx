@@ -143,7 +143,11 @@ const ManageFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 						<button
 							onClick={onClose}
 							className="absolute top-4 right-4"
-							style={{ color: "#e9cc9e" }}
+							style={{ 
+								color: "#e9cc9e",
+								WebkitAppearance: "none",
+								WebkitTapHighlightColor: "transparent",
+							}}
 							aria-label="Cerrar"
 						>
 							<FiX size={24} />
@@ -245,6 +249,8 @@ const ManageFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 											item.is_active ? "#b91c1c" : "#22c55e"
 										}`,
 										color: item.is_active ? "#fca5a5" : "#86efac",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 								>
 									{isSubmitting
@@ -284,6 +290,8 @@ const ManageFoodModal = ({ item, isOpen, onClose, onUpdateSuccess }) => {
 										backgroundColor: "#b91c1c",
 										color: "#ffffff",
 										border: "1px solid #7f1d1d",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 								>
 									Eliminar

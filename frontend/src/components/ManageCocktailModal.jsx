@@ -145,6 +145,8 @@ const ManageCocktailModal = ({
 									backgroundColor: "#2a2a2a",
 									color: "#e9cc9e",
 									border: "1px solid #3a3a3a",
+									WebkitAppearance: "none",
+									WebkitTapHighlightColor: "transparent",
 								}}
 							>
 								Cancelar
@@ -157,6 +159,8 @@ const ManageCocktailModal = ({
 									backgroundColor: "#b91c1c",
 									color: "#ffffff",
 									border: "1px solid #7f1d1d",
+									WebkitAppearance: "none",
+									WebkitTapHighlightColor: "transparent",
 								}}
 							>
 								{isSubmitting ? "Eliminando..." : "Eliminar Definitivamente"}
@@ -178,7 +182,11 @@ const ManageCocktailModal = ({
 						<button
 							onClick={onClose}
 							className="absolute top-4 right-4"
-							style={{ color: "#e9cc9e" }}
+							style={{ 
+								color: "#e9cc9e",
+								WebkitAppearance: "none",
+								WebkitTapHighlightColor: "transparent",
+							}}
 							aria-label="Cerrar modal"
 						>
 							<FiX size={24} />
@@ -287,6 +295,8 @@ const ManageCocktailModal = ({
 											cocktail.is_active ? "#b91c1c" : "#22c55e"
 										}`,
 										color: cocktail.is_active ? "#fca5a5" : "#86efac",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 								>
 									{isSubmitting
@@ -327,6 +337,8 @@ const ManageCocktailModal = ({
 										backgroundColor: "#b91c1c",
 										color: "#ffffff",
 										border: "1px solid #7f1d1d",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
 									}}
 								>
 									Eliminar
