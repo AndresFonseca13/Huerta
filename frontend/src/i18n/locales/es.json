@@ -1,0 +1,121 @@
+{
+  "translation": {
+    "changeLanguage": "Cambiar idioma",
+    "navbar": {
+      "home": "Inicio",
+      "beverages": "Bebidas",
+      "food": "Comida",
+      "otherDrinks": "Otras Bebidas"
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados",
+      "contact": "Contacto",
+      "aboutUs": "Acerca de nosotros",
+      "followUs": "Síguenos"
+    },
+    "cocktailCard": {
+      "ingredients": "Ingredientes",
+      "price": "Precio",
+      "viewDetails": "Ver Detalles",
+      "alcoholPercentage": "Grado Alcohólico",
+      "inactive": "Inactivo"
+    },
+    "cocktailDetail": {
+      "title": "Detalles del Cóctel",
+      "description": "Descripción",
+      "ingredients": "Ingredientes",
+      "categories": "Categorías",
+      "price": "Precio",
+      "alcoholPercentage": "Grado Alcohólico",
+      "close": "Cerrar",
+      "edit": "Editar",
+      "manage": "Gestionar"
+    },
+    "manageCocktail": {
+      "title": "Gestionar Cóctel",
+      "successTitle": "¡Estado Actualizado!",
+      "successMessage": "ha sido",
+      "disabled": "deshabilitado",
+      "enabled": "habilitado",
+      "successfully": "exitosamente",
+      "deleteConfirmTitle": "¿Eliminar definitivamente?",
+      "deleteConfirmMessage": "Esta acción eliminará permanentemente el cóctel",
+      "cannotUndo": "y no se puede deshacer",
+      "cancel": "Cancelar",
+      "deleteDefinitively": "Eliminar Definitivamente",
+      "deleting": "Eliminando...",
+      "price": "Precio",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "ingredients": "Ingredientes",
+      "categories": "Categorías",
+      "enabledInMenu": "Habilitado en el menú",
+      "disabledInMenu": "Deshabilitado en el menú",
+      "customersCanSee": "Los clientes pueden ver este cóctel en el menú",
+      "customersCannotSee": "Los clientes no pueden ver este cóctel en el menú",
+      "disable": "Deshabilitar",
+      "enable": "Habilitar",
+      "processing": "Procesando...",
+      "permanentDeletion": "Eliminación permanente",
+      "permanentDeletionDesc": "Elimina completamente el cóctel de la base de datos",
+      "delete": "Eliminar",
+      "cocktailDisabled": "El cóctel \"{{name}}\" ha sido deshabilitado exitosamente.",
+      "cocktailEnabled": "El cóctel \"{{name}}\" ha sido habilitado exitosamente.",
+      "deleteWarning": "Esta acción eliminará permanentemente el cóctel \"{{name}}\" y no se puede deshacer."
+    },
+    "editCocktail": {
+      "title": "Editar Cóctel",
+      "name": "Nombre",
+      "description": "Descripción",
+      "price": "Precio",
+      "alcoholPercentage": "Porcentaje de Alcohol",
+      "ingredients": "Ingredientes",
+      "addIngredient": "Agregar Ingrediente",
+      "images": "Imágenes",
+      "uploadImage": "Subir Imagen",
+      "categories": "Categorías",
+      "selectCategory": "Seleccionar Categoría",
+      "distilled": "Destilado",
+      "save": "Guardar Cambios",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "optional": "Opcional"
+    },
+    "categoryFilter": {
+      "all": "Todos",
+      "beverages": "Bebidas",
+      "food": "Comida"
+    },
+    "search": {
+      "placeholder": "Buscar...",
+      "noResults": "No se encontraron resultados",
+      "searching": "Buscando..."
+    },
+    "common": {
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Cerrar",
+      "back": "Volver",
+      "next": "Siguiente",
+      "previous": "Anterior"
+    },
+    "admin": {
+      "panel": "Panel de Administración",
+      "users": "Usuarios",
+      "products": "Productos",
+      "categories": "Categorías",
+      "promotions": "Promociones",
+      "logout": "Cerrar Sesión"
+    }
+  }
+}
+
+
+

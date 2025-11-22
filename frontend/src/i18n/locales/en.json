@@ -1,0 +1,118 @@
+{
+	"translation": {
+		"changeLanguage": "Change Language",
+		"navbar": {
+			"home": "Home",
+			"beverages": "Beverages",
+			"food": "Food",
+			"otherDrinks": "Other Drinks"
+		},
+		"footer": {
+			"rights": "All rights reserved",
+			"contact": "Contact",
+			"aboutUs": "About us",
+			"followUs": "Follow us"
+		},
+		"cocktailCard": {
+			"ingredients": "Ingredients",
+			"price": "Price",
+			"viewDetails": "View Details",
+			"alcoholPercentage": "Alcohol Percentage",
+			"inactive": "Inactive"
+		},
+		"cocktailDetail": {
+			"title": "Cocktail Details",
+			"description": "Description",
+			"ingredients": "Ingredients",
+			"categories": "Categories",
+			"price": "Price",
+			"alcoholPercentage": "Alcohol Percentage",
+			"close": "Close",
+			"edit": "Edit",
+			"manage": "Manage"
+		},
+		"manageCocktail": {
+			"title": "Manage Cocktail",
+			"successTitle": "Status Updated!",
+			"successMessage": "has been",
+			"disabled": "disabled",
+			"enabled": "enabled",
+			"successfully": "successfully",
+			"deleteConfirmTitle": "Delete permanently?",
+			"deleteConfirmMessage": "This action will permanently delete the cocktail",
+			"cannotUndo": "and cannot be undone",
+			"cancel": "Cancel",
+			"deleteDefinitively": "Delete Permanently",
+			"deleting": "Deleting...",
+			"price": "Price",
+			"status": "Status",
+			"active": "Active",
+			"inactive": "Inactive",
+			"ingredients": "Ingredients",
+			"categories": "Categories",
+			"enabledInMenu": "Enabled in menu",
+			"disabledInMenu": "Disabled in menu",
+			"customersCanSee": "Customers can see this cocktail in the menu",
+			"customersCannotSee": "Customers cannot see this cocktail in the menu",
+			"disable": "Disable",
+			"enable": "Enable",
+			"processing": "Processing...",
+			"permanentDeletion": "Permanent deletion",
+			"permanentDeletionDesc": "Completely removes the cocktail from the database",
+			"delete": "Delete",
+			"cocktailDisabled": "The cocktail \"{{name}}\" has been disabled successfully.",
+			"cocktailEnabled": "The cocktail \"{{name}}\" has been enabled successfully.",
+			"deleteWarning": "This action will permanently delete the cocktail \"{{name}}\" and cannot be undone."
+		},
+		"editCocktail": {
+			"title": "Edit Cocktail",
+			"name": "Name",
+			"description": "Description",
+			"price": "Price",
+			"alcoholPercentage": "Alcohol Percentage",
+			"ingredients": "Ingredients",
+			"addIngredient": "Add Ingredient",
+			"images": "Images",
+			"uploadImage": "Upload Image",
+			"categories": "Categories",
+			"selectCategory": "Select Category",
+			"distilled": "Distilled",
+			"save": "Save Changes",
+			"cancel": "Cancel",
+			"saving": "Saving...",
+			"optional": "Optional"
+		},
+		"categoryFilter": {
+			"all": "All",
+			"beverages": "Beverages",
+			"food": "Food"
+		},
+		"search": {
+			"placeholder": "Search...",
+			"noResults": "No results found",
+			"searching": "Searching..."
+		},
+		"common": {
+			"loading": "Loading...",
+			"error": "Error",
+			"success": "Success",
+			"confirm": "Confirm",
+			"cancel": "Cancel",
+			"save": "Save",
+			"delete": "Delete",
+			"edit": "Edit",
+			"close": "Close",
+			"back": "Back",
+			"next": "Next",
+			"previous": "Previous"
+		},
+		"admin": {
+			"panel": "Administration Panel",
+			"users": "Users",
+			"products": "Products",
+			"categories": "Categories",
+			"promotions": "Promotions",
+			"logout": "Logout"
+		}
+	}
+}

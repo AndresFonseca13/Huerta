@@ -9,6 +9,8 @@ import {
 } from "react-icons/fi";
 import { updateProductStatus, deleteProduct } from "../services/productService";
 import ErrorModal from "./ErrorModal";
+import { useTranslation } from "react-i18next";
+import { useProductTranslation } from "../hooks/useProductTranslation";
 
 const ManageCocktailModal = ({
 	cocktail,
@@ -18,10 +20,13 @@ const ManageCocktailModal = ({
 }) => {
 	console.log("[DEBUG] ManageCocktailModal - Cocktail recibido:", cocktail);
 
+	const { t } = useTranslation();
+	const { translatedProduct } = useProductTranslation(cocktail);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState(null);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [newStatus, setNewStatus] = useState(null); // Para guardar el nuevo estado después del toggle
 
 	const handleToggleStatus = async () => {
 		setIsSubmitting(true);
@@ -42,9 +47,12 @@ const ManageCocktailModal = ({
 
 			const result = await updateProductStatus(cocktail.id, newStatus);
 
+			// Guardar el nuevo estado para mostrar el mensaje correcto
+			setNewStatus(newStatus);
 			setIsSuccess(true);
 			setTimeout(() => {
 				setIsSuccess(false);
+				setNewStatus(null);
 				onUpdateSuccess(result.cocktail);
 			}, 2000);
 		} catch (err) {
@@ -101,12 +109,14 @@ const ManageCocktailModal = ({
 							</svg>
 						</div>
 						<h3 className="text-xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
-							¡Estado Actualizado!
+							{t("manageCocktail.successTitle")}
 						</h3>
 						<p style={{ color: "#b8b8b8" }}>
-							El cóctel "{cocktail.name}" ha sido{" "}
-							{cocktail.is_active ? "deshabilitado" : "habilitado"}{" "}
-							exitosamente.
+							{newStatus === false
+								? t("manageCocktail.cocktailDisabled", { name: translatedProduct.name })
+								: newStatus === true
+								? t("manageCocktail.cocktailEnabled", { name: translatedProduct.name })
+								: ""}
 						</p>
 					</div>
 				</div>
@@ -130,11 +140,10 @@ const ManageCocktailModal = ({
 							/>
 						</div>
 						<h3 className="text-xl font-bold mb-2" style={{ color: "#e9cc9e" }}>
-							¿Eliminar definitivamente?
+							{t("manageCocktail.deleteConfirmTitle")}
 						</h3>
 						<p className="mb-6" style={{ color: "#b8b8b8" }}>
-							Esta acción eliminará permanentemente el cóctel "{cocktail.name}"
-							y no se puede deshacer.
+							{t("manageCocktail.deleteWarning", { name: translatedProduct.name })}
 						</p>
 						<div className="flex space-x-4 justify-center">
 							<button
@@ -149,7 +158,7 @@ const ManageCocktailModal = ({
 									WebkitTapHighlightColor: "transparent",
 								}}
 							>
-								Cancelar
+								{t("manageCocktail.cancel")}
 							</button>
 							<button
 								onClick={handlePhysicalDelete}
@@ -163,7 +172,7 @@ const ManageCocktailModal = ({
 									WebkitTapHighlightColor: "transparent",
 								}}
 							>
-								{isSubmitting ? "Eliminando..." : "Eliminar Definitivamente"}
+								{isSubmitting ? t("manageCocktail.deleting") : t("manageCocktail.deleteDefinitively")}
 							</button>
 						</div>
 					</div>
@@ -182,7 +191,7 @@ const ManageCocktailModal = ({
 						<button
 							onClick={onClose}
 							className="absolute top-4 right-4"
-							style={{ 
+							style={{
 								color: "#e9cc9e",
 								WebkitAppearance: "none",
 								WebkitTapHighlightColor: "transparent",
@@ -196,7 +205,7 @@ const ManageCocktailModal = ({
 							className="text-2xl font-bold mb-6"
 							style={{ color: "#e9cc9e" }}
 						>
-							Gestionar Cóctel
+							{t("manageCocktail.title")}
 						</h2>
 
 						{/* Información del cóctel */}
@@ -211,12 +220,12 @@ const ManageCocktailModal = ({
 								className="text-lg font-semibold mb-4 capitalize"
 								style={{ color: "#e9cc9e" }}
 							>
-								{cocktail.name}
+								{translatedProduct.name}
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
 								<div>
 									<span className="font-medium" style={{ color: "#e9cc9e" }}>
-										Precio:
+										{t("manageCocktail.price")}:
 									</span>
 									<span className="ml-2" style={{ color: "#b8b8b8" }}>
 										${cocktail.price}
@@ -224,7 +233,7 @@ const ManageCocktailModal = ({
 								</div>
 								<div>
 									<span className="font-medium" style={{ color: "#e9cc9e" }}>
-										Estado:
+										{t("manageCocktail.active")}:
 									</span>
 									<span
 										className="ml-2"
@@ -232,12 +241,12 @@ const ManageCocktailModal = ({
 											color: cocktail.is_active ? "#22c55e" : "#b91c1c",
 										}}
 									>
-										{cocktail.is_active ? "Activo" : "Inactivo"}
+										{cocktail.is_active ? t("manageCocktail.active") : t("manageCocktail.inactive")}
 									</span>
 								</div>
 								<div>
 									<span className="font-medium" style={{ color: "#e9cc9e" }}>
-										Ingredientes:
+										{t("manageCocktail.ingredients")}:
 									</span>
 									<span className="ml-2" style={{ color: "#b8b8b8" }}>
 										{cocktail.ingredients?.length || 0}
@@ -245,7 +254,7 @@ const ManageCocktailModal = ({
 								</div>
 								<div>
 									<span className="font-medium" style={{ color: "#e9cc9e" }}>
-										Categorías:
+										{t("manageCocktail.categories")}:
 									</span>
 									<span className="ml-2" style={{ color: "#b8b8b8" }}>
 										{cocktail.categories?.length || 0}
@@ -275,13 +284,14 @@ const ManageCocktailModal = ({
 									)}
 									<div>
 										<h4 className="font-medium" style={{ color: "#e9cc9e" }}>
-											{cocktail.is_active ? "Habilitado" : "Deshabilitado"} en
-											el menú
+											{cocktail.is_active
+												? t("manageCocktail.enabledInMenu")
+												: t("manageCocktail.disabledInMenu")}
 										</h4>
 										<p className="text-sm" style={{ color: "#b8b8b8" }}>
 											{cocktail.is_active
-												? "Los clientes pueden ver este cóctel en el menú"
-												: "Los clientes no pueden ver este cóctel en el menú"}
+												? t("manageCocktail.customersCanSee")
+												: t("manageCocktail.customersCannotSee")}
 										</p>
 									</div>
 								</div>
@@ -300,10 +310,10 @@ const ManageCocktailModal = ({
 									}}
 								>
 									{isSubmitting
-										? "Procesando..."
+										? t("manageCocktail.processing")
 										: cocktail.is_active
-										? "Deshabilitar"
-										: "Habilitar"}
+										? t("manageCocktail.disable")
+										: t("manageCocktail.enable")}
 								</button>
 							</div>
 
@@ -322,10 +332,10 @@ const ManageCocktailModal = ({
 									/>
 									<div>
 										<h4 className="font-medium" style={{ color: "#fca5a5" }}>
-											Eliminación permanente
+											{t("manageCocktail.permanentDeletion")}
 										</h4>
 										<p className="text-sm" style={{ color: "#fca5a5" }}>
-											Elimina completamente el cóctel de la base de datos
+											{t("manageCocktail.permanentDeletionDesc")}
 										</p>
 									</div>
 								</div>
@@ -341,7 +351,7 @@ const ManageCocktailModal = ({
 										WebkitTapHighlightColor: "transparent",
 									}}
 								>
-									Eliminar
+									{t("manageCocktail.delete")}
 								</button>
 							</div>
 						</div>
