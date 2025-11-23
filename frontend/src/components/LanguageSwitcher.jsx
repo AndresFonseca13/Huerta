@@ -24,7 +24,7 @@ const LanguageSwitcher = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       {/* Botón principal */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -48,13 +48,13 @@ const LanguageSwitcher = () => {
         <>
           {/* Overlay para cerrar al hacer clic fuera */}
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-[9998]"
             onClick={() => setIsOpen(false)}
           />
           
           {/* Menu */}
           <div
-            className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl overflow-hidden z-[9999]"
             style={{
               backgroundColor: '#2a2a2a',
               border: '1px solid #3a3a3a',

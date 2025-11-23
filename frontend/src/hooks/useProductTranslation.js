@@ -1,183 +1,261 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import translationService from '../services/translationService';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import translationService from "../services/translationService";
 
 /**
  * Hook personalizado para traducir productos dinámicamente
  * Traduce nombres, descripciones, ingredientes y categorías
  */
 export const useProductTranslation = (product) => {
-  const { i18n } = useTranslation();
-  const [translatedProduct, setTranslatedProduct] = useState(product);
-  const [isTranslating, setIsTranslating] = useState(false);
+	const { i18n } = useTranslation();
+	const [translatedProduct, setTranslatedProduct] = useState(product);
+	const [isTranslating, setIsTranslating] = useState(false);
 
-  useEffect(() => {
-    const translateProduct = async () => {
-      if (!product) return;
+	useEffect(() => {
+		const translateProduct = async () => {
+			if (!product) return;
 
-      const currentLang = i18n.language;
+			const currentLang = i18n.language;
 
-      // Si el idioma es español (original), no traducir
-      if (currentLang === 'es') {
-        setTranslatedProduct(product);
-        return;
-      }
+			// Si el idioma es español (original), no traducir
+			if (currentLang === "es") {
+				setTranslatedProduct(product);
+				return;
+			}
 
-      setIsTranslating(true);
+			setIsTranslating(true);
 
-      try {
-        // Traducir nombre y descripción
-        const [translatedName, translatedDescription] = await Promise.all([
-          translationService.translate(product.name, 'es', currentLang),
-          product.description 
-            ? translationService.translate(product.description, 'es', currentLang)
-            : Promise.resolve('')
-        ]);
+			try {
+				// Determinar si es cóctel
+				const isCocktail =
+					product.categories?.some(
+						(cat) =>
+							cat.type === "destilado" &&
+							(cat.name?.toLowerCase() === "cocktail" ||
+								product.destilado_name?.toLowerCase() === "cocktail")
+					) ||
+					// Verificar si tiene categoría específica de cóctel
+					product.categories?.some(
+						(cat) =>
+							cat.name?.toLowerCase() === "cocktail" &&
+							cat.type === "clasificacion"
+					);
 
-        // Traducir ingredientes si existen
-        let translatedIngredients = product.ingredients || [];
-        if (translatedIngredients.length > 0 && translatedIngredients[0] !== null) {
-          translatedIngredients = await translationService.translateBatch(
-            translatedIngredients.filter(i => i !== null),
-            'es',
-            currentLang
-          );
-        }
+				// Traducir nombre si NO es cóctel (comida y otras bebidas sí se traducen)
+				const translatedName = !isCocktail
+					? await translationService.translate(product.name, "es", currentLang)
+					: product.name; // Mantener nombre original para cócteles
 
-        // Traducir categorías si existen
-        let translatedCategories = product.categories || [];
-        if (translatedCategories.length > 0) {
-          translatedCategories = await Promise.all(
-            translatedCategories.map(async (cat) => {
-              if (!cat || !cat.name) return cat;
-              
-              const translatedName = await translationService.translate(
-                cat.name,
-                'es',
-                currentLang
-              );
-              
-              return {
-                ...cat,
-                name: translatedName,
-                originalName: cat.name // Guardar nombre original
-              };
-            })
-          );
-        }
+				// Traducir descripción siempre
+				const translatedDescription = product.description
+					? await translationService.translate(
+							product.description,
+							"es",
+							currentLang
+					  )
+					: "";
 
-        setTranslatedProduct({
-          ...product,
-          name: translatedName,
-          description: translatedDescription,
-          ingredients: translatedIngredients,
-          categories: translatedCategories,
-          originalName: product.name, // Guardar nombre original
-          originalDescription: product.description
-        });
-      } catch (error) {
-        console.error('Error translating product:', error);
-        setTranslatedProduct(product); // En caso de error, usar original
-      } finally {
-        setIsTranslating(false);
-      }
-    };
+				// Traducir ingredientes si existen (sin preservar cantidades ya que no las tienen)
+				// Procesar secuencialmente para evitar rate limiting
+				let translatedIngredients = product.ingredients || [];
+				if (
+					translatedIngredients.length > 0 &&
+					translatedIngredients[0] !== null
+				) {
+					// Traducir cada ingrediente secuencialmente para evitar 429
+					translatedIngredients = [];
+					for (const ingredient of product.ingredients.filter(
+						(i) => i !== null
+					)) {
+						const translated = await translationService.translate(
+							ingredient,
+							"es",
+							currentLang,
+							false // No preservar cantidades
+						);
+						translatedIngredients.push(translated);
+					}
+				}
 
-    translateProduct();
-  }, [product, i18n.language]);
+				// Traducir categorías si existen (procesar secuencialmente)
+				let translatedCategories = product.categories || [];
+				if (translatedCategories.length > 0) {
+					translatedCategories = [];
+					for (const cat of product.categories) {
+						if (!cat || !cat.name) {
+							translatedCategories.push(cat);
+							continue;
+						}
 
-  return { translatedProduct, isTranslating };
+						const translatedName = await translationService.translate(
+							cat.name,
+							"es",
+							currentLang
+						);
+
+						translatedCategories.push({
+							...cat,
+							name: translatedName,
+							originalName: cat.name, // Guardar nombre original
+						});
+					}
+				}
+
+				setTranslatedProduct({
+					...product,
+					name: translatedName,
+					description: translatedDescription,
+					ingredients: translatedIngredients,
+					categories: translatedCategories,
+					originalName: product.name, // Guardar nombre original
+					originalDescription: product.description,
+				});
+			} catch (error) {
+				console.error("Error translating product:", error);
+				console.error("Product that failed:", product.name);
+				setTranslatedProduct(product); // En caso de error, usar original
+			} finally {
+				setIsTranslating(false);
+			}
+		};
+
+		translateProduct();
+	}, [product, i18n.language]);
+
+	return { translatedProduct, isTranslating };
 };
 
 /**
  * Hook para traducir un array de productos
  */
 export const useProductsTranslation = (products) => {
-  const { i18n } = useTranslation();
-  const [translatedProducts, setTranslatedProducts] = useState(products);
-  const [isTranslating, setIsTranslating] = useState(false);
+	const { i18n } = useTranslation();
+	const [translatedProducts, setTranslatedProducts] = useState(products);
+	const [isTranslating, setIsTranslating] = useState(false);
 
-  useEffect(() => {
-    const translateProducts = async () => {
-      if (!products || products.length === 0) return;
+	useEffect(() => {
+		const translateProducts = async () => {
+			if (!products || products.length === 0) return;
 
-      const currentLang = i18n.language;
+			const currentLang = i18n.language;
 
-      // Si el idioma es español (original), no traducir
-      if (currentLang === 'es') {
-        setTranslatedProducts(products);
-        return;
-      }
+			// Si el idioma es español (original), no traducir
+			if (currentLang === "es") {
+				setTranslatedProducts(products);
+				return;
+			}
 
-      setIsTranslating(true);
+			setIsTranslating(true);
 
-      try {
-        const translated = await Promise.all(
-          products.map(async (product) => {
-            // Traducir nombre y descripción
-            const [translatedName, translatedDescription] = await Promise.all([
-              translationService.translate(product.name, 'es', currentLang),
-              product.description
-                ? translationService.translate(product.description, 'es', currentLang)
-                : Promise.resolve('')
-            ]);
+			try {
+				const translated = await Promise.all(
+					products.map(async (product) => {
+						// Determinar si es cóctel
+						const isCocktail =
+							product.categories?.some(
+								(cat) =>
+									cat.type === "destilado" &&
+									(cat.name?.toLowerCase() === "cocktail" ||
+										product.destilado_name?.toLowerCase() === "cocktail")
+							) ||
+							// Verificar si tiene categoría específica de cóctel
+							product.categories?.some(
+								(cat) =>
+									cat.name?.toLowerCase() === "cocktail" &&
+									cat.type === "clasificacion"
+							);
 
-            // Traducir ingredientes
-            let translatedIngredients = product.ingredients || [];
-            if (translatedIngredients.length > 0 && translatedIngredients[0] !== null) {
-              translatedIngredients = await translationService.translateBatch(
-                translatedIngredients.filter(i => i !== null),
-                'es',
-                currentLang
-              );
-            }
+						// Traducir nombre si NO es cóctel (comida y otras bebidas sí se traducen)
+						const translatedName = !isCocktail
+							? await translationService.translate(
+									product.name,
+									"es",
+									currentLang
+							  )
+							: product.name;
 
-            // Traducir categorías
-            let translatedCategories = product.categories || [];
-            if (translatedCategories.length > 0) {
-              translatedCategories = await Promise.all(
-                translatedCategories.map(async (cat) => {
-                  if (!cat || !cat.name) return cat;
-                  
-                  const translatedName = await translationService.translate(
-                    cat.name,
-                    'es',
-                    currentLang
-                  );
-                  
-                  return {
-                    ...cat,
-                    name: translatedName,
-                    originalName: cat.name
-                  };
-                })
-              );
-            }
+						// Traducir descripción siempre
+						const translatedDescription = product.description
+							? await translationService.translate(
+									product.description,
+									"es",
+									currentLang
+							  )
+							: "";
 
-            return {
-              ...product,
-              name: translatedName,
-              description: translatedDescription,
-              ingredients: translatedIngredients,
-              categories: translatedCategories,
-              originalName: product.name,
-              originalDescription: product.description
-            };
-          })
-        );
+						// Traducir ingredientes (sin preservar cantidades ya que no las tienen)
+						// Procesar secuencialmente para evitar rate limiting
+						let translatedIngredients = product.ingredients || [];
+						if (
+							translatedIngredients.length > 0 &&
+							translatedIngredients[0] !== null
+						) {
+							// Traducir cada ingrediente secuencialmente para evitar 429
+							translatedIngredients = [];
+							for (const ingredient of product.ingredients.filter(
+								(i) => i !== null
+							)) {
+								const translated = await translationService.translate(
+									ingredient,
+									"es",
+									currentLang,
+									false // No preservar cantidades
+								);
+								translatedIngredients.push(translated);
+							}
+						}
 
-        setTranslatedProducts(translated);
-      } catch (error) {
-        console.error('Error translating products:', error);
-        setTranslatedProducts(products);
-      } finally {
-        setIsTranslating(false);
-      }
-    };
+						// Traducir categorías (procesar secuencialmente)
+						let translatedCategories = product.categories || [];
+						if (translatedCategories.length > 0) {
+							translatedCategories = [];
+							for (const cat of product.categories) {
+								if (!cat || !cat.name) {
+									translatedCategories.push(cat);
+									continue;
+								}
 
-    translateProducts();
-  }, [products, i18n.language]);
+								const translatedName = await translationService.translate(
+									cat.name,
+									"es",
+									currentLang
+								);
 
-  return { translatedProducts, isTranslating };
+								translatedCategories.push({
+									...cat,
+									name: translatedName,
+									originalName: cat.name,
+								});
+							}
+						}
+
+						return {
+							...product,
+							name: translatedName,
+							description: translatedDescription,
+							ingredients: translatedIngredients,
+							categories: translatedCategories,
+							originalName: product.name,
+							originalDescription: product.description,
+						};
+					})
+				);
+
+				setTranslatedProducts(translated);
+			} catch (error) {
+				console.error("Error translating products:", error);
+				console.error(
+					"Products that failed:",
+					products.map((p) => p.name).join(", ")
+				);
+				setTranslatedProducts(products);
+			} finally {
+				setIsTranslating(false);
+			}
+		};
+
+		translateProducts();
+	}, [products, i18n.language]);
+
+	return { translatedProducts, isTranslating };
 };
-

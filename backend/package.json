@@ -8,7 +8,7 @@
 		"test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
 		"test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
 		"start": "node app.js",
-		"dev": "nodemon app.js",
+		"dev": "npx nodemon app.js",
 		"lint": "eslint .",
 		"migrate:add-alcohol": "node ./scripts/addAlcoholPercentage.js"
 	},

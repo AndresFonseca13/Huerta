@@ -21,7 +21,7 @@ const Navbar = () => {
 			className="shadow-lg sticky top-0 z-40"
 			style={{ backgroundColor: "#121212", borderBottom: "1px solid #3a3a3a" }}
 		>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 overflow-hidden">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
 				{/* Logo */}
 				<Motion.div
 					whileHover={{ scale: 1.05 }}

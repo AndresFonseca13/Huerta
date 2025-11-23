@@ -8,8 +8,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./CocktailDetailModal.css";
+import { useTranslation } from "react-i18next";
+import { useProductTranslation } from "../hooks/useProductTranslation";
 
 const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
+	const { t } = useTranslation();
+	const { translatedProduct } = useProductTranslation(cocktail);
+
 	// Cerrar modal con ESC
 	useEffect(() => {
 		const handleEsc = (event) => {
@@ -21,7 +26,9 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 
 	if (!isOpen || !cocktail) return null;
 
-	const { name, price, description, images, ingredients } = cocktail;
+	// Usar translatedProduct si está disponible, sino usar cocktail original
+	const productToShow = translatedProduct || cocktail;
+	const { name, price, description, images, ingredients } = productToShow;
 	const alcoholPct =
 		cocktail.alcohol_percentage ?? cocktail.alcoholPercentage ?? null;
 	const destilado = cocktail.destilado_name || null;
@@ -73,8 +80,8 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					<button
 						onClick={onClose}
 						className="absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
-						style={{ 
-							backgroundColor: "#2a2a2a", 
+						style={{
+							backgroundColor: "#2a2a2a",
 							border: "1px solid #3a3a3a",
 							WebkitAppearance: "none",
 							WebkitTapHighlightColor: "transparent",
@@ -216,7 +223,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 										className="text-xl font-semibold"
 										style={{ color: "#e9cc9e" }}
 									>
-										Ingredientes
+										{t("cocktailDetail.ingredients")}
 									</h3>
 								</div>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-2 capitalize items-center justify-center">
@@ -255,7 +262,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 								className="w-full py-3 px-6 rounded-lg font-semibold transition-colors duration-200"
 								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
-								Cerrar
+								{t("cocktailDetail.close")}
 							</button>
 						</Motion.div>
 					</div>

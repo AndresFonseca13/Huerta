@@ -10,8 +10,10 @@ import {
 	FaBars,
 	FaTimes,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const FloatingTypeSwitcher = () => {
+	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -51,7 +53,7 @@ const FloatingTypeSwitcher = () => {
 	const menuOptions = [
 		{
 			key: "cocteles",
-			label: "Cócteles",
+			label: t("menu.cocktails"),
 			icon: FaCocktail,
 			bgColor: "#e9cc9e",
 			textColor: "#191919",
@@ -59,7 +61,7 @@ const FloatingTypeSwitcher = () => {
 		},
 		{
 			key: "comida",
-			label: "Comida",
+			label: t("menu.food"),
 			icon: FaUtensils,
 			bgColor: "#e9cc9e",
 			textColor: "#191919",
@@ -67,7 +69,7 @@ const FloatingTypeSwitcher = () => {
 		},
 		{
 			key: "otras-bebidas",
-			label: "Otras Bebidas",
+			label: t("menu.otherDrinks"),
 			icon: FaWineBottle,
 			bgColor: "#e9cc9e",
 			textColor: "#191919",

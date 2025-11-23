@@ -84,8 +84,33 @@
 		},
 		"categoryFilter": {
 			"all": "All",
+			"allBeverages": "All beverages",
+			"allFood": "All food",
+			"allWines": "All wines",
+			"allDrinks": "All drinks",
 			"beverages": "Beverages",
-			"food": "Food"
+			"food": "Food",
+			"loading": "Loading...",
+			"error": "Could not load categories"
+		},
+		"menu": {
+			"cocktails": "Cocktails",
+			"food": "Food",
+			"otherDrinks": "Other Drinks"
+		},
+		"pageTitle": {
+			"allCocktails": "All cocktails",
+			"allFood": "All food",
+			"otherDrinks": "Other drinks",
+			"foundBeverages": "Found {{count}} beverages",
+			"foundDishes": "Found {{count}} dishes",
+			"noResults": "No results found"
+		},
+		"foodCategory": {
+			"entrada": "Appetizer",
+			"fuerte": "Main Course",
+			"postre": "Dessert",
+			"adiciones": "Sides"
 		},
 		"search": {
 			"placeholder": "Search...",
