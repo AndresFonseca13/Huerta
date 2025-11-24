@@ -2,23 +2,25 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
 import { FaWineBottle } from "react-icons/fa6";
+import { useProductTranslation } from "../hooks/useProductTranslation";
 
 const CardCocktail = ({ cocktail, onClick }) => {
-	const { name, price, description, images } = cocktail;
+	const { translatedProduct } = useProductTranslation(cocktail);
+	const { name, price, description, images } = translatedProduct;
 
 	const imageUrl =
 		images && images.length > 0 && images[0]
 			? images[0]
 			: "https://via.placeholder.com/600x400?text=Sin+Imagen";
 
-	const categories = Array.isArray(cocktail.categories)
-		? cocktail.categories.filter(Boolean)
+	const categories = Array.isArray(translatedProduct.categories)
+		? translatedProduct.categories.filter(Boolean)
 		: [];
 	// Preferir etiquetas calculadas por backend: destilado o clasificación de comida
 	const primaryCategory =
-		cocktail.food_classification_name ||
-		cocktail.destilado_name ||
-		categories[0] ||
+		translatedProduct.food_classification_name ||
+		translatedProduct.destilado_name ||
+		(categories[0]?.name || categories[0]) ||
 		"Cóctel";
 
 	const capitalize = (s) =>
@@ -26,8 +28,8 @@ const CardCocktail = ({ cocktail, onClick }) => {
 			? s.charAt(0).toUpperCase() + s.slice(1)
 			: s;
 
-	const ingredients = Array.isArray(cocktail.ingredients)
-		? cocktail.ingredients
+	const ingredients = Array.isArray(translatedProduct.ingredients)
+		? translatedProduct.ingredients
 				.filter(Boolean)
 				.map((i) =>
 					typeof i === "string" ? capitalize(i) : capitalize(i?.name)
@@ -35,7 +37,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 		: [];
 
 	const alcoholPct =
-		cocktail.alcohol_percentage ?? cocktail.alcoholPercentage ?? null;
+		translatedProduct.alcohol_percentage ?? translatedProduct.alcoholPercentage ?? null;
 
 	return (
 		<Motion.div

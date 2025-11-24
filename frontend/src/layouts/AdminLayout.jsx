@@ -13,6 +13,7 @@ import AdminBottomNav from "../components/AdminBottomNav";
 import { logout } from "../services/authService";
 import { usePermissions } from "../hooks/usePermissions";
 import logo from "../assets/logo huerta .png";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 // Función para obtener las opciones del menú según los permisos
 const getMenuOptions = (permissions) => {
@@ -146,13 +147,16 @@ const AdminLayout = () => {
 					>
 						Huerta
 					</span>
-					<button
-						onClick={handleLogout}
-						className="ml-auto lg:hidden inline-flex items-center px-3 py-1.5 rounded-md text-sm"
-						style={{ color: "#e9cc9e", border: "1px solid #3a3a3a" }}
-					>
-						Cerrar sesión
-					</button>
+					<div className="ml-auto flex items-center gap-3">
+						<LanguageSwitcher />
+						<button
+							onClick={handleLogout}
+							className="lg:hidden inline-flex items-center px-3 py-1.5 rounded-md text-sm"
+							style={{ color: "#e9cc9e", border: "1px solid #3a3a3a" }}
+						>
+							Cerrar sesión
+						</button>
+					</div>
 				</div>
 			</div>
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 sm:pb-6">

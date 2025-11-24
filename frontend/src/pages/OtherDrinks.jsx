@@ -7,6 +7,8 @@ import {
 	getAllCategories,
 } from "../services/categoryService";
 import FloatingTypeSwitcher from "../components/FloatingTypeSwitcher";
+import { useTranslation } from "react-i18next";
+import { useProductsTranslation } from "../hooks/useProductTranslation";
 
 const normalize = (s) =>
 	String(s || "")
@@ -21,6 +23,7 @@ const currency = (n) =>
 	}).format(Number(n || 0));
 
 const OtherDrinks = () => {
+	const { t } = useTranslation();
 	const [items, setItems] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize] = useState(10);
@@ -32,6 +35,9 @@ const OtherDrinks = () => {
 	const [wineSubcategories, setWineSubcategories] = useState([]);
 	const [destiladoSubcategories, setDestiladoSubcategories] = useState([]);
 	const topRef = useRef(null);
+
+	// Traducir productos
+	const { translatedProducts } = useProductsTranslation(items);
 
 	// Cargar categorías de bebidas al montar
 	useEffect(() => {
@@ -107,8 +113,8 @@ const OtherDrinks = () => {
 		fetchData();
 	}, [currentPage, pageSize, filter, subFilter]);
 
-	// Los items ya vienen filtrados del backend, no necesitamos filtrar en frontend
-	const filteredItems = items;
+	// Los items ya vienen filtrados del backend, usar productos traducidos
+	const filteredItems = translatedProducts;
 
 	const handlePageChange = (newPage) => {
 		setCurrentPage(newPage);
@@ -138,12 +144,12 @@ const OtherDrinks = () => {
 					className="text-3xl md:text-4xl font-bold mb-2"
 					style={{ color: "#e9cc9e" }}
 				>
-					Otras bebidas
+					{t("pageTitle.otherDrinks")}
 				</h1>
 				<p className="text-gray-400">
 					{totalRecords > 0
-						? `Encontramos ${totalRecords} bebidas`
-						: "No se encontraron resultados"}
+						? t("pageTitle.foundBeverages", { count: totalRecords })
+						: t("pageTitle.noResults")}
 				</p>
 			</motion.div>
 
@@ -164,7 +170,7 @@ const OtherDrinks = () => {
 							setCurrentPage(1);
 						}}
 					>
-						Todos
+						{t("categoryFilter.all")}
 					</button>
 					{/* Filtros dinámicos desde categorías de clasificacion bebida */}
 					{beverageCategories.map((cat) => (
@@ -218,7 +224,7 @@ const OtherDrinks = () => {
 								setCurrentPage(1);
 							}}
 						>
-							Todos los vinos
+							{t("categoryFilter.allWines")}
 						</button>
 						{wineSubcategories.map((cat) => (
 							<button
@@ -324,7 +330,7 @@ const OtherDrinks = () => {
 								setCurrentPage(1);
 							}}
 						>
-							Todos los tragos
+							{t("categoryFilter.allDrinks")}
 						</button>
 						{destiladoSubcategories.map((cat) => (
 							<button

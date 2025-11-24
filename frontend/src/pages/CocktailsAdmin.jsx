@@ -20,8 +20,10 @@ import {
 	FiChevronDown,
 	FiPlus,
 } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const CocktailsAdmin = () => {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const [cocktails, setCocktails] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -455,7 +457,7 @@ const CocktailsAdmin = () => {
 									categoryFilter === null ? { backgroundColor: "#e9cc9e" } : {}
 								}
 							>
-								Todas
+								{t("categoryFilter.all")}
 							</button>
 							{uniqueCategories.map((cat) => (
 								<button

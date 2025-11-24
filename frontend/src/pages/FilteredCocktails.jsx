@@ -6,8 +6,10 @@ import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
 import CocktailDetailModal from "../components/CocktailDetailModal";
 import CategoryFilterBar from "../components/CategoryFilterBar.jsx";
+import { useTranslation } from "react-i18next";
 
 const FilteredCocktails = () => {
+	const { t } = useTranslation();
 	const { categoria } = useParams();
 	const location = useLocation();
 	const [cocktails, setCocktails] = useState([]);
@@ -85,7 +87,9 @@ const FilteredCocktails = () => {
 
 	const getFilterTitle = () => {
 		if (!categoria) {
-			return tipo === "destilado" ? "Todos los cocteles" : "Toda la comida";
+			return tipo === "destilado"
+				? t("pageTitle.allCocktails")
+				: t("pageTitle.allFood");
 		}
 		return categoria;
 	};
@@ -111,10 +115,10 @@ const FilteredCocktails = () => {
 				</h1>
 				<p className="text-gray-400">
 					{totalRecords > 0
-						? `Encontramos ${totalRecords} ${
-								tipo === "destilado" ? "bebidas" : "platos"
-						  }`
-						: "No se encontraron resultados"}
+						? tipo === "destilado"
+							? t("pageTitle.foundBeverages", { count: totalRecords })
+							: t("pageTitle.foundDishes", { count: totalRecords })
+						: t("pageTitle.noResults")}
 				</p>
 			</motion.div>
 

@@ -1,10 +1,15 @@
 import React from "react";
 import { FiTag, FiList, FiX } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
+import { useProductTranslation } from "../hooks/useProductTranslation";
 
 const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 	if (!cocktail) return null;
+	
+	const { t } = useTranslation();
+	const { translatedProduct } = useProductTranslation(cocktail);
 	const { name, price, description, images, ingredients, categories } =
-		cocktail;
+		translatedProduct;
 
 	console.log("Cocktail en PreviewCardCocktail:", cocktail);
 
@@ -63,7 +68,7 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 								className="text-lg font-semibold"
 								style={{ color: "#e9cc9e" }}
 							>
-								Ingredientes:
+								{t('cocktailDetail.ingredients')}:
 							</h4>
 						</div>
 						<div className="flex flex-wrap gap-2">
@@ -96,7 +101,7 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 								className="text-lg font-semibold"
 								style={{ color: "#e9cc9e" }}
 							>
-								Categorías:
+								{t('cocktailDetail.categories')}:
 							</h4>
 						</div>
 						<div className="flex flex-wrap gap-2">

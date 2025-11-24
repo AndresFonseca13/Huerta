@@ -6,8 +6,10 @@ import {
 	getAllCategories,
 	getFoodCategories,
 } from "../services/categoryService.js";
+import { useTranslation } from "react-i18next";
 
 const CategoryFilterBar = () => {
+	const { t } = useTranslation();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { categoria } = useParams();
@@ -51,13 +53,13 @@ const CategoryFilterBar = () => {
 				}
 				setAllCategories(Array.isArray(data) ? data : []);
 			} catch (_err) {
-				setError("No se pudieron cargar las categorías");
+				setError(t("categoryFilter.error"));
 			} finally {
 				setLoading(false);
 			}
 		};
 		fetchCategories();
-	}, [tipo]);
+	}, [tipo, t]);
 
 	const categoriasFiltradas = useMemo(() => {
 		// Si el backend ya devuelve solo las válidas para comida, no filtramos por type
@@ -127,19 +129,21 @@ const CategoryFilterBar = () => {
 							!categoria &&
 							(location.pathname === "/bebidas" ||
 								location.pathname === "/comida")
-								? { 
-									backgroundColor: "#e9cc9e",
-									WebkitAppearance: "none",
-									WebkitTapHighlightColor: "transparent"
-								}
+								? {
+										backgroundColor: "#e9cc9e",
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
+								  }
 								: {
-									WebkitAppearance: "none",
-									WebkitTapHighlightColor: "transparent"
-								}
+										WebkitAppearance: "none",
+										WebkitTapHighlightColor: "transparent",
+								  }
 						}
 						onClick={() => handleSelectCategoria(null)}
 					>
-						{tipo === "destilado" ? "Todas las bebidas" : "Toda la comida"}
+						{tipo === "destilado"
+							? t("categoryFilter.allBeverages")
+							: t("categoryFilter.allFood")}
 					</button>
 
 					{loading && (
@@ -147,7 +151,7 @@ const CategoryFilterBar = () => {
 							className="flex-shrink-0 text-sm"
 							style={{ color: "#b8b8b8" }}
 						>
-							Cargando...
+							{t("categoryFilter.loading")}
 						</span>
 					)}
 					{error && (
@@ -156,31 +160,47 @@ const CategoryFilterBar = () => {
 
 					{!loading &&
 						!error &&
-						categoriasFiltradas.map((cat) => (
-							<button
-								key={cat.id}
-								className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base capitalize transition-all shadow-sm ${
-									isSelected(cat.name)
-										? "border-[#e9cc9e] text-[#191919]"
-										: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
-								}`}
-								style={
-									isSelected(cat.name) 
-										? { 
-											backgroundColor: "#e9cc9e",
-											WebkitAppearance: "none",
-											WebkitTapHighlightColor: "transparent"
-										} 
-										: {
-											WebkitAppearance: "none",
-											WebkitTapHighlightColor: "transparent"
-										}
+						categoriasFiltradas.map((cat) => {
+							// Traducir categorías de comida (entrada, fuerte, postre, adiciones)
+							const getCategoryLabel = (categoryName) => {
+								if (tipo === "clasificacion") {
+									const normalizedName = categoryName.toLowerCase();
+									const translationKey = `foodCategory.${normalizedName}`;
+									const translated = t(translationKey);
+									// Si la traducción es igual a la clave, significa que no existe, usar nombre original
+									return translated !== translationKey
+										? translated
+										: categoryName;
 								}
-								onClick={() => handleSelectCategoria(cat.name)}
-							>
-								{cat.name}
-							</button>
-						))}
+								return categoryName;
+							};
+
+							return (
+								<button
+									key={cat.id}
+									className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base capitalize transition-all shadow-sm ${
+										isSelected(cat.name)
+											? "border-[#e9cc9e] text-[#191919]"
+											: "bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]"
+									}`}
+									style={
+										isSelected(cat.name)
+											? {
+													backgroundColor: "#e9cc9e",
+													WebkitAppearance: "none",
+													WebkitTapHighlightColor: "transparent",
+											  }
+											: {
+													WebkitAppearance: "none",
+													WebkitTapHighlightColor: "transparent",
+											  }
+									}
+									onClick={() => handleSelectCategoria(cat.name)}
+								>
+									{getCategoryLabel(cat.name)}
+								</button>
+							);
+						})}
 				</div>
 			</div>
 		</div>

@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import logo from "../assets/logo huerta .png";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 // --- Componente Principal de la Barra de Navegación ---
 const Navbar = () => {
@@ -20,7 +21,7 @@ const Navbar = () => {
 			className="shadow-lg sticky top-0 z-40"
 			style={{ backgroundColor: "#121212", borderBottom: "1px solid #3a3a3a" }}
 		>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 overflow-hidden">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
 				{/* Logo */}
 				<Motion.div
 					whileHover={{ scale: 1.05 }}
@@ -44,9 +45,8 @@ const Navbar = () => {
 					</h1>
 				</Motion.div>
 
-				{/* Sin menú de escritorio: navegación por botón flotante y píldoras */}
-
-				{/* Sin menú móvil */}
+				{/* Selector de idioma */}
+				<LanguageSwitcher />
 			</div>
 
 			{/* Sin panel de menú móvil */}

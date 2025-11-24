@@ -14,8 +14,10 @@ import { getProductsAdmin } from "../services/productService";
 import EditFoodModal from "../components/EditFoodModal";
 import ManageFoodModal from "../components/ManageFoodModal";
 import CocktailDetailModal from "../components/CocktailDetailModal";
+import { useTranslation } from "react-i18next";
 
 const FoodAdmin = () => {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	const [items, setItems] = useState([]);
@@ -358,7 +360,7 @@ const FoodAdmin = () => {
 									categoryFilter === null ? { backgroundColor: "#e9cc9e" } : {}
 								}
 							>
-								Todas
+								{t("categoryFilter.all")}
 							</button>
 							{uniqueClassifications.map((cat) => (
 								<button
