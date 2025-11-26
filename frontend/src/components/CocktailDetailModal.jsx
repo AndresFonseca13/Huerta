@@ -46,7 +46,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 		<AnimatePresence>
 			<Motion.div
 				className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-				initial={{ opacity: 0 }}
+				initial={{ opacity: 1 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
 				transition={{ duration: 0.3 }}
@@ -56,7 +56,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
 					style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 					initial={{
-						opacity: 0,
+						opacity: 1,
 						scale: 0.8,
 						y: 50,
 					}}
@@ -149,7 +149,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 					<div className="p-6">
 						{/* Header */}
 						<Motion.div
-							initial={{ opacity: 0, y: 20 }}
+							initial={{ opacity: 1, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.2 }}
 							className="mb-6"
@@ -193,7 +193,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 
 						{/* Descripción */}
 						<Motion.div
-							initial={{ opacity: 0, y: 20 }}
+							initial={{ opacity: 1, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.3 }}
 							className="mb-6"
@@ -209,7 +209,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 						{/* Ingredientes */}
 						{ingredients && ingredients.length > 0 && (
 							<Motion.div
-								initial={{ opacity: 0, y: 20 }}
+								initial={{ opacity: 1, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.4 }}
 								className="mb-6"
@@ -249,7 +249,7 @@ const CocktailDetailModal = ({ cocktail, isOpen, onClose }) => {
 
 						{/* Botón de acción */}
 						<Motion.div
-							initial={{ opacity: 0, y: 20 }}
+							initial={{ opacity: 1, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.6 }}
 							className="pt-4"

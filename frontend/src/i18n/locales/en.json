@@ -108,9 +108,17 @@
 		},
 		"foodCategory": {
 			"entrada": "Appetizer",
+			"entradas": "Appetizers",
 			"fuerte": "Main Course",
+			"fuertes": "Main Courses",
+			"platofuerte": "Main Course",
+			"platosfuertes": "Main Courses",
 			"postre": "Dessert",
-			"adiciones": "Sides"
+			"postres": "Desserts",
+			"adiciones": "Sides",
+			"adicion": "Side",
+			"acompañamiento": "Side Dish",
+			"acompañamientos": "Side Dishes"
 		},
 		"search": {
 			"placeholder": "Search...",

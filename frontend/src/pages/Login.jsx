@@ -65,7 +65,7 @@ const Login = () => {
 					</motion.div>
 					<motion.h1
 						className="text-2xl font-bold text-gray-800"
-						initial={{ opacity: 0, y: 20 }}
+						initial={{ opacity: 1, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
 					>
@@ -73,7 +73,7 @@ const Login = () => {
 					</motion.h1>
 					<motion.p
 						className="text-gray-600 mt-2"
-						initial={{ opacity: 0, y: 20 }}
+						initial={{ opacity: 1, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.4 }}
 					>
