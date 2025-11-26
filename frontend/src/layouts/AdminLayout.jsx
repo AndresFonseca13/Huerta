@@ -12,7 +12,7 @@ import {
 import AdminBottomNav from "../components/AdminBottomNav";
 import { logout } from "../services/authService";
 import { usePermissions } from "../hooks/usePermissions";
-import logo from "../assets/logo huerta .png";
+import logo from "../assets/Logo Huerta.webp";
 
 // Función para obtener las opciones del menú según los permisos
 const getMenuOptions = (permissions) => {

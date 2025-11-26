@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
-import logo from "../assets/logo huerta .png";
+import logo from "../assets/Logo Huerta.webp";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 // --- Componente Principal de la Barra de Navegación ---

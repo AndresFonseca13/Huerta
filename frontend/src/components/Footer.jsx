@@ -1,7 +1,7 @@
 import React from "react";
 import { FiInstagram, FiMapPin, FiExternalLink } from "react-icons/fi";
 import { FaWhatsapp, FaTripadvisor } from "react-icons/fa";
-import logo from "../assets/logo huerta .png";
+import logo from "../assets/Logo Huerta.webp";
 
 const Footer = () => {
 	return (
