@@ -101,12 +101,34 @@ export const useProductTranslation = (product) => {
 					}
 				}
 
+				// Traducir food_classification_name si existe
+				let translatedFoodClassification = product.food_classification_name;
+				if (product.food_classification_name) {
+					translatedFoodClassification = await translationService.translate(
+						product.food_classification_name,
+						"es",
+						currentLang
+					);
+				}
+
+				// Traducir destilado_name si existe
+				let translatedDestiladoName = product.destilado_name;
+				if (product.destilado_name) {
+					translatedDestiladoName = await translationService.translate(
+						product.destilado_name,
+						"es",
+						currentLang
+					);
+				}
+
 				setTranslatedProduct({
 					...product,
 					name: translatedName,
 					description: translatedDescription,
 					ingredients: translatedIngredients,
 					categories: translatedCategories,
+					food_classification_name: translatedFoodClassification,
+					destilado_name: translatedDestiladoName,
 					originalName: product.name, // Guardar nombre original
 					originalDescription: product.description,
 				});
@@ -229,12 +251,34 @@ export const useProductsTranslation = (products) => {
 							}
 						}
 
+						// Traducir food_classification_name si existe
+						let translatedFoodClassification = product.food_classification_name;
+						if (product.food_classification_name) {
+							translatedFoodClassification = await translationService.translate(
+								product.food_classification_name,
+								"es",
+								currentLang
+							);
+						}
+
+						// Traducir destilado_name si existe
+						let translatedDestiladoName = product.destilado_name;
+						if (product.destilado_name) {
+							translatedDestiladoName = await translationService.translate(
+								product.destilado_name,
+								"es",
+								currentLang
+							);
+						}
+
 						return {
 							...product,
 							name: translatedName,
 							description: translatedDescription,
 							ingredients: translatedIngredients,
 							categories: translatedCategories,
+							food_classification_name: translatedFoodClassification,
+							destilado_name: translatedDestiladoName,
 							originalName: product.name,
 							originalDescription: product.description,
 						};

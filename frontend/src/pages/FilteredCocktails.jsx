@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
 import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
@@ -17,7 +16,6 @@ const FilteredCocktails = () => {
 	const [pageSize] = useState(10);
 	const [totalPages, setTotalPages] = useState(0);
 	const [totalRecords, setTotalRecords] = useState(0);
-	const [isLoading, setIsLoading] = useState(false);
 	const [selectedCocktail, setSelectedCocktail] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
@@ -29,7 +27,6 @@ const FilteredCocktails = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setIsLoading(true);
 			try {
 				const data = await getProducts(currentPage, pageSize, categoria, tipo);
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
@@ -40,8 +37,6 @@ const FilteredCocktails = () => {
 				setTotalRecords(totalRecords);
 			} catch (_error) {
 				// noop
-			} finally {
-				setIsLoading(false);
 			}
 		};
 
@@ -67,30 +62,42 @@ const FilteredCocktails = () => {
 		setSelectedCocktail(null);
 	};
 
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: { staggerChildren: 0.1 },
-		},
-	};
-
-	const itemVariants = {
-		hidden: { opacity: 0, y: 20, scale: 0.95 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			scale: 1,
-			transition: { duration: 0.3, ease: "easeOut" },
-		},
-	};
-
 	const getFilterTitle = () => {
 		if (!categoria) {
 			return tipo === "destilado"
 				? t("pageTitle.allCocktails")
 				: t("pageTitle.allFood");
 		}
+
+		// Traducir categorías de comida
+		if (tipo === "clasificacion") {
+			// Normalizar el nombre removiendo espacios y convirtiendo a minúsculas
+			const normalizedName = categoria.toLowerCase().trim().replace(/\s+/g, "");
+
+			// Mapear variaciones comunes de categorías
+			const categoryMap = {
+				entrada: "entrada",
+				entradas: "entrada",
+				fuerte: "fuerte",
+				fuertes: "fuerte",
+				platofuerte: "fuerte",
+				platosfuertes: "fuerte",
+				postre: "postre",
+				postres: "postre",
+				adiciones: "adiciones",
+				adicion: "adiciones",
+				acompañamientos: "adiciones",
+				acompañamiento: "adiciones",
+			};
+
+			const mappedName = categoryMap[normalizedName] || normalizedName;
+			const translationKey = `foodCategory.${mappedName}`;
+			const translated = t(translationKey);
+
+			// Si la traducción es igual a la clave, significa que no existe, usar nombre original
+			return translated !== translationKey ? translated : categoria;
+		}
+
 		return categoria;
 	};
 
@@ -103,7 +110,7 @@ const FilteredCocktails = () => {
 			<CategoryFilterBar />
 			<motion.div
 				className="text-center mb-6 px-4"
-				initial={{ opacity: 0, y: -20 }}
+				initial={{ opacity: 1, y: 0 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
@@ -122,24 +129,25 @@ const FilteredCocktails = () => {
 				</p>
 			</motion.div>
 
-			<motion.div
-				className="flex flex-wrap gap-4 justify-center p-6"
-				variants={containerVariants}
-				initial="hidden"
-				animate={isLoading ? "hidden" : "visible"}
-				key={`${categoria}-${tipo}-${currentPage}`}
-			>
-				{cocktails.map((cocktail) => (
-					<motion.div key={cocktail.id} variants={itemVariants} layout>
+			<div className="flex flex-wrap gap-4 justify-center p-6">
+				{cocktails.map((cocktail, index) => (
+					<div
+						key={cocktail.id}
+						className="animate-fade-in"
+						style={{
+							opacity: 1,
+							animationDelay: `${index * 0.05}s`,
+						}}
+					>
 						<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
-					</motion.div>
+					</div>
 				))}
-			</motion.div>
+			</div>
 
 			{totalPages > 0 && (
 				<motion.div
 					className="flex flex-col items-center mt-4 space-y-2 mb-4 px-4"
-					initial={{ opacity: 0, y: 20 }}
+					initial={{ opacity: 1, y: 0 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.3, delay: 0.2 }}
 				>

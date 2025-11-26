@@ -11,14 +11,12 @@ const Home = () => {
 	const [pageSize] = useState(10);
 	const [totalPages, setTotalPages] = useState(0);
 	const [totalRecords, setTotalRecords] = useState(0);
-	const [isLoading, setIsLoading] = useState(false);
 	const [selectedCocktail, setSelectedCocktail] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const topRef = useRef(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setIsLoading(true);
 			try {
 				const response = await getProducts(currentPage, pageSize);
 				const { cocteles, paginacion } = response;
@@ -28,8 +26,6 @@ const Home = () => {
 				setTotalRecords(paginacion.totalRecords);
 			} catch (error) {
 				console.error("Error fetching cocktails:", error);
-			} finally {
-				setIsLoading(false);
 			}
 		};
 
@@ -55,53 +51,27 @@ const Home = () => {
 		setSelectedCocktail(null);
 	};
 
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.1,
-			},
-		},
-	};
-
-	const itemVariants = {
-		hidden: {
-			opacity: 0,
-			y: 20,
-			scale: 0.95,
-		},
-		visible: {
-			opacity: 1,
-			y: 0,
-			scale: 1,
-			transition: {
-				duration: 0.3,
-				ease: "easeOut",
-			},
-		},
-	};
-
 	return (
 		<>
 			<div ref={topRef} />
-			<motion.div
-				className="flex flex-wrap gap-4 justify-center p-6"
-				variants={containerVariants}
-				initial="hidden"
-				animate={isLoading ? "hidden" : "visible"}
-				key={currentPage} // Esto fuerza la re-animación en cada cambio de página
-			>
-				{cocktails.map((cocktail) => (
-					<motion.div key={cocktail.id} variants={itemVariants} layout>
+			<div className="flex flex-wrap gap-4 justify-center p-6">
+				{cocktails.map((cocktail, index) => (
+					<div
+						key={cocktail.id}
+						className="animate-fade-in"
+						style={{
+							opacity: 1,
+							animationDelay: `${index * 0.05}s`,
+						}}
+					>
 						<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
-					</motion.div>
+					</div>
 				))}
-			</motion.div>
+			</div>
 
 			<motion.div
 				className="flex flex-col items-center mt-4 space-y-2 mb-4"
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 1, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.3, delay: 0.2 }}
 			>

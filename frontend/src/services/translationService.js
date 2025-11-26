@@ -6,6 +6,44 @@
 const CACHE_KEY = "huerta_translations_cache";
 const API_URL = "https://api.mymemory.translated.net/get";
 
+// Diccionario de traducciones fijas para categorías de comida
+const FOOD_CATEGORY_TRANSLATIONS = {
+	es: {
+		en: {
+			// Clasificaciones de comida
+			entrada: "Appetizer",
+			entradas: "Appetizers",
+			"plato fuerte": "Main Course",
+			"platos fuertes": "Main Courses",
+			fuerte: "Main Course",
+			postre: "Dessert",
+			postres: "Desserts",
+			bebida: "Beverage",
+			bebidas: "Beverages",
+			acompañamiento: "Side Dish",
+			acompañamientos: "Side Dishes",
+			ensalada: "Salad",
+			ensaladas: "Salads",
+			sopa: "Soup",
+			sopas: "Soups",
+			// Tipos de destilados/bebidas
+			tequila: "Tequila",
+			vodka: "Vodka",
+			ron: "Rum",
+			whisky: "Whisky",
+			whiskey: "Whiskey",
+			gin: "Gin",
+			ginebra: "Gin",
+			mezcal: "Mezcal",
+			pisco: "Pisco",
+			cerveza: "Beer",
+			vino: "Wine",
+			cocktail: "Cocktail",
+			cóctel: "Cocktail",
+		},
+	},
+};
+
 // Lista de marcas y nombres propios que NO deben traducirse
 const NO_TRANSLATE_BRANDS = [
 	// Marcas de tequila
@@ -164,6 +202,19 @@ class TranslationService {
 	}
 
 	/**
+	 * Limpia completamente el caché de traducciones
+	 */
+	clearCache() {
+		try {
+			localStorage.removeItem(CACHE_KEY);
+			this.cache = {};
+			console.log("✅ Translation cache cleared");
+		} catch (error) {
+			console.error("Error clearing translation cache:", error);
+		}
+	}
+
+	/**
 	 * Genera una clave única para el caché
 	 * Incluye preserveQuantities para separar traducciones con/sin cantidades
 	 */
@@ -220,6 +271,15 @@ class TranslationService {
 		if (shouldNotTranslate(text)) {
 			console.log("🚫 Not translating (brand/proper noun):", text);
 			return text;
+		}
+
+		// Buscar en el diccionario de categorías fijas primero
+		const lowerText = text.toLowerCase().trim();
+		if (FOOD_CATEGORY_TRANSLATIONS[fromLang]?.[toLang]?.[lowerText]) {
+			const translation =
+				FOOD_CATEGORY_TRANSLATIONS[fromLang][toLang][lowerText];
+			console.log("📖 Fixed translation:", text, "→", translation);
+			return translation;
 		}
 
 		// Extraer cantidad si existe (para ingredientes)
@@ -360,15 +420,6 @@ class TranslationService {
 			this.translate(text, fromLang, toLang)
 		);
 		return Promise.all(promises);
-	}
-
-	/**
-	 * Limpia el caché de traducciones
-	 */
-	clearCache() {
-		this.cache = {};
-		localStorage.removeItem(CACHE_KEY);
-		console.log("🗑️ Translation cache cleared");
 	}
 
 	/**

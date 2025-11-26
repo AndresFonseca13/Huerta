@@ -123,7 +123,7 @@ const AdminBottomNav = () => {
 
 	const nav = (
 		<Motion.nav
-			initial={{ y: 40, opacity: 0 }}
+			initial={{ y: 40, opacity: 1 }}
 			animate={{ y: 0, opacity: 1 }}
 			transition={{ duration: 0.25 }}
 			className="fixed inset-x-0 bottom-0 z-[100] lg:hidden pb-2 h-16"

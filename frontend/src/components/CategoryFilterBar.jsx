@@ -164,9 +164,33 @@ const CategoryFilterBar = () => {
 							// Traducir categorías de comida (entrada, fuerte, postre, adiciones)
 							const getCategoryLabel = (categoryName) => {
 								if (tipo === "clasificacion") {
-									const normalizedName = categoryName.toLowerCase();
-									const translationKey = `foodCategory.${normalizedName}`;
+									// Normalizar el nombre removiendo espacios y convirtiendo a minúsculas
+									const normalizedName = categoryName
+										.toLowerCase()
+										.trim()
+										.replace(/\s+/g, "");
+
+									// Mapear variaciones comunes de categorías
+									const categoryMap = {
+										entrada: "entrada",
+										entradas: "entrada",
+										fuerte: "fuerte",
+										fuertes: "fuerte",
+										platofuerte: "fuerte",
+										platosfuertes: "fuerte",
+										postre: "postre",
+										postres: "postre",
+										adiciones: "adiciones",
+										adicion: "adiciones",
+										acompañamientos: "adiciones",
+										acompañamiento: "adiciones",
+									};
+
+									const mappedName =
+										categoryMap[normalizedName] || normalizedName;
+									const translationKey = `foodCategory.${mappedName}`;
 									const translated = t(translationKey);
+
 									// Si la traducción es igual a la clave, significa que no existe, usar nombre original
 									return translated !== translationKey
 										? translated

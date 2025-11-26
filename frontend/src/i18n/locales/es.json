@@ -108,9 +108,17 @@
 		},
 		"foodCategory": {
 			"entrada": "Entrada",
+			"entradas": "Entradas",
 			"fuerte": "Fuerte",
+			"fuertes": "Fuertes",
+			"platofuerte": "Plato Fuerte",
+			"platosfuertes": "Platos Fuertes",
 			"postre": "Postre",
-			"adiciones": "Adiciones"
+			"postres": "Postres",
+			"adiciones": "Adiciones",
+			"adicion": "Adición",
+			"acompañamiento": "Acompañamiento",
+			"acompañamientos": "Acompañamientos"
 		},
 		"search": {
 			"placeholder": "Buscar...",

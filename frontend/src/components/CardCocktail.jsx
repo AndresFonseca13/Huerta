@@ -1,6 +1,5 @@
 // components/CardCocktail.jsx
 import React from "react";
-import { motion as Motion } from "framer-motion";
 import { FaWineBottle } from "react-icons/fa6";
 import { useProductTranslation } from "../hooks/useProductTranslation";
 
@@ -20,7 +19,8 @@ const CardCocktail = ({ cocktail, onClick }) => {
 	const primaryCategory =
 		translatedProduct.food_classification_name ||
 		translatedProduct.destilado_name ||
-		(categories[0]?.name || categories[0]) ||
+		categories[0]?.name ||
+		categories[0] ||
 		"Cóctel";
 
 	const capitalize = (s) =>
@@ -37,19 +37,19 @@ const CardCocktail = ({ cocktail, onClick }) => {
 		: [];
 
 	const alcoholPct =
-		translatedProduct.alcohol_percentage ?? translatedProduct.alcoholPercentage ?? null;
+		translatedProduct.alcohol_percentage ??
+		translatedProduct.alcoholPercentage ??
+		null;
 
 	return (
-		<Motion.div
-			className="w-full max-w-sm rounded-2xl shadow-lg overflow-hidden cursor-pointer transition hover:shadow-xl"
+		<div
+			className="w-full max-w-sm rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98]"
 			style={{
 				backgroundColor: "#2a2a2a",
 				borderColor: "#3a3a3a",
 				border: "1px solid",
 			}}
 			onClick={() => onClick && onClick(cocktail)}
-			whileHover={{ y: -2 }}
-			whileTap={{ scale: 0.98 }}
 		>
 			{/* Imagen */}
 			<div className="relative">
@@ -111,7 +111,7 @@ const CardCocktail = ({ cocktail, onClick }) => {
 					</p>
 				)}
 			</div>
-		</Motion.div>
+		</div>
 	);
 };
 
