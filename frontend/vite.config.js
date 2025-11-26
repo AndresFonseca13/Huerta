@@ -13,4 +13,24 @@ export default defineConfig({
 			},
 		},
 	},
+	build: {
+		// Reportar tamaño de chunks
+		reportCompressedSize: true,
+		// Tamaño de chunk warnings en KB
+		chunkSizeWarningLimit: 1000,
+		rollupOptions: {
+			output: {
+				// Separar vendor chunks para mejor caching
+				manualChunks: {
+					"react-vendor": ["react", "react-dom", "react-router-dom"],
+					"ui-vendor": ["framer-motion", "swiper", "react-icons"],
+					"i18n-vendor": [
+						"i18next",
+						"react-i18next",
+						"i18next-browser-languagedetector",
+					],
+				},
+			},
+		},
+	},
 });
