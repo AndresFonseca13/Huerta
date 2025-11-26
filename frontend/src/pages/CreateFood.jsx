@@ -167,7 +167,7 @@ const CreateFood = () => {
 					animate="visible"
 				>
 					<motion.div
-						className="rounded-lg p-8 max-w-md mx-4 relative"
+						className="rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full mx-4 relative max-h-[90vh] overflow-y-auto"
 						style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 						variants={cardVariants}
 						initial="hidden"
@@ -180,40 +180,43 @@ const CreateFood = () => {
 						>
 							×
 						</button>
-						<div className="text-center mb-6">
+						<div className="text-center mb-4 sm:mb-6">
 							<motion.div
 								initial={{ scale: 0 }}
 								animate={{ scale: 1 }}
 								transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-								className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+								className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
 								style={{
 									backgroundColor: "#122114",
 									border: "1px solid #22c55e",
 								}}
 							>
-								<span className="text-2xl" style={{ color: "#22c55e" }}>
+								<span
+									className="text-xl sm:text-2xl"
+									style={{ color: "#22c55e" }}
+								>
 									✓
 								</span>
 							</motion.div>
 							<h2
-								className="text-2xl font-bold mb-2"
+								className="text-xl sm:text-2xl font-bold mb-2"
 								style={{ color: "#e9cc9e" }}
 							>
 								¡Plato Creado!
 							</h2>
-							<p style={{ color: "#b8b8b8" }}>
+							<p className="text-sm sm:text-base" style={{ color: "#b8b8b8" }}>
 								Tu plato ha sido creado exitosamente
 							</p>
 						</div>
-						<div className="mb-6">
+						<div className="mb-4 sm:mb-6 w-full">
 							<PreviewCardCocktail cocktail={createdItem} />
 						</div>
-						<div className="flex flex-col space-y-3">
+						<div className="flex flex-col space-y-2 sm:space-y-3 w-full">
 							<motion.button
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleBackToPanel}
-								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
 								style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
 							>
 								Volver al Panel
@@ -222,7 +225,7 @@ const CreateFood = () => {
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
 								onClick={handleCreateAnother}
-								className="px-6 py-3 rounded-lg transition-colors font-medium"
+								className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-colors font-medium text-sm sm:text-base"
 								style={{
 									backgroundColor: "#2a2a2a",
 									color: "#e9cc9e",

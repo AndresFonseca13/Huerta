@@ -29,7 +29,7 @@ const LanguageSwitcher = () => {
 			{/* Botón principal */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+				className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all duration-200 hover:scale-105"
 				style={{
 					backgroundColor: "#2a2a2a",
 					border: "1px solid #3a3a3a",
@@ -37,8 +37,8 @@ const LanguageSwitcher = () => {
 				}}
 				aria-label={t("changeLanguage")}
 			>
-				<FiGlobe size={20} />
-				<span className="text-2xl">{currentLanguage.flag}</span>
+				<FiGlobe className="text-base sm:text-lg" />
+				<span className="text-xl sm:text-2xl">{currentLanguage.flag}</span>
 				<span className="hidden md:inline text-sm font-medium">
 					{currentLanguage.name}
 				</span>
@@ -55,14 +55,14 @@ const LanguageSwitcher = () => {
 
 					{/* Menu */}
 					<div
-						className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl overflow-hidden z-[9999]"
+						className="absolute right-0 mt-2 w-40 sm:w-48 rounded-lg shadow-xl overflow-hidden z-[9999]"
 						style={{
 							backgroundColor: "#2a2a2a",
 							border: "1px solid #3a3a3a",
 						}}
 					>
 						<div
-							className="px-4 py-2 border-b"
+							className="px-3 sm:px-4 py-1.5 sm:py-2 border-b"
 							style={{ borderColor: "#3a3a3a" }}
 						>
 							<p
@@ -77,7 +77,7 @@ const LanguageSwitcher = () => {
 							<button
 								key={lang.code}
 								onClick={() => changeLanguage(lang.code)}
-								className="w-full flex items-center justify-between px-4 py-3 transition-colors"
+								className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 transition-colors"
 								style={{
 									backgroundColor:
 										i18n.language === lang.code ? "#3a3a3a" : "transparent",
@@ -94,12 +94,17 @@ const LanguageSwitcher = () => {
 									}
 								}}
 							>
-								<div className="flex items-center space-x-3">
-									<span className="text-2xl">{lang.flag}</span>
-									<span className="text-sm font-medium">{lang.name}</span>
+								<div className="flex items-center space-x-2 sm:space-x-3">
+									<span className="text-xl sm:text-2xl">{lang.flag}</span>
+									<span className="text-xs sm:text-sm font-medium">
+										{lang.name}
+									</span>
 								</div>
 								{i18n.language === lang.code && (
-									<FiCheck size={18} style={{ color: "#22c55e" }} />
+									<FiCheck
+										className="text-base sm:text-lg"
+										style={{ color: "#22c55e" }}
+									/>
 								)}
 							</button>
 						))}

@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 import { useProductTranslation } from "../hooks/useProductTranslation";
 
 const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
-	if (!cocktail) return null;
-	
 	const { t } = useTranslation();
 	const { translatedProduct } = useProductTranslation(cocktail);
+
+	if (!cocktail) return null;
+
 	const { name, price, description, images, ingredients, categories } =
 		translatedProduct;
 
@@ -19,22 +20,22 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 			: "https://via.placeholder.com/600x400?text=Sin+Imagen";
 
 	const content = (
-		<div className={isModal ? "w-full" : "w-80"}>
+		<div className={isModal ? "w-full" : "w-full max-w-sm mx-auto"}>
 			<img
 				src={imageUrl}
 				alt={name}
 				className={
 					isModal
-						? "w-full h-72 object-cover rounded-t-2xl mb-6"
-						: "w-full h-48 object-cover"
+						? "w-full h-48 sm:h-64 md:h-72 object-cover rounded-t-2xl mb-4 sm:mb-6"
+						: "w-full h-40 sm:h-48 object-cover rounded-t-lg"
 				}
 			/>
-			<div className={isModal ? "px-6 pb-6" : "p-4"}>
+			<div className={isModal ? "px-4 sm:px-6 pb-4 sm:pb-6" : "p-3 sm:p-4"}>
 				<h3
 					className={
 						isModal
-							? "text-3xl font-bold capitalize text-left mb-4"
-							: "text-xl font-semibold capitalize text-center mb-2"
+							? "text-xl sm:text-2xl md:text-3xl font-bold capitalize text-left mb-2 sm:mb-3 md:mb-4"
+							: "text-lg sm:text-xl font-semibold capitalize text-center mb-2"
 					}
 					style={{ color: "#e9cc9e" }}
 				>
@@ -42,7 +43,9 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				</h3>
 				<p
 					className={
-						isModal ? "text-lg mb-4 text-left" : "text-sm mb-3 text-center"
+						isModal
+							? "text-sm sm:text-base md:text-lg mb-3 sm:mb-4 text-left line-clamp-3"
+							: "text-xs sm:text-sm mb-2 sm:mb-3 text-center line-clamp-2"
 					}
 					style={{ color: "#b8b8b8" }}
 				>
@@ -51,8 +54,8 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				<p
 					className={
 						isModal
-							? "text-2xl font-bold mb-6 text-left"
-							: "text-lg font-bold mb-4 text-center"
+							? "text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 text-left"
+							: "text-base sm:text-lg font-bold mb-3 sm:mb-4 text-center"
 					}
 					style={{ color: "#e9cc9e" }}
 				>
@@ -61,21 +64,24 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 
 				{/* Ingredientes */}
 				{ingredients && ingredients.length > 0 && (
-					<div className="mb-6">
-						<div className="flex items-center mb-2">
-							<FiList className="mr-2 text-lg" style={{ color: "#e9cc9e" }} />
+					<div className="mb-3 sm:mb-4 md:mb-6">
+						<div className="flex items-center mb-1.5 sm:mb-2">
+							<FiList
+								className="mr-1.5 sm:mr-2 text-base sm:text-lg"
+								style={{ color: "#e9cc9e" }}
+							/>
 							<h4
-								className="text-lg font-semibold"
+								className="text-sm sm:text-base md:text-lg font-semibold"
 								style={{ color: "#e9cc9e" }}
 							>
-								{t('cocktailDetail.ingredients')}:
+								{t("cocktailDetail.ingredients")}:
 							</h4>
 						</div>
-						<div className="flex flex-wrap gap-2">
+						<div className="flex flex-wrap gap-1.5 sm:gap-2">
 							{ingredients.map((ingredient, index) => (
 								<span
 									key={index}
-									className="px-3 py-1 text-sm rounded-full"
+									className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-full"
 									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									{(() => {
@@ -95,20 +101,23 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 				{/* Categorías */}
 				{categories && categories.length > 0 && (
 					<div className="mb-2">
-						<div className="flex items-center mb-2">
-							<FiTag className="mr-2 text-lg" style={{ color: "#e9cc9e" }} />
+						<div className="flex items-center mb-1.5 sm:mb-2">
+							<FiTag
+								className="mr-1.5 sm:mr-2 text-base sm:text-lg"
+								style={{ color: "#e9cc9e" }}
+							/>
 							<h4
-								className="text-lg font-semibold"
+								className="text-sm sm:text-base md:text-lg font-semibold"
 								style={{ color: "#e9cc9e" }}
 							>
-								{t('cocktailDetail.categories')}:
+								{t("cocktailDetail.categories")}:
 							</h4>
 						</div>
-						<div className="flex flex-wrap gap-2">
+						<div className="flex flex-wrap gap-1.5 sm:gap-2">
 							{categories.map((category, index) => (
 								<span
 									key={index}
-									className="px-3 py-1 text-sm rounded-full"
+									className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm rounded-full"
 									style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
 								>
 									{typeof category === "string" ? category : category.name}
@@ -124,7 +133,7 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 	if (!isModal)
 		return (
 			<div
-				className="w-80 shadow-md rounded-lg overflow-hidden"
+				className="w-full max-w-sm mx-auto shadow-md rounded-lg overflow-hidden"
 				style={{ backgroundColor: "#2a2a2a", border: "1px solid #3a3a3a" }}
 			>
 				{content}
