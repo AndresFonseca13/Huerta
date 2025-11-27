@@ -1,12 +1,49 @@
 {
 	"navigationFallback": {
 		"rewrite": "/index.html",
-		"exclude": ["/assets/*", "/*.{js,css,png,jpg,jpeg,gif,ico,svg}", "/api/*"]
+		"exclude": [
+			"/assets/*",
+			"/*.{js,css,png,jpg,jpeg,gif,ico,svg,webp}",
+			"/api/*"
+		]
 	},
 	"responseOverrides": {
 		"404": {
 			"rewrite": "/index.html",
 			"statusCode": 200
 		}
+	},
+	"globalHeaders": {
+		"cache-control": "public, max-age=31536000, immutable"
+	},
+	"routes": [
+		{
+			"route": "/assets/*",
+			"headers": {
+				"cache-control": "public, max-age=31536000, immutable"
+			}
+		},
+		{
+			"route": "/*.{js,css}",
+			"headers": {
+				"cache-control": "public, max-age=31536000, immutable"
+			}
+		},
+		{
+			"route": "/*.{jpg,jpeg,png,gif,svg,webp,ico}",
+			"headers": {
+				"cache-control": "public, max-age=31536000, immutable"
+			}
+		},
+		{
+			"route": "/index.html",
+			"headers": {
+				"cache-control": "no-cache"
+			}
+		}
+	],
+	"mimeTypes": {
+		".webp": "image/webp",
+		".json": "application/json"
 	}
 }

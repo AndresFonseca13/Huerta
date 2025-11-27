@@ -1,24 +1,42 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import CreateCocktail from "./pages/CreateCocktail";
-import FilteredCocktails from "./pages/FilteredCocktails";
+import { lazy, Suspense } from "react";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
-import AdminPanel from "./pages/AdminPanel.jsx";
-import OtherDrinks from "./pages/OtherDrinks.jsx";
-import AdminLayout from "./layouts/AdminLayout.jsx";
-import AdminLogin from "./pages/AdminLogin.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import RoleProtectedRoute from "./components/RoleProtectedRoute.jsx";
-import CocktailsAdmin from "./pages/CocktailsAdmin";
-import FoodAdmin from "./pages/FoodAdmin.jsx";
-import CreateFood from "./pages/CreateFood.jsx";
-import CategoriesAdmin from "./pages/CategoriesAdmin";
-import UsersAdmin from "./pages/UsersAdmin.jsx";
-import PromotionsAdmin from "./pages/PromotionsAdmin.jsx";
-import PromotionEditor from "./pages/PromotionEditor.jsx";
 import Footer from "./components/Footer.jsx";
-import OtherDrinksAdmin from "./pages/OtherDrinksAdmin.jsx";
+
+// Lazy loading de páginas para mejor performance
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const FilteredCocktails = lazy(() => import("./pages/FilteredCocktails"));
+const OtherDrinks = lazy(() => import("./pages/OtherDrinks.jsx"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin.jsx"));
+const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel.jsx"));
+const CocktailsAdmin = lazy(() => import("./pages/CocktailsAdmin"));
+const FoodAdmin = lazy(() => import("./pages/FoodAdmin.jsx"));
+const CreateCocktail = lazy(() => import("./pages/CreateCocktail"));
+const CreateFood = lazy(() => import("./pages/CreateFood.jsx"));
+const CategoriesAdmin = lazy(() => import("./pages/CategoriesAdmin"));
+const UsersAdmin = lazy(() => import("./pages/UsersAdmin.jsx"));
+const PromotionsAdmin = lazy(() => import("./pages/PromotionsAdmin.jsx"));
+const PromotionEditor = lazy(() => import("./pages/PromotionEditor.jsx"));
+const OtherDrinksAdmin = lazy(() => import("./pages/OtherDrinksAdmin.jsx"));
+const ProtectedRoute = lazy(() => import("./components/ProtectedRoute.jsx"));
+const RoleProtectedRoute = lazy(() =>
+	import("./components/RoleProtectedRoute.jsx")
+);
+
+// Componente de carga
+const LoadingSpinner = () => (
+	<div
+		className="flex items-center justify-center min-h-screen"
+		style={{ backgroundColor: "#191919" }}
+	>
+		<div
+			className="animate-spin rounded-full h-12 w-12 border-b-2"
+			style={{ borderColor: "#e9cc9e" }}
+		></div>
+	</div>
+);
 
 function App() {
 	const location = useLocation();
@@ -52,133 +70,135 @@ function App() {
 	return (
 		<>
 			<ConditionalNavbar />
-			<Routes>
-				<Route path="/" element={<Navigate to="/bebidas" replace />} />
-				<Route path="/login" element={<Login />} />
-				<Route
-					path="/admin/create"
-					element={
-						<ProtectedRoute>
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "barmanager"]}
-							>
-								<CreateCocktail />
-							</RoleProtectedRoute>
-						</ProtectedRoute>
-					}
-				/>
-				<Route path="/bebidas" element={<FilteredCocktails />} />
-				<Route path="/bebidas/:categoria" element={<FilteredCocktails />} />
-				<Route path="/comida" element={<FilteredCocktails />} />
-				<Route path="/comida/:categoria" element={<FilteredCocktails />} />
-				<Route path="/otras-bebidas" element={<OtherDrinks />} />
-				<Route path="/otras-bebidas/:categoria" element={<OtherDrinks />} />
-				<Route path="/admin/login" element={<AdminLogin />} />
-				<Route
-					path="/admin"
-					element={
-						<ProtectedRoute>
-							<AdminLayout />
-						</ProtectedRoute>
-					}
-				>
-					<Route index element={<AdminPanel />} />
+			<Suspense fallback={<LoadingSpinner />}>
+				<Routes>
+					<Route path="/" element={<Navigate to="/bebidas" replace />} />
+					<Route path="/login" element={<Login />} />
 					<Route
-						path="beverages"
+						path="/admin/create"
 						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "barmanager"]}
-							>
-								<CocktailsAdmin />
-							</RoleProtectedRoute>
+							<ProtectedRoute>
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "barmanager"]}
+								>
+									<CreateCocktail />
+								</RoleProtectedRoute>
+							</ProtectedRoute>
 						}
 					/>
+					<Route path="/bebidas" element={<FilteredCocktails />} />
+					<Route path="/bebidas/:categoria" element={<FilteredCocktails />} />
+					<Route path="/comida" element={<FilteredCocktails />} />
+					<Route path="/comida/:categoria" element={<FilteredCocktails />} />
+					<Route path="/otras-bebidas" element={<OtherDrinks />} />
+					<Route path="/otras-bebidas/:categoria" element={<OtherDrinks />} />
+					<Route path="/admin/login" element={<AdminLogin />} />
 					<Route
-						path="other-beverages"
+						path="/admin"
 						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "barmanager"]}
-							>
-								<OtherDrinksAdmin />
-							</RoleProtectedRoute>
+							<ProtectedRoute>
+								<AdminLayout />
+							</ProtectedRoute>
 						}
-					/>
-					<Route
-						path="categories"
-						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
-							>
-								<CategoriesAdmin />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="users"
-						element={
-							<RoleProtectedRoute requiredRoles={["admin", "ventas"]}>
-								<UsersAdmin />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="food"
-						element={
-							<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
-								<FoodAdmin />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="create"
-						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "barmanager"]}
-							>
-								<CreateCocktail />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="food/create"
-						element={
-							<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
-								<CreateFood />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="promotions"
-						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
-							>
-								<PromotionsAdmin />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="promotions/create"
-						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
-							>
-								<PromotionEditor />
-							</RoleProtectedRoute>
-						}
-					/>
-					<Route
-						path="promotions/:id/edit"
-						element={
-							<RoleProtectedRoute
-								requiredRoles={["admin", "ventas", "chef", "barmanager"]}
-							>
-								<PromotionEditor />
-							</RoleProtectedRoute>
-						}
-					/>
-				</Route>
-			</Routes>
+					>
+						<Route index element={<AdminPanel />} />
+						<Route
+							path="beverages"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "barmanager"]}
+								>
+									<CocktailsAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="other-beverages"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "barmanager"]}
+								>
+									<OtherDrinksAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="categories"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+								>
+									<CategoriesAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="users"
+							element={
+								<RoleProtectedRoute requiredRoles={["admin", "ventas"]}>
+									<UsersAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="food"
+							element={
+								<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
+									<FoodAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="create"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "barmanager"]}
+								>
+									<CreateCocktail />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="food/create"
+							element={
+								<RoleProtectedRoute requiredRoles={["admin", "ventas", "chef"]}>
+									<CreateFood />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="promotions"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+								>
+									<PromotionsAdmin />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="promotions/create"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+								>
+									<PromotionEditor />
+								</RoleProtectedRoute>
+							}
+						/>
+						<Route
+							path="promotions/:id/edit"
+							element={
+								<RoleProtectedRoute
+									requiredRoles={["admin", "ventas", "chef", "barmanager"]}
+								>
+									<PromotionEditor />
+								</RoleProtectedRoute>
+							}
+						/>
+					</Route>
+				</Routes>
+			</Suspense>
 			{showFooter && <Footer />}
 		</>
 	);

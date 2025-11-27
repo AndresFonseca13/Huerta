@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
 import { useParams, useLocation } from "react-router-dom";
 import { getProducts } from "../services/productService";
 import CardCocktail from "../components/CardCocktail";
@@ -108,12 +107,7 @@ const FilteredCocktails = () => {
 		>
 			<div ref={topRef} />
 			<CategoryFilterBar />
-			<motion.div
-				className="text-center mb-6 px-4"
-				initial={{ opacity: 1, y: 0 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-			>
+			<div className="text-center mb-6 px-4">
 				<h1
 					className="text-3xl md:text-4xl font-bold mb-2 capitalize"
 					style={{ color: "#e9cc9e" }}
@@ -127,7 +121,7 @@ const FilteredCocktails = () => {
 							: t("pageTitle.foundDishes", { count: totalRecords })
 						: t("pageTitle.noResults")}
 				</p>
-			</motion.div>
+			</div>
 
 			<div className="flex flex-wrap gap-4 justify-center p-6">
 				{cocktails.map((cocktail, index) => (
@@ -145,21 +139,14 @@ const FilteredCocktails = () => {
 			</div>
 
 			{totalPages > 0 && (
-				<motion.div
-					className="flex flex-col items-center mt-4 space-y-2 mb-4 px-4"
-					initial={{ opacity: 1, y: 0 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.2 }}
-				>
+				<div className="flex flex-col items-center mt-4 space-y-2 mb-4 px-4">
 					<div className="text-sm" style={{ color: "#b8b8b8" }}>
 						Mostrando {cocktails.length} de {totalRecords}{" "}
 						{tipo === "destilado" ? "bebidas" : "platos"} (Página {currentPage}{" "}
 						de {totalPages})
 					</div>
 					<div className="flex justify-center space-x-2 overflow-x-auto">
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+						<button
 							disabled={currentPage === 1}
 							onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
 							className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
@@ -170,12 +157,10 @@ const FilteredCocktails = () => {
 							}}
 						>
 							‹ Anterior
-						</motion.button>
+						</button>
 						{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-							<motion.button
+							<button
 								key={page}
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
 								onClick={() => handlePageChange(page)}
 								className={`px-3 py-2 rounded-lg transition-all ${
 									page === currentPage ? "font-bold" : ""
@@ -191,11 +176,9 @@ const FilteredCocktails = () => {
 								}
 							>
 								{page}
-							</motion.button>
+							</button>
 						))}
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+						<button
 							disabled={currentPage === totalPages}
 							onClick={() =>
 								handlePageChange(Math.min(currentPage + 1, totalPages))
@@ -208,9 +191,9 @@ const FilteredCocktails = () => {
 							}}
 						>
 							Siguiente ›
-						</motion.button>
+						</button>
 					</div>
-				</motion.div>
+				</div>
 			)}
 
 			{/* Modal de detalles del cóctel */}

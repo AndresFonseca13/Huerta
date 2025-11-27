@@ -17,7 +17,10 @@ export default defineConfig({
 		// Reportar tamaño de chunks
 		reportCompressedSize: true,
 		// Tamaño de chunk warnings en KB
-		chunkSizeWarningLimit: 1000,
+		chunkSizeWarningLimit: 500,
+		// Minificación con esbuild (más rápido)
+		minify: "esbuild",
+		target: "es2015",
 		rollupOptions: {
 			output: {
 				// Separar vendor chunks para mejor caching
@@ -29,6 +32,8 @@ export default defineConfig({
 						"react-i18next",
 						"i18next-browser-languagedetector",
 					],
+					"azure-vendor": ["@azure/storage-blob"],
+					utils: ["axios"],
 				},
 			},
 		},

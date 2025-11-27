@@ -53,7 +53,13 @@ const CardCocktail = ({ cocktail, onClick }) => {
 		>
 			{/* Imagen */}
 			<div className="relative">
-				<img src={imageUrl} alt={name} className="w-full h-56 object-cover" />
+				<img
+					src={imageUrl}
+					alt={name}
+					className="w-full h-56 object-cover"
+					loading="lazy"
+					decoding="async"
+				/>
 				{/* Badge de destilado/categoría principal */}
 				<div
 					className="absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full capitalize"
