@@ -51,3 +51,13 @@ export const deleteUser = async (id) => {
 	});
 	return data;
 };
+
+export const resetUserPassword = async (id, newPassword) => {
+	const headers = getAuthHeaders();
+	const { data } = await axios.patch(
+		`${apiConfig.baseURL}/users/${id}/reset-password`,
+		{ newPassword },
+		{ headers }
+	);
+	return data;
+};

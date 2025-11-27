@@ -1,4 +1,5 @@
 import pool from '../config/db.js';
+import bcrypt from 'bcrypt';
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -118,5 +119,35 @@ export const deleteUser = async (req, res) => {
   } catch (error) {
     console.error('Error eliminando usuario:', error);
     res.status(500).json({ mensaje: 'Error al eliminar usuario' });
+  }
+};
+
+export const resetUserPassword = async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+  const uuidRegex =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!id || !uuidRegex.test(id)) {
+    return res.status(400).json({ mensaje: 'ID inválido' });
+  }
+  if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
+    return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 6 caracteres' });
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    const upd = await pool.query(
+      'UPDATE users SET password = $1 WHERE id = $2 RETURNING id, username',
+      [hashedPassword, id],
+    );
+    if (!upd.rows.length)
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    return res.status(200).json({ 
+      mensaje: 'Contraseña restablecida exitosamente',
+      username: upd.rows[0].username 
+    });
+  } catch (error) {
+    console.error('Error restableciendo contraseña:', error);
+    res.status(500).json({ mensaje: 'Error al restablecer contraseña' });
   }
 };
