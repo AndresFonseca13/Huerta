@@ -45,4 +45,12 @@ router.delete(
   usersController.deleteUser,
 );
 
+// Restablecer contraseña de usuario (solo admin)
+router.patch(
+  '/:id/reset-password',
+  authMiddleware,
+  requireRoles(['admin']),
+  usersController.resetUserPassword,
+);
+
 export default router;

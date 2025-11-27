@@ -6,6 +6,7 @@ import {
 	getAllCategories,
 	getFoodCategories,
 } from "../services/categoryService.js";
+import { getProducts } from "../services/productService.js";
 import { useTranslation } from "react-i18next";
 
 const CategoryFilterBar = () => {
@@ -23,6 +24,7 @@ const CategoryFilterBar = () => {
 
 	const [tipo, setTipo] = useState(initialTipo);
 	const [allCategories, setAllCategories] = useState([]);
+	const [categoriesWithProducts, setCategoriesWithProducts] = useState(new Set());
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	// Estado eliminado por no uso para evitar warning de lint
@@ -61,11 +63,87 @@ const CategoryFilterBar = () => {
 		fetchCategories();
 	}, [tipo, t]);
 
-	const categoriasFiltradas = useMemo(() => {
-		// Si el backend ya devuelve solo las válidas para comida, no filtramos por type
-		if (tipo === "clasificacion") return allCategories;
-		return allCategories.filter((c) => c.type === tipo);
+	// Verificar qué categorías tienen productos asociados
+	useEffect(() => {
+		const checkCategoriesWithProducts = async () => {
+			if (allCategories.length === 0) {
+				setCategoriesWithProducts(new Set());
+				return;
+			}
+
+			try {
+				// Filtrar categorías por tipo primero
+				const filteredByType = tipo === "clasificacion" 
+					? allCategories.filter((c) => c.type === "clasificacion comida")
+					: allCategories.filter((c) => c.type === tipo);
+
+				if (filteredByType.length === 0) {
+					setCategoriesWithProducts(new Set());
+					return;
+				}
+
+				const productType = tipo === "clasificacion" ? "clasificacion" : tipo;
+				const categoriesSet = new Set();
+
+				// Verificar cada categoría individualmente
+				// Hacemos llamadas paralelas para ser más eficientes
+				const checkPromises = filteredByType.map(async (category) => {
+					try {
+						// Hacer una llamada con límite 1 para verificar si hay productos
+						const data = await getProducts(1, 1, category.name, productType);
+						const products = Array.isArray(data.cocteles) ? data.cocteles : [];
+						const totalRecords = data.paginacion?.totalRecords || 0;
+						
+						// Si hay al menos 1 producto, agregar la categoría
+						if (totalRecords > 0 || products.length > 0) {
+							return { name: category.name, hasProducts: true };
+						}
+						return { name: category.name, hasProducts: false };
+					} catch (err) {
+						// Si hay error al verificar una categoría, no la incluimos
+						return { name: category.name, hasProducts: false, error: true };
+					}
+				});
+
+				// Esperar todas las verificaciones
+				const results = await Promise.all(checkPromises);
+				
+				// Agregar solo las categorías que tienen productos
+				results.forEach((result) => {
+					if (result.hasProducts) {
+						categoriesSet.add(result.name);
+					}
+				});
+
+				setCategoriesWithProducts(categoriesSet);
+			} catch (_err) {
+				// Si hay error general, no mostrar ninguna categoría (más seguro)
+				setCategoriesWithProducts(new Set());
+			}
+		};
+
+		checkCategoriesWithProducts();
 	}, [allCategories, tipo]);
+
+	const categoriasFiltradas = useMemo(() => {
+		// Primero filtrar por tipo
+		let filtered = tipo === "clasificacion" 
+			? allCategories.filter((c) => c.type === "clasificacion comida")
+			: allCategories.filter((c) => c.type === tipo);
+		
+		// Luego filtrar solo las que tienen productos asociados
+		// Si categoriesWithProducts está vacío y ya cargamos las categorías, no mostrar ninguna
+		// (esperando a que se verifiquen)
+		if (allCategories.length > 0 && categoriesWithProducts.size === 0) {
+			// Aún verificando, no mostrar ninguna categoría temporalmente
+			return [];
+		}
+		
+		// Filtrar solo las que tienen productos
+		const finalFiltered = filtered.filter((c) => categoriesWithProducts.has(c.name));
+		
+		return finalFiltered;
+	}, [allCategories, tipo, categoriesWithProducts]);
 
 	const handleSelectCategoria = (nombreCategoria) => {
 		if (!nombreCategoria) {

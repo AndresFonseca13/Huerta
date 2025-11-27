@@ -6,6 +6,7 @@ import {
 	createUser,
 	updateUserStatus as updateUserStatusApi,
 	deleteUser as deleteUserApi,
+	resetUserPassword,
 } from "../services/userService";
 import {
 	FiUserPlus,
@@ -18,6 +19,7 @@ import {
 	FiCheck,
 	FiUser,
 	FiLock,
+	FiCheckCircle,
 } from "react-icons/fi";
 import axios from "axios"; // eslint-disable-line no-unused-vars
 
@@ -43,6 +45,12 @@ const UsersAdmin = () => {
 	const [editActive, setEditActive] = useState(true);
 	const [savingEdit, setSavingEdit] = useState(false);
 	const [currentUserId, setCurrentUserId] = useState(null);
+	const [currentUserRole, setCurrentUserRole] = useState(null);
+	const [resetPasswordUserId, setResetPasswordUserId] = useState(null);
+	const [newPassword, setNewPassword] = useState("");
+	const [resettingPassword, setResettingPassword] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const [successMessage, setSuccessMessage] = useState("");
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -63,6 +71,7 @@ const UsersAdmin = () => {
 			if (token) {
 				const payload = JSON.parse(atob(token.split(".")[1]));
 				if (payload?.id) setCurrentUserId(payload.id);
+				if (payload?.role) setCurrentUserRole(payload.role);
 			}
 		} catch (_e) {
 			// noop
@@ -272,6 +281,31 @@ const UsersAdmin = () => {
 			alert("No se pudo crear el usuario");
 		} finally {
 			setCreating(false);
+		}
+	};
+
+	const handleResetPassword = async () => {
+		if (!resetPasswordUserId || !newPassword || newPassword.length < 6) {
+			alert("La contraseña debe tener al menos 6 caracteres");
+			return;
+		}
+		setResettingPassword(true);
+		try {
+			await resetUserPassword(resetPasswordUserId, newPassword);
+			const username = users.find(u => u.id === resetPasswordUserId)?.username || "";
+			setSuccessMessage(`Contraseña restablecida exitosamente para el usuario ${username}`);
+			setResetPasswordUserId(null);
+			setNewPassword("");
+			setShowSuccessModal(true);
+			// Cerrar automáticamente después de 3 segundos
+			setTimeout(() => {
+				setShowSuccessModal(false);
+			}, 3000);
+		} catch (error) {
+			const message = error.response?.data?.mensaje || "No se pudo restablecer la contraseña";
+			alert(message);
+		} finally {
+			setResettingPassword(false);
 		}
 	};
 
@@ -664,11 +698,212 @@ const UsersAdmin = () => {
 								>
 									<FiEdit2 />
 								</button>
+								{currentUserRole === "admin" && (
+									<button
+										onClick={() => setResetPasswordUserId(u.id)}
+										className="px-3 py-2 rounded-lg"
+										style={{ border: "1px solid #3a3a3a", color: "#e9cc9e" }}
+										title="Restablecer contraseña"
+									>
+										<FiLock />
+									</button>
+								)}
 							</div>
 						</div>
 					))
 				)}
 			</div>
+
+			{/* Modal Restablecer Contraseña */}
+			<AnimatePresence>
+				{resetPasswordUserId && (
+					<Motion.div className="fixed inset-0 z-[2000] flex items-center justify-center">
+						<Motion.div
+							className="absolute inset-0 bg-black/50"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={() => !resettingPassword && setResetPasswordUserId(null)}
+						/>
+						<Motion.div
+							initial={{ opacity: 0, scale: 0.95 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0, scale: 0.95 }}
+							transition={{ type: "spring", stiffness: 260, damping: 20 }}
+							className="relative w-full max-w-md mx-4 rounded-2xl shadow-2xl"
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
+						>
+							<div
+								className="flex items-center justify-between px-5 py-3 border-b"
+								style={{ borderColor: "#3a3a3a" }}
+							>
+								<h3
+									className="text-lg font-semibold"
+									style={{ color: "#e9cc9e" }}
+								>
+									Restablecer contraseña
+								</h3>
+								<button
+									onClick={() => !resettingPassword && setResetPasswordUserId(null)}
+									className="p-2"
+									style={{ color: "#b8b8b8" }}
+									aria-label="Cerrar"
+								>
+									<FiX />
+								</button>
+							</div>
+							<div className="px-5 py-4 space-y-4">
+								<div>
+									<div className="text-sm mb-2" style={{ color: "#b8b8b8" }}>
+										Usuario: <span style={{ color: "#e9cc9e" }}>{users.find(u => u.id === resetPasswordUserId)?.username}</span>
+									</div>
+									<label
+										className="block text-sm font-medium mb-1"
+										style={{ color: "#e9cc9e" }}
+									>
+										Nueva contraseña
+									</label>
+									<div className="relative">
+										<FiLock
+											className="absolute left-3 top-1/2 -translate-y-1/2"
+											style={{ color: "#b8b8b8" }}
+										/>
+										<input
+											type="password"
+											value={newPassword}
+											onChange={(e) => setNewPassword(e.target.value)}
+											className="w-full pl-9 pr-3 py-2 border rounded-lg placeholder-[#b8b8b8] caret-[#e9cc9e]"
+											style={{
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
+											placeholder="••••••••"
+											minLength={6}
+										/>
+									</div>
+									<p className="text-xs mt-1" style={{ color: "#9a9a9a" }}>
+										La contraseña debe tener al menos 6 caracteres
+									</p>
+								</div>
+								<div className="pt-2 flex gap-2 justify-end">
+									<button
+										onClick={() => {
+											if (!resettingPassword) {
+												setResetPasswordUserId(null);
+												setNewPassword("");
+											}
+										}}
+										className="px-4 py-2 rounded-lg"
+										style={{
+											backgroundColor: "#2a2a2a",
+											color: "#e9cc9e",
+											border: "1px solid #3a3a3a",
+										}}
+										disabled={resettingPassword}
+									>
+										Cancelar
+									</button>
+									<button
+										onClick={handleResetPassword}
+										disabled={resettingPassword || !newPassword || newPassword.length < 6}
+										className="inline-flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
+										style={{ backgroundColor: "#e9cc9e", color: "#191919" }}
+									>
+										<FiLock />
+										{resettingPassword ? "Restableciendo..." : "Restablecer contraseña"}
+									</button>
+								</div>
+							</div>
+						</Motion.div>
+					</Motion.div>
+				)}
+			</AnimatePresence>
+
+			{/* Modal de Éxito */}
+			<AnimatePresence>
+				{showSuccessModal && (
+					<Motion.div className="fixed inset-0 z-[2100] flex items-center justify-center">
+						<Motion.div
+							className="absolute inset-0 bg-black/50"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={() => setShowSuccessModal(false)}
+						/>
+						<Motion.div
+							initial={{ opacity: 0, scale: 0.8, y: 20 }}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							exit={{ opacity: 0, scale: 0.8, y: 20 }}
+							transition={{ 
+								type: "spring", 
+								stiffness: 300, 
+								damping: 25 
+							}}
+							className="relative w-full max-w-sm mx-4 rounded-2xl shadow-2xl p-6"
+							style={{
+								backgroundColor: "#2a2a2a",
+								border: "1px solid #3a3a3a",
+							}}
+						>
+							<div className="flex flex-col items-center text-center space-y-4">
+								<Motion.div
+									initial={{ scale: 0 }}
+									animate={{ scale: 1 }}
+									transition={{ 
+										type: "spring", 
+										stiffness: 200, 
+										damping: 15,
+										delay: 0.1 
+									}}
+									className="w-16 h-16 rounded-full flex items-center justify-center"
+									style={{ backgroundColor: "#22c55e" }}
+								>
+									<FiCheckCircle 
+										size={32} 
+										style={{ color: "#ffffff" }} 
+									/>
+								</Motion.div>
+								<Motion.div
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: 0.2 }}
+								>
+									<h3
+										className="text-xl font-semibold mb-2"
+										style={{ color: "#e9cc9e" }}
+									>
+										¡Éxito!
+									</h3>
+									<p className="text-sm" style={{ color: "#b8b8b8" }}>
+										{successMessage}
+									</p>
+								</Motion.div>
+								<Motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: 0.3 }}
+									className="w-full"
+								>
+									<button
+										onClick={() => setShowSuccessModal(false)}
+										className="w-full px-4 py-2 rounded-lg font-medium"
+										style={{ 
+											backgroundColor: "#e9cc9e", 
+											color: "#191919" 
+										}}
+									>
+										Aceptar
+									</button>
+								</Motion.div>
+							</div>
+						</Motion.div>
+					</Motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Modal Editar Usuario */}
 			<AnimatePresence>

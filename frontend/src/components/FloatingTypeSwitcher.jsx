@@ -18,12 +18,25 @@ const FloatingTypeSwitcher = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const containerRef = useRef(null);
+	const buttonRef = useRef(null);
 
 	// Cerrar al hacer clic fuera
 	useEffect(() => {
 		if (!open) return;
 
 		const handleClickOutside = (event) => {
+			// Verificar explícitamente si el click fue en el botón
+			const clickedOnButton = buttonRef.current && (
+				buttonRef.current === event.target ||
+				buttonRef.current.contains(event.target)
+			);
+			
+			// Si el click fue en el botón, no hacer nada (el onClick del botón manejará el cierre)
+			if (clickedOnButton) {
+				return;
+			}
+
+			// Verificar que el click esté fuera del contenedor completo
 			if (
 				containerRef.current &&
 				!containerRef.current.contains(event.target)
@@ -42,6 +55,20 @@ const FloatingTypeSwitcher = () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [open]);
+
+	// Función para manejar el toggle del menú
+	const handleToggle = (e) => {
+		if (e) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
+		// Si está abierto, cerrar directamente
+		if (open) {
+			setOpen(false);
+		} else {
+			setOpen(true);
+		}
+	};
 
 	// Determinar cuál está activo basado en la ruta
 	const activeMenu = location.pathname.startsWith("/comida")
@@ -92,15 +119,17 @@ const FloatingTypeSwitcher = () => {
 				transform: "translateY(-50%)",
 			}}
 		>
-			{/* Botón principal */}
+			{/* Botón principal - debe estar por encima del menú */}
 			<motion.button
+				ref={buttonRef}
 				type="button"
-				aria-label="Menú de navegación"
-				onClick={(e) => {
+				aria-label={open ? "Cerrar menú" : "Abrir menú"}
+				onClick={handleToggle}
+				onMouseDown={(e) => {
+					// Prevenir que el handleClickOutside se ejecute cuando hacemos click en el botón
 					e.stopPropagation();
-					setOpen(!open);
 				}}
-				className="flex items-center justify-center w-14 h-14 rounded-full shadow-xl hover:scale-110 transition-all duration-200 focus:outline-none"
+				className="flex items-center justify-center w-14 h-14 rounded-full shadow-xl hover:scale-110 transition-all duration-200 focus:outline-none relative z-[2001]"
 				style={{
 					backgroundColor: open ? "#3a3a3a" : "#e9cc9e",
 					color: open ? "#e9cc9e" : "#191919",
@@ -138,11 +167,12 @@ const FloatingTypeSwitcher = () => {
 			<AnimatePresence>
 				{open && (
 					<motion.div
-						className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col gap-3 pr-20"
+						className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col gap-3 pr-20 pointer-events-none"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.2 }}
+						style={{ zIndex: 2000 }}
 					>
 						{menuOptions.map((option, index) => {
 							const Icon = option.icon;
@@ -153,7 +183,7 @@ const FloatingTypeSwitcher = () => {
 									key={option.key}
 									type="button"
 									onClick={() => handleNavigate(option.path)}
-									className={`flex items-center gap-3 rounded-full shadow-lg pl-4 pr-5 py-3 transition-all ${
+									className={`flex items-center gap-3 rounded-full shadow-lg pl-4 pr-5 py-3 transition-all pointer-events-auto ${
 										isActive ? "ring-2 ring-offset-2" : ""
 									}`}
 									style={{

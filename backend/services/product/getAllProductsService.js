@@ -7,15 +7,29 @@ const getAllProductsService = async ({
   limite,
   offset,
 }) => {
+  // Cuando el tipo es 'destilado', necesitamos validar que también tenga la categoría 'cocktail'
   const tipoFiltro = tipo
-    ? `AND p.id IN (
-      SELECT pc3.product_id
-      FROM products_categories pc3
-      JOIN categories c3 ON pc3.category_id = c3.id
-      WHERE c3.type = '${
+    ? tipo === 'destilado'
+      ? `AND p.id IN (
+          SELECT pc3.product_id
+          FROM products_categories pc3
+          JOIN categories c3 ON pc3.category_id = c3.id
+          WHERE c3.type = 'destilado'
+        )
+        AND p.id IN (
+          SELECT pc_cocktail.product_id
+          FROM products_categories pc_cocktail
+          JOIN categories c_cocktail ON pc_cocktail.category_id = c_cocktail.id
+          WHERE c_cocktail.name = 'cocktail' AND c_cocktail.type = 'clasificacion'
+        )`
+      : `AND p.id IN (
+          SELECT pc3.product_id
+          FROM products_categories pc3
+          JOIN categories c3 ON pc3.category_id = c3.id
+          WHERE c3.type = '${
   tipo === 'clasificacion' ? 'clasificacion comida' : tipo
 }'
-    )`
+        )`
     : '';
 
   const query = `
@@ -48,6 +62,31 @@ const getAllProductsService = async ({
     LIMIT ${limite} OFFSET ${offset}
   `;
 
+  // Para el countQuery, usar la misma lógica del tipoFiltro
+  const countTipoFiltro = tipo
+    ? tipo === 'destilado'
+      ? `AND p.id IN (
+          SELECT pc3.product_id
+          FROM products_categories pc3
+          JOIN categories c3 ON pc3.category_id = c3.id
+          WHERE c3.type = 'destilado'
+        )
+        AND p.id IN (
+          SELECT pc_cocktail.product_id
+          FROM products_categories pc_cocktail
+          JOIN categories c_cocktail ON pc_cocktail.category_id = c_cocktail.id
+          WHERE c_cocktail.name = 'cocktail' AND c_cocktail.type = 'clasificacion'
+        )`
+      : `AND p.id IN (
+          SELECT pc3.product_id
+          FROM products_categories pc3
+          JOIN categories c3 ON pc3.category_id = c3.id
+          WHERE c3.type = '${
+  tipo === 'clasificacion' ? 'clasificacion comida' : tipo
+}'
+        )`
+    : '';
+
   const countQuery = `
     SELECT COUNT(DISTINCT p.id) as total
     FROM products p
@@ -62,7 +101,7 @@ const getAllProductsService = async ({
     )`
     : ''
 }
-    ${tipoFiltro}
+    ${countTipoFiltro}
   `;
 
   const [result, countResult] = await Promise.all([

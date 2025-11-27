@@ -17,6 +17,7 @@ const FilteredCocktails = () => {
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [selectedCocktail, setSelectedCocktail] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const topRef = useRef(null);
 
 	// Determinar el tipo basado en la ruta (soporta "/bebidas" y "/comida")
@@ -24,8 +25,14 @@ const FilteredCocktails = () => {
 		? "destilado"
 		: "clasificacion";
 
+	// Resetear a página 1 cuando cambia la categoría
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [categoria, tipo]);
+
 	useEffect(() => {
 		const fetchData = async () => {
+			setLoading(true);
 			try {
 				const data = await getProducts(currentPage, pageSize, categoria, tipo);
 				const items = Array.isArray(data.cocteles) ? data.cocteles : [];
@@ -36,6 +43,8 @@ const FilteredCocktails = () => {
 				setTotalRecords(totalRecords);
 			} catch (_error) {
 				// noop
+			} finally {
+				setLoading(false);
 			}
 		};
 
@@ -123,22 +132,47 @@ const FilteredCocktails = () => {
 				</p>
 			</div>
 
-			<div className="flex flex-wrap gap-4 justify-center p-6">
-				{cocktails.map((cocktail, index) => (
-					<div
-						key={cocktail.id}
-						className="animate-fade-in"
-						style={{
-							opacity: 1,
-							animationDelay: `${index * 0.05}s`,
-						}}
-					>
-						<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
+			{loading ? (
+				<div className="flex flex-col items-center justify-center py-20">
+					<div className="relative w-16 h-16 mb-4">
+						<div
+							className="absolute inset-0 border-4 rounded-full animate-spin"
+							style={{
+								borderColor: "#3a3a3a",
+								borderTopColor: "#e9cc9e",
+							}}
+						/>
 					</div>
-				))}
-			</div>
+					<p className="text-lg" style={{ color: "#b8b8b8" }}>
+						Cargando...
+					</p>
+				</div>
+			) : (
+				<div className="flex flex-wrap gap-4 justify-center p-6">
+					{cocktails.length === 0 ? (
+						<div className="text-center py-20 w-full">
+							<p className="text-xl" style={{ color: "#b8b8b8" }}>
+								{t("pageTitle.noResults")}
+							</p>
+						</div>
+					) : (
+						cocktails.map((cocktail, index) => (
+							<div
+								key={cocktail.id}
+								className="animate-fade-in"
+								style={{
+									opacity: 1,
+									animationDelay: `${index * 0.05}s`,
+								}}
+							>
+								<CardCocktail cocktail={cocktail} onClick={handleCardClick} />
+							</div>
+						))
+					)}
+				</div>
+			)}
 
-			{totalPages > 0 && (
+			{!loading && totalPages > 0 && (
 				<div className="flex flex-col items-center mt-4 space-y-2 mb-4 px-4">
 					<div className="text-sm" style={{ color: "#b8b8b8" }}>
 						Mostrando {cocktails.length} de {totalRecords}{" "}
