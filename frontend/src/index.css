@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Usar font-display: swap para evitar FOIT (Flash of Invisible Text) */
+@font-face {
+	font-family: "Playfair Display";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: local("Playfair Display");
+}
+
 :root {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;

@@ -29,6 +29,8 @@ const PreviewCardCocktail = ({ cocktail, isModal = false, onClose }) => {
 						? "w-full h-48 sm:h-64 md:h-72 object-cover rounded-t-2xl mb-4 sm:mb-6"
 						: "w-full h-40 sm:h-48 object-cover rounded-t-lg"
 				}
+				loading="lazy"
+				decoding="async"
 			/>
 			<div className={isModal ? "px-4 sm:px-6 pb-4 sm:pb-6" : "p-3 sm:p-4"}>
 				<h3
