@@ -34,6 +34,10 @@ const OtherDrinks = () => {
 	const [beverageCategories, setBeverageCategories] = useState([]);
 	const [wineSubcategories, setWineSubcategories] = useState([]);
 	const [destiladoSubcategories, setDestiladoSubcategories] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [categoriesWithProducts, setCategoriesWithProducts] = useState(new Set());
+	const [wineSubcatsWithProducts, setWineSubcatsWithProducts] = useState(new Set());
+	const [destiladoSubcatsWithProducts, setDestiladoSubcatsWithProducts] = useState(new Set());
 	const topRef = useRef(null);
 
 	// Traducir productos
@@ -69,8 +73,169 @@ const OtherDrinks = () => {
 		fetchCategories();
 	}, []);
 
+	// Verificar qué categorías principales tienen productos
+	useEffect(() => {
+		const checkCategoriesWithProducts = async () => {
+			if (beverageCategories.length === 0) return;
+
+			try {
+				const categoriesSet = new Set();
+
+				// Verificar cada categoría individualmente
+				const checkPromises = beverageCategories.map(async (category) => {
+					try {
+						const data = await getProducts(1, 1, normalize(category.name), null);
+						const products = Array.isArray(data.cocteles) ? data.cocteles : [];
+						const totalRecords = data.paginacion?.totalRecords || 0;
+
+						// Excluir comida y cócteles
+						const others = products.filter((p) => {
+							const hasFood = p.categories?.some(
+								(c) => normalize(c.type) === "clasificacion comida"
+							);
+							const isCocktail = p.categories?.some(
+								(c) =>
+									normalize(c.name) === "cocktail" &&
+									normalize(c.type) === "clasificacion"
+							);
+							return !hasFood && !isCocktail;
+						});
+
+						if (totalRecords > 0 || others.length > 0) {
+							return normalize(category.name);
+						}
+						return null;
+					} catch (_err) {
+						return null;
+					}
+				});
+
+				const results = await Promise.all(checkPromises);
+				results.forEach((categoryName) => {
+					if (categoryName) {
+						categoriesSet.add(categoryName);
+					}
+				});
+
+				setCategoriesWithProducts(categoriesSet);
+			} catch (_err) {
+				setCategoriesWithProducts(new Set());
+			}
+		};
+
+		checkCategoriesWithProducts();
+	}, [beverageCategories]);
+
+	// Verificar qué subcategorías de vino tienen productos
+	useEffect(() => {
+		const checkWineSubcategories = async () => {
+			if (wineSubcategories.length === 0) return;
+
+			try {
+				const categoriesSet = new Set();
+
+				const checkPromises = wineSubcategories.map(async (category) => {
+					try {
+						const data = await getProducts(1, 1, normalize(category.name), null);
+						const products = Array.isArray(data.cocteles) ? data.cocteles : [];
+						const totalRecords = data.paginacion?.totalRecords || 0;
+
+						const others = products.filter((p) => {
+							const hasFood = p.categories?.some(
+								(c) => normalize(c.type) === "clasificacion comida"
+							);
+							const isCocktail = p.categories?.some(
+								(c) =>
+									normalize(c.name) === "cocktail" &&
+									normalize(c.type) === "clasificacion"
+							);
+							return !hasFood && !isCocktail;
+						});
+
+						if (totalRecords > 0 || others.length > 0) {
+							return normalize(category.name);
+						}
+						return null;
+					} catch (_err) {
+						return null;
+					}
+				});
+
+				const results = await Promise.all(checkPromises);
+				results.forEach((categoryName) => {
+					if (categoryName) {
+						categoriesSet.add(categoryName);
+					}
+				});
+
+				setWineSubcatsWithProducts(categoriesSet);
+			} catch (_err) {
+				setWineSubcatsWithProducts(new Set());
+			}
+		};
+
+		checkWineSubcategories();
+	}, [wineSubcategories]);
+
+	// Verificar qué subcategorías de destilados tienen productos
+	useEffect(() => {
+		const checkDestiladoSubcategories = async () => {
+			if (destiladoSubcategories.length === 0) return;
+
+			try {
+				const categoriesSet = new Set();
+
+				const checkPromises = destiladoSubcategories.map(async (category) => {
+					try {
+						const data = await getProducts(1, 1, normalize(category.name), null);
+						const products = Array.isArray(data.cocteles) ? data.cocteles : [];
+						const totalRecords = data.paginacion?.totalRecords || 0;
+
+						const others = products.filter((p) => {
+							const hasFood = p.categories?.some(
+								(c) => normalize(c.type) === "clasificacion comida"
+							);
+							const isCocktail = p.categories?.some(
+								(c) =>
+									normalize(c.name) === "cocktail" &&
+									normalize(c.type) === "clasificacion"
+							);
+							return !hasFood && !isCocktail;
+						});
+
+						if (totalRecords > 0 || others.length > 0) {
+							return normalize(category.name);
+						}
+						return null;
+					} catch (_err) {
+						return null;
+					}
+				});
+
+				const results = await Promise.all(checkPromises);
+				results.forEach((categoryName) => {
+					if (categoryName) {
+						categoriesSet.add(categoryName);
+					}
+				});
+
+				setDestiladoSubcatsWithProducts(categoriesSet);
+			} catch (_err) {
+				setDestiladoSubcatsWithProducts(new Set());
+			}
+		};
+
+		checkDestiladoSubcategories();
+	}, [destiladoSubcategories]);
+
+	// Resetear a página 1 cuando cambia el filtro
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [filter, subFilter]);
+
 	useEffect(() => {
 		const fetchData = async () => {
+			setLoading(true);
 			try {
 				// Si hay subfiltro activo, usar ese; si no, usar el filtro principal
 				const categoria = subFilter || (filter !== "todos" ? filter : null);
@@ -108,6 +273,8 @@ const OtherDrinks = () => {
 				setItems([]);
 				setTotalPages(0);
 				setTotalRecords(0);
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchData();
@@ -172,8 +339,17 @@ const OtherDrinks = () => {
 					>
 						{t("categoryFilter.all")}
 					</button>
-					{/* Filtros dinámicos desde categorías de clasificacion bebida */}
-					{beverageCategories.map((cat) => (
+					{/* Filtros dinámicos desde categorías de clasificacion bebida - solo las que tienen productos */}
+					{beverageCategories
+						.filter((cat) => {
+							// Si aún no se han verificado las categorías, mostrar todas temporalmente
+							if (categoriesWithProducts.size === 0 && beverageCategories.length > 0) {
+								return false;
+							}
+							// Filtrar solo las que tienen productos
+							return categoriesWithProducts.has(normalize(cat.name));
+						})
+						.map((cat) => (
 						<button
 							key={cat.id}
 							className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm capitalize ${
@@ -199,7 +375,13 @@ const OtherDrinks = () => {
 			</div>
 
 			{/* Subfiltros de vino */}
-			{filter === "vino" && wineSubcategories.length > 0 && (
+			{filter === "vino" && 
+				wineSubcategories.filter((cat) => {
+					if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) {
+						return false;
+					}
+					return wineSubcatsWithProducts.has(normalize(cat.name));
+				}).length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
 					<p
 						className="text-xs mb-2 px-1"
@@ -226,7 +408,14 @@ const OtherDrinks = () => {
 						>
 							{t("categoryFilter.allWines")}
 						</button>
-						{wineSubcategories.map((cat) => (
+						{wineSubcategories
+							.filter((cat) => {
+								if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) {
+									return false;
+								}
+								return wineSubcatsWithProducts.has(normalize(cat.name));
+							})
+							.map((cat) => (
 							<button
 								key={cat.id}
 								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
@@ -252,7 +441,13 @@ const OtherDrinks = () => {
 			)}
 
 			{/* Subfiltros de botellas - mostrar destilados */}
-			{filter === "botellas" && destiladoSubcategories.length > 0 && (
+			{filter === "botellas" && 
+				destiladoSubcategories.filter((cat) => {
+					if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
+						return false;
+					}
+					return destiladoSubcatsWithProducts.has(normalize(cat.name));
+				}).length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
 					<p
 						className="text-xs mb-2 px-1"
@@ -279,7 +474,14 @@ const OtherDrinks = () => {
 						>
 							Todas las botellas
 						</button>
-						{destiladoSubcategories.map((cat) => (
+						{destiladoSubcategories
+							.filter((cat) => {
+								if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
+									return false;
+								}
+								return destiladoSubcatsWithProducts.has(normalize(cat.name));
+							})
+							.map((cat) => (
 							<button
 								key={cat.id}
 								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
@@ -305,7 +507,13 @@ const OtherDrinks = () => {
 			)}
 
 			{/* Subfiltros de tragos - mostrar destilados */}
-			{filter === "tragos" && destiladoSubcategories.length > 0 && (
+			{filter === "tragos" && 
+				destiladoSubcategories.filter((cat) => {
+					if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
+						return false;
+					}
+					return destiladoSubcatsWithProducts.has(normalize(cat.name));
+				}).length > 0 && (
 				<div className="w-full max-w-7xl mx-auto px-4 mb-4">
 					<p
 						className="text-xs mb-2 px-1"
@@ -332,7 +540,14 @@ const OtherDrinks = () => {
 						>
 							{t("categoryFilter.allDrinks")}
 						</button>
-						{destiladoSubcategories.map((cat) => (
+						{destiladoSubcategories
+							.filter((cat) => {
+								if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
+									return false;
+								}
+								return destiladoSubcatsWithProducts.has(normalize(cat.name));
+							})
+							.map((cat) => (
 							<button
 								key={cat.id}
 								className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
@@ -358,8 +573,31 @@ const OtherDrinks = () => {
 			)}
 
 			{/* Listado */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 max-w-6xl mx-auto">
-				{filteredItems.map((p) => (
+			{loading ? (
+				<div className="flex flex-col items-center justify-center py-20">
+					<div className="relative w-16 h-16 mb-4">
+						<div
+							className="absolute inset-0 border-4 rounded-full animate-spin"
+							style={{
+								borderColor: "#3a3a3a",
+								borderTopColor: "#e9cc9e",
+							}}
+						/>
+					</div>
+					<p className="text-lg" style={{ color: "#b8b8b8" }}>
+						Cargando...
+					</p>
+				</div>
+			) : (
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 max-w-6xl mx-auto">
+					{filteredItems.length === 0 ? (
+						<div className="col-span-2 text-center py-20">
+							<p className="text-xl" style={{ color: "#b8b8b8" }}>
+								{t("pageTitle.noResults")}
+							</p>
+						</div>
+					) : (
+						filteredItems.map((p) => (
 					<div
 						key={p.id}
 						className="rounded-xl border shadow-sm hover:shadow-lg transition-all p-4 md:p-5"
@@ -457,11 +695,12 @@ const OtherDrinks = () => {
 							</div>
 						)}
 					</div>
-				))}
+				)))}
 			</div>
+			)}
 
 			{/* Paginación */}
-			{totalPages > 0 && (
+			{!loading && totalPages > 0 && (
 				<div className="flex justify-center items-center space-x-2 mt-6 mb-8">
 					<button
 						disabled={currentPage === 1}
