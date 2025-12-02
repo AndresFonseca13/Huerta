@@ -1,5 +1,5 @@
 import pool from '../../config/db.js';
-import { ConflictError } from '../../errors/ConflictError.js';
+import { ConflictError } from '../../errors/conflictError.js';
 
 const createIngredientService = async (name) => {
   const checkQuery = 'SELECT * FROM ingredients WHERE name = $1';

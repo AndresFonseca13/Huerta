@@ -1,5 +1,5 @@
 import pool from '../../config/db.js';
-import { ConflictError } from '../../errors/ConflictError.js';
+import { ConflictError } from '../../errors/conflictError.js';
 
 const createCategoryService = async (name, type, is_active = true) => {
   const checkQuery = 'SELECT * FROM categories WHERE name = $1 AND type = $2';

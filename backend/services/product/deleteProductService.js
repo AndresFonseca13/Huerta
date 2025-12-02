@@ -1,26 +1,55 @@
 import pool from '../../config/db.js';
-import { BlobServiceClient } from '@azure/storage-blob';
+import { createClient } from '@supabase/supabase-js';
 
-const AZURE_STORAGE_CONNECTION_STRING =
-	process.env.AZURE_STORAGE_CONNECTION_STRING;
-const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const containerName = 'cocktail-images';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_BUCKET = 'cocktail-images';
 
-async function deleteImagesFromAzure(imageUrls) {
-  if (!AZURE_STORAGE_CONNECTION_STRING || !AZURE_STORAGE_ACCOUNT_NAME) return;
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    AZURE_STORAGE_CONNECTION_STRING,
-  );
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-  for (const url of imageUrls) {
-    try {
-      const parts = url.split('/');
-      const blobName = parts[parts.length - 1];
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-      await blockBlobClient.deleteIfExists();
-    } catch (err) {
-      console.error('Error al borrar imagen en Azure:', url, err.message);
+const supabase =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    : null;
+
+function getBlobNameFromUrl(url) {
+  try {
+    const u = new URL(url);
+    const parts = u.pathname.split('/').filter(Boolean);
+    // Soporta:
+    // - /cocktail-images/<blob>
+    // - /storage/v1/object/public/cocktail-images/<blob>
+    const bucketIndex = parts.findIndex((p) => p === SUPABASE_BUCKET);
+    if (bucketIndex === -1 || bucketIndex === parts.length - 1) return null;
+    return parts.slice(bucketIndex + 1).join('/');
+  } catch {
+    return null;
+  }
+}
+
+async function deleteImagesFromSupabase(imageUrls) {
+  if (!supabase || !Array.isArray(imageUrls) || imageUrls.length === 0) return;
+
+  const blobNames = imageUrls
+    .map((url) => getBlobNameFromUrl(url))
+    .filter(Boolean);
+
+  if (blobNames.length === 0) return;
+
+  try {
+    const { error } = await supabase.storage
+      .from(SUPABASE_BUCKET)
+      .remove(blobNames);
+
+    if (error) {
+      console.error(
+        'Error al borrar imágenes en Supabase Storage:',
+        error.message,
+      );
     }
+  } catch (err) {
+    console.error(
+      'Error inesperado al borrar imágenes en Supabase Storage:',
+      err.message,
+    );
   }
 }
 
@@ -44,7 +73,7 @@ const deleteProductService = async (id) => {
     await pool.query('DELETE FROM products WHERE id = $1', [id]);
     await pool.query('COMMIT');
 
-    await deleteImagesFromAzure(imageUrls);
+    await deleteImagesFromSupabase(imageUrls);
     return { mensaje: 'Producto eliminado exitosamente' };
   } catch (error) {
     await pool.query('ROLLBACK');
