@@ -1,44 +1,60 @@
 import promotionServices from '../services/promotion/index.js';
-import { BlobServiceClient } from '@azure/storage-blob';
+import { createClient } from '@supabase/supabase-js';
 
-const AZURE_STORAGE_CONNECTION_STRING =
-	process.env.AZURE_STORAGE_CONNECTION_STRING;
-const AZURE_STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const AZURE_CONTAINER = 'cocktail-images'; // mismo contenedor usado en upload
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_BUCKET = 'cocktail-images'; // mismo bucket usado en upload
+
+const supabase =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    : null;
 
 function getBlobNameFromUrl(url) {
   try {
     const u = new URL(url);
-    const parts = u.pathname.split('/').filter(Boolean);
-    // estructura: /<container>/<blob>
-    return parts.length >= 2 ? parts.slice(1).join('/') : null;
+    const pathname = u.pathname;
+    const parts = pathname.split('/').filter(Boolean);
+
+    // Formato Azure: /<container>/<blob>
+    if (parts[0] === SUPABASE_BUCKET) {
+      return parts.slice(1).join('/');
+    }
+
+    // Formato Supabase: /storage/v1/object/public/<bucket>/<blob...>
+    const bucketIndex = parts.findIndex((p) => p === SUPABASE_BUCKET);
+    if (bucketIndex !== -1 && bucketIndex < parts.length - 1) {
+      return parts.slice(bucketIndex + 1).join('/');
+    }
+
+    return null;
   } catch {
     return null;
   }
 }
 
 async function deleteAzureBlobIfExists(imageUrl) {
-  if (
-    !imageUrl ||
-		!AZURE_STORAGE_CONNECTION_STRING ||
-		!AZURE_STORAGE_ACCOUNT_NAME
-  )
-    return;
+  if (!imageUrl || !supabase) return;
+
   const blobName = getBlobNameFromUrl(imageUrl);
   if (!blobName) return;
+
   try {
-    const blobServiceClient = BlobServiceClient.fromConnectionString(
-      AZURE_STORAGE_CONNECTION_STRING,
-    );
-    const containerClient =
-			blobServiceClient.getContainerClient(AZURE_CONTAINER);
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    const exists = await blockBlobClient.exists();
-    if (exists) {
-      await blockBlobClient.delete();
+    const { error } = await supabase.storage
+      .from(SUPABASE_BUCKET)
+      .remove([blobName]);
+
+    if (error) {
+      console.warn(
+        'No se pudo borrar el archivo en Supabase Storage:',
+        error.message,
+      );
     }
   } catch (e) {
-    console.warn('No se pudo borrar el blob de Azure:', e?.message || e);
+    console.warn(
+      'No se pudo borrar el archivo en Supabase Storage:',
+      e?.message || e,
+    );
   }
 }
 
