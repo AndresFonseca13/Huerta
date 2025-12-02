@@ -40,10 +40,10 @@ app.get("/bienvenido", (req, res) => {
 	res.json({ mensaje });
 });
 
-app.listen(port, () => {
-	console.log(`Servidor escuchando en http://localhost:${port}`);
-	// Log de variables de entorno en desarrollo
-	if (process.env.NODE_ENV !== "production") {
+// Solo escuchar si no estamos en Vercel
+if (process.env.NODE_ENV !== "production") {
+	app.listen(port, () => {
+		console.log(`Servidor escuchando en http://localhost:${port}`);
 		console.log("Variables de entorno cargadas:");
 		console.log(
 			"SUPABASE_URL:",
@@ -57,5 +57,8 @@ app.listen(port, () => {
 			"DATABASE_URL:",
 			process.env.DATABASE_URL ? "Configurado" : "No configurado"
 		);
-	}
-});
+	});
+}
+
+// Exportar para Vercel
+export default app;
