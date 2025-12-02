@@ -3,11 +3,13 @@ import { lazy, Suspense } from "react";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import Footer from "./components/Footer.jsx";
 
-// Lazy loading de páginas para mejor performance
+// ✅ Páginas públicas - importación directa (se cargan inmediatamente)
+import FilteredCocktails from "./pages/FilteredCocktails";
+import OtherDrinks from "./pages/OtherDrinks.jsx";
+
+// ✅ Páginas de admin y secundarias - lazy loading (se cargan cuando se necesitan)
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
-const FilteredCocktails = lazy(() => import("./pages/FilteredCocktails"));
-const OtherDrinks = lazy(() => import("./pages/OtherDrinks.jsx"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin.jsx"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel.jsx"));

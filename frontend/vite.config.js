@@ -32,7 +32,6 @@ export default defineConfig({
 						"react-i18next",
 						"i18next-browser-languagedetector",
 					],
-					"azure-vendor": ["@azure/storage-blob"],
 					utils: ["axios"],
 				},
 			},
