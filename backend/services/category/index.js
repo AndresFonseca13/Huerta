@@ -6,6 +6,7 @@ import updateCategory from './updateCategory.js';
 import searchCategoryService from './searchCategoryService.js';
 import getFoodClassificationCategoriesService from './getFoodClassificationCategoriesService.js';
 import getBeverageClassificationCategoriesService from './getBeverageClassificationCategoriesService.js';
+import toggleCategoryPriorityService from './toggleCategoryPriorityService.js';
 
 export {
   createCategoryService,
@@ -16,4 +17,5 @@ export {
   searchCategoryService,
   getFoodClassificationCategoriesService,
   getBeverageClassificationCategoriesService,
+  toggleCategoryPriorityService,
 };

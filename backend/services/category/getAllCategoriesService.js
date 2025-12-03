@@ -13,12 +13,13 @@ const getAllCategoriesService = async (showAll = false) => {
             c.name, 
             c.type, 
             c.is_active,
+            c.is_priority,
             COUNT(p.id) as product_count
         FROM categories c
         LEFT JOIN products_categories pc ON c.id = pc.category_id
         LEFT JOIN products p ON pc.product_id = p.id AND p.is_active = true
         ${showAll ? '' : 'WHERE c.is_active = true'}
-        GROUP BY c.id, c.name, c.type, c.is_active
+        GROUP BY c.id, c.name, c.type, c.is_active, c.is_priority
         ORDER BY c.name;
     `;
 

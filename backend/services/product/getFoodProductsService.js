@@ -21,9 +21,10 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
   const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
+           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type, 'is_priority', c.is_priority)) AS categories,
            array_agg(DISTINCT img.url) AS images,
-           MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
+           MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name,
+           COUNT(DISTINCT CASE WHEN c.is_priority = true THEN c.id END) AS priority_count
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
@@ -34,7 +35,7 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
       AND ${baseFilterComida}
       ${categoriaExtra}
     GROUP BY p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage
-    ORDER BY p."${safeOrder}"
+    ORDER BY priority_count DESC, p."${safeOrder}"
     LIMIT ${limite} OFFSET ${offset}
   `;
 

@@ -94,6 +94,24 @@ export const toggleCategoryActive = async (id, is_active) => {
 	}
 };
 
+export const toggleCategoryPriority = async (id, is_priority) => {
+	try {
+		const token = localStorage.getItem("token");
+		const response = await axios.patch(
+			`${apiConfig.baseURL}/categories/${id}/priority`,
+			{ is_priority },
+			{
+				headers: {
+					Authorization: token ? `Bearer ${token}` : undefined,
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		throw error.response?.data || error;
+	}
+};
+
 export const deleteCategory = async (id) => {
 	try {
 		const token = localStorage.getItem("token");

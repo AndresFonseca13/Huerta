@@ -45,4 +45,12 @@ router.patch(
   categoryController.setCategoryActive,
 );
 
+// Cambiar prioridad de categorías - Admin, ventas, chef y barmanager pueden cambiar
+router.patch(
+  '/:id/priority',
+  authMiddleware,
+  requireRoles(['admin', 'ventas', 'chef', 'barmanager']),
+  categoryController.setCategoryPriority,
+);
+
 export default router;

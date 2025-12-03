@@ -1,7 +1,7 @@
 import pool from '../../config/db.js';
 import { ConflictError } from '../../errors/conflictError.js';
 
-const createCategoryService = async (name, type, is_active = true) => {
+const createCategoryService = async (name, type, is_active = true, is_priority = false) => {
   const checkQuery = 'SELECT * FROM categories WHERE name = $1 AND type = $2';
   const checkResult = await pool.query(checkQuery, [name, type]);
   if (checkResult.rows.length > 0) {
@@ -11,11 +11,12 @@ const createCategoryService = async (name, type, is_active = true) => {
   try {
     await pool.query('BEGIN');
     const insertCategoryQuery =
-      'INSERT INTO categories (name, type, is_active) VALUES ($1, $2, $3) RETURNING id, name, type, is_active';
+      'INSERT INTO categories (name, type, is_active, is_priority) VALUES ($1, $2, $3, $4) RETURNING id, name, type, is_active, is_priority';
     const categoryResult = await pool.query(insertCategoryQuery, [
       name,
       type,
       is_active,
+      is_priority,
     ]);
 
     await pool.query('COMMIT');

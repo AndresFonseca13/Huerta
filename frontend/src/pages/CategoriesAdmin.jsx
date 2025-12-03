@@ -6,6 +6,7 @@ import {
 	FiCheckCircle,
 	FiXCircle,
 	FiSearch,
+	FiStar,
 } from "react-icons/fi";
 import { getAllCategories } from "../services/categoryService";
 import { motion as Motion } from "framer-motion";
@@ -14,6 +15,7 @@ import {
 	createCategory,
 	updateCategory,
 	toggleCategoryActive,
+	toggleCategoryPriority,
 	deleteCategory,
 } from "../services/categoryService";
 import ConfirmModal from "../components/ConfirmModal";
@@ -60,6 +62,16 @@ const CategoriesAdmin = () => {
 			setCategories(updated);
 		} catch (err) {
 			alert(err.message || "Error al cambiar el estado de la categoría");
+		}
+	};
+
+	const handleTogglePriority = async (category) => {
+		try {
+			await toggleCategoryPriority(category.id, !category.is_priority);
+			const updated = await getAllCategories(true);
+			setCategories(updated);
+		} catch (err) {
+			alert(err.message || "Error al cambiar la prioridad de la categoría");
 		}
 	};
 
@@ -467,75 +479,124 @@ const CategoriesAdmin = () => {
 									border: "1px solid #3a3a3a",
 								}}
 							>
-								<div className="flex items-start justify-between gap-2">
-									<div>
-										<h3
-											className="text-lg font-semibold capitalize"
-											style={{ color: "#e9cc9e" }}
-										>
-											{cat.name}
-										</h3>
-										<div className="flex items-center gap-2 mt-1">
-											<span
-												className="inline-flex text-xs px-2 py-1 rounded-full capitalize"
-												style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+								<div className="flex flex-col gap-3 h-full">
+									{/* Cabecera: nombre + estado/prioridad */}
+									<div className="flex items-start justify-between gap-3">
+										<div className="min-w-0">
+											<h3
+												className="text-lg font-semibold capitalize truncate"
+												style={{ color: "#e9cc9e" }}
 											>
-												{cat.type}
-											</span>
+												{cat.name}
+											</h3>
+											<div className="flex flex-wrap items-center gap-2 mt-2">
+												<span
+													className="inline-flex text-xs px-2 py-1 rounded-full capitalize"
+													style={{
+														backgroundColor: "#3a3a3a",
+														color: "#e9cc9e",
+													}}
+												>
+													{cat.type}
+												</span>
+												<span
+													className="inline-flex text-xs px-2 py-1 rounded-full"
+													style={{
+														backgroundColor: "#3a3a3a",
+														color: "#e9cc9e",
+													}}
+												>
+													{cat.product_count || 0} productos
+												</span>
+											</div>
+										</div>
+										<div className="flex flex-col items-end gap-2 shrink-0">
 											<span
-												className="inline-flex text-xs px-2 py-1 rounded-full"
-												style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
+												className="text-xs px-2 py-1 rounded-full"
+												style={{
+													backgroundColor: "#3a3a3a",
+													color: "#e9cc9e",
+												}}
 											>
-												{cat.product_count || 0} productos
+												{cat.is_active ? "Activa" : "Inactiva"}
 											</span>
+											{cat.is_priority && (
+												<span
+													className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full"
+													style={{
+														backgroundColor: "#e9cc9e",
+														color: "#191919",
+													}}
+												>
+													<FiStar className="fill-current" size={12} />
+													Prioritaria
+												</span>
+											)}
 										</div>
 									</div>
-									<span
-										className="text-xs px-2 py-1 rounded-full"
-										style={{ backgroundColor: "#3a3a3a", color: "#e9cc9e" }}
-									>
-										{cat.is_active ? "Activa" : "Inactiva"}
-									</span>
-								</div>
-								<div className="flex flex-wrap items-center gap-2 mt-4">
-									<button
-										onClick={() => openEditModal(cat)}
-										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
-										style={{
-											backgroundColor: "#2a2a2a",
-											color: "#e9cc9e",
-											border: "1px solid #3a3a3a",
-										}}
-									>
-										<FiEdit className="mr-1" /> Editar
-									</button>
-									<button
-										onClick={() => handleToggleActive(cat)}
-										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
-										style={{
-											backgroundColor: "#2a2a2a",
-											color: "#e9cc9e",
-											border: "1px solid #3a3a3a",
-										}}
-									>
-										{cat.is_active ? (
-											<FiXCircle className="mr-1" />
-										) : (
-											<FiCheckCircle className="mr-1" />
-										)}
-										{cat.is_active ? "Desactivar" : "Activar"}
-									</button>
-									<button
-										onClick={() => handleDelete(cat)}
-										className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
-										style={{
-											backgroundColor: "#2a2a2a",
-											color: "#e9cc9e",
-											border: "1px solid #3a3a3a",
-										}}
-									>
-										<FiTrash2 className="mr-1" /> Borrar
-									</button>
+
+									{/* Acciones */}
+									<div className="flex flex-wrap items-center gap-2 mt-1">
+										<button
+											onClick={() => openEditModal(cat)}
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											style={{
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
+										>
+											<FiEdit className="mr-1" /> Editar
+										</button>
+										<button
+											onClick={() => handleTogglePriority(cat)}
+											className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full ${
+												cat.is_priority ? "ring-2 ring-[#e9cc9e]" : ""
+											}`}
+											style={{
+												backgroundColor: cat.is_priority ? "#e9cc9e" : "#2a2a2a",
+												color: cat.is_priority ? "#191919" : "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
+											title={
+												cat.is_priority
+													? "Quitar prioridad (los productos aparecerán después)"
+													: "Marcar como prioritaria (los productos aparecerán primero)"
+											}
+										>
+											<FiStar
+												className={`mr-1 ${cat.is_priority ? "fill-current" : ""}`}
+											/>
+											{cat.is_priority ? "Prioritaria" : "Priorizar"}
+										</button>
+										<button
+											onClick={() => handleToggleActive(cat)}
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											style={{
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
+										>
+											{cat.is_active ? (
+												<FiXCircle className="mr-1" />
+											) : (
+												<FiCheckCircle className="mr-1" />
+											)}
+											{cat.is_active ? "Desactivar" : "Activar"}
+										</button>
+										<button
+											onClick={() => handleDelete(cat)}
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											style={{
+												backgroundColor: "#2a2a2a",
+												color: "#e9cc9e",
+												border: "1px solid #3a3a3a",
+											}}
+										>
+											<FiTrash2 className="mr-1" /> Borrar
+										</button>
+									</div>
 								</div>
 							</div>
 						))}
