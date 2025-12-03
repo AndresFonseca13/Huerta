@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import Footer from "./components/Footer.jsx";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // ✅ Páginas públicas - importación directa (se cargan inmediatamente)
 import FilteredCocktails from "./pages/FilteredCocktails";
@@ -204,6 +205,7 @@ function App() {
 			</Suspense>
 			{showFooter && <Footer />}
 			<Analytics />
+			<SpeedInsights />
 		</>
 	);
 }
