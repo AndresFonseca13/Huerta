@@ -39,6 +39,8 @@ const CategoriesAdmin = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 12;
 	const listTopRef = useRef(null);
+	const [loadingPriorityId, setLoadingPriorityId] = useState(null);
+	const [loadingActiveId, setLoadingActiveId] = useState(null);
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -57,21 +59,27 @@ const CategoriesAdmin = () => {
 
 	const handleToggleActive = async (category) => {
 		try {
+			setLoadingActiveId(category.id);
 			await toggleCategoryActive(category.id, !category.is_active);
 			const updated = await getAllCategories(true);
 			setCategories(updated);
 		} catch (err) {
 			alert(err.message || "Error al cambiar el estado de la categoría");
+		} finally {
+			setLoadingActiveId(null);
 		}
 	};
 
 	const handleTogglePriority = async (category) => {
 		try {
+			setLoadingPriorityId(category.id);
 			await toggleCategoryPriority(category.id, !category.is_priority);
 			const updated = await getAllCategories(true);
 			setCategories(updated);
 		} catch (err) {
 			alert(err.message || "Error al cambiar la prioridad de la categoría");
+		} finally {
+			setLoadingPriorityId(null);
 		}
 	};
 
@@ -539,7 +547,7 @@ const CategoriesAdmin = () => {
 									<div className="flex flex-wrap items-center gap-2 mt-1">
 										<button
 											onClick={() => openEditModal(cat)}
-											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-150"
 											style={{
 												backgroundColor: "#2a2a2a",
 												color: "#e9cc9e",
@@ -550,7 +558,7 @@ const CategoriesAdmin = () => {
 										</button>
 										<button
 											onClick={() => handleTogglePriority(cat)}
-											className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full ${
+											className={`inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-150 ${
 												cat.is_priority ? "ring-2 ring-[#e9cc9e]" : ""
 											}`}
 											style={{
@@ -563,31 +571,57 @@ const CategoriesAdmin = () => {
 													? "Quitar prioridad (los productos aparecerán después)"
 													: "Marcar como prioritaria (los productos aparecerán primero)"
 											}
+											disabled={loadingPriorityId === cat.id}
 										>
-											<FiStar
-												className={`mr-1 ${cat.is_priority ? "fill-current" : ""}`}
-											/>
-											{cat.is_priority ? "Prioritaria" : "Priorizar"}
+											{loadingPriorityId === cat.id ? (
+												<span className="flex items-center gap-2">
+													<span className="w-4 h-4 border-2 border-[#191919] border-t-transparent rounded-full animate-spin" />
+													<span>
+														{cat.is_priority
+															? "Actualizando..."
+															: "Priorizando..."}
+													</span>
+												</span>
+											) : (
+												<>
+													<FiStar
+														className={`mr-1 ${
+															cat.is_priority ? "fill-current" : ""
+														}`}
+													/>
+													{cat.is_priority ? "Prioritaria" : "Priorizar"}
+												</>
+											)}
 										</button>
 										<button
 											onClick={() => handleToggleActive(cat)}
-											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-150"
 											style={{
 												backgroundColor: "#2a2a2a",
 												color: "#e9cc9e",
 												border: "1px solid #3a3a3a",
 											}}
+											disabled={loadingActiveId === cat.id}
 										>
-											{cat.is_active ? (
-												<FiXCircle className="mr-1" />
+											{loadingActiveId === cat.id ? (
+												<span className="flex items-center gap-2">
+													<span className="w-4 h-4 border-2 border-[#e9cc9e] border-t-transparent rounded-full animate-spin" />
+													<span>Aplicando...</span>
+												</span>
 											) : (
-												<FiCheckCircle className="mr-1" />
+												<>
+													{cat.is_active ? (
+														<FiXCircle className="mr-1" />
+													) : (
+														<FiCheckCircle className="mr-1" />
+													)}
+													{cat.is_active ? "Desactivar" : "Activar"}
+												</>
 											)}
-											{cat.is_active ? "Desactivar" : "Activar"}
 										</button>
 										<button
 											onClick={() => handleDelete(cat)}
-											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full"
+											className="inline-flex items-center justify-center shrink-0 w-full sm:w-auto text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-150"
 											style={{
 												backgroundColor: "#2a2a2a",
 												color: "#e9cc9e",

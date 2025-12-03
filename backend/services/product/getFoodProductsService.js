@@ -18,6 +18,15 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
 
   const values = categoria ? [categoria] : [];
 
+  const inactiveCategoryFilter = `
+    AND NOT EXISTS (
+      SELECT 1
+      FROM products_categories pci
+      JOIN categories ci ON pci.category_id = ci.id
+      WHERE pci.product_id = p.id AND ci.is_active = false
+    )
+  `;
+
   const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
@@ -32,6 +41,7 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
     LEFT JOIN categories c ON pc.category_id = c.id
     LEFT JOIN images img ON p.id = img.product_id
     WHERE p.is_active = true
+      ${inactiveCategoryFilter}
       AND ${baseFilterComida}
       ${categoriaExtra}
     GROUP BY p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage
@@ -43,6 +53,7 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
     SELECT COUNT(DISTINCT p.id) AS total
     FROM products p
     WHERE p.is_active = true
+      ${inactiveCategoryFilter}
       AND ${baseFilterComida}
       ${
   categoria
