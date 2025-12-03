@@ -18,12 +18,22 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
 
   const values = categoria ? [categoria] : [];
 
+  const inactiveCategoryFilter = `
+    AND NOT EXISTS (
+      SELECT 1
+      FROM products_categories pci
+      JOIN categories ci ON pci.category_id = ci.id
+      WHERE pci.product_id = p.id AND ci.is_active = false
+    )
+  `;
+
   const query = `
     SELECT p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage,
            array_agg(DISTINCT i.name) AS ingredients,
-           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type)) AS categories,
+           array_agg(DISTINCT jsonb_build_object('name', c.name, 'type', c.type, 'is_priority', c.is_priority)) AS categories,
            array_agg(DISTINCT img.url) AS images,
-           MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name
+           MIN(CASE WHEN c.type = 'clasificacion comida' THEN c.name END) AS food_classification_name,
+           COUNT(DISTINCT CASE WHEN c.is_priority = true THEN c.id END) AS priority_count
     FROM products p
     LEFT JOIN products_ingredients pi ON p.id = pi.product_id
     LEFT JOIN ingredients i ON pi.ingredient_id = i.id
@@ -31,10 +41,11 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
     LEFT JOIN categories c ON pc.category_id = c.id
     LEFT JOIN images img ON p.id = img.product_id
     WHERE p.is_active = true
+      ${inactiveCategoryFilter}
       AND ${baseFilterComida}
       ${categoriaExtra}
     GROUP BY p.id, p.name, p.price, p.description, p.is_active, p.alcohol_percentage
-    ORDER BY p."${safeOrder}"
+    ORDER BY priority_count DESC, p."${safeOrder}"
     LIMIT ${limite} OFFSET ${offset}
   `;
 
@@ -42,6 +53,7 @@ const getFoodProductsService = async ({ categoria, limite, offset, orden }) => {
     SELECT COUNT(DISTINCT p.id) AS total
     FROM products p
     WHERE p.is_active = true
+      ${inactiveCategoryFilter}
       AND ${baseFilterComida}
       ${
   categoria

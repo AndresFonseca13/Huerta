@@ -2,12 +2,13 @@ import { ConflictError } from "../errors/conflictError.js";
 import * as categoryService from "../services/category/index.js";
 
 const createCategory = async (req, res) => {
-	const { name, type, is_active } = req.body;
+	const { name, type, is_active, is_priority } = req.body;
 	try {
 		const category = await categoryService.createCategoryService(
 			name,
 			type,
-			is_active
+			is_active,
+			is_priority
 		);
 		res
 			.status(201)
@@ -126,7 +127,7 @@ const getCategoryById = async (req, res) => {
 
 const updateCategory = async (req, res) => {
 	const { id } = req.params;
-	const { name, type, is_active } = req.body;
+	const { name, type, is_active, is_priority } = req.body;
 	// Validación del formato UUID
 	const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -145,7 +146,8 @@ const updateCategory = async (req, res) => {
 			id,
 			name,
 			type,
-			is_active
+			is_active,
+			is_priority
 		);
 		res.status(200).json({
 			mensaje: "Categoría actualizada exitosamente",
@@ -205,7 +207,8 @@ const setCategoryActive = async (req, res) => {
 			id,
 			null,
 			null,
-			is_active
+			is_active,
+			null
 		);
 		if (!updatedCategory) {
 			return res.status(404).json({ mensaje: "Categoría no encontrada" });
@@ -225,6 +228,39 @@ const setCategoryActive = async (req, res) => {
 	}
 };
 
+// Nuevo endpoint para cambiar prioridad de categoría
+const setCategoryPriority = async (req, res) => {
+	const { id } = req.params;
+	const { is_priority } = req.body;
+	if (!id) {
+		return res.status(400).json({ mensaje: "ID de categoría es requerido" });
+	}
+	if (typeof is_priority !== "boolean") {
+		return res.status(400).json({ mensaje: "is_priority debe ser booleano" });
+	}
+	try {
+		const updatedCategory = await categoryService.toggleCategoryPriorityService(
+			id,
+			is_priority
+		);
+		if (!updatedCategory) {
+			return res.status(404).json({ mensaje: "Categoría no encontrada" });
+		}
+		res.status(200).json({
+			mensaje: `Categoría ${
+				is_priority ? "marcada como prioritaria" : "desmarcada como prioritaria"
+			} exitosamente`,
+			category: updatedCategory,
+		});
+	} catch (error) {
+		console.error("Error al cambiar prioridad de la categoría:", error);
+		res.status(500).json({
+			mensaje: "Error al cambiar prioridad de la categoría",
+			error: error.message,
+		});
+	}
+};
+
 export {
 	createCategory,
 	deleteCategory,
@@ -233,4 +269,5 @@ export {
 	updateCategory,
 	searchCategory,
 	setCategoryActive,
+	setCategoryPriority,
 };
