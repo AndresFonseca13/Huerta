@@ -2,6 +2,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ConditionalNavbar from "./components/ConditionalNavbar.jsx";
 import Footer from "./components/Footer.jsx";
+import { Analytics } from "@vercel/analytics/react";
 
 // ✅ Páginas públicas - importación directa (se cargan inmediatamente)
 import FilteredCocktails from "./pages/FilteredCocktails";
@@ -202,6 +203,7 @@ function App() {
 				</Routes>
 			</Suspense>
 			{showFooter && <Footer />}
+			<Analytics />
 		</>
 	);
 }

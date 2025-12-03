@@ -14,17 +14,17 @@ const poolConfig = process.env.DATABASE_URL
       },
     }
   : {
-      host: process.env.DB_HOST,
+  host: process.env.DB_HOST,
       port: process.env.DB_PORT || 5432,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      ssl: {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: {
         rejectUnauthorized: false, // Para Supabase PostgreSQL
-      },
+  },
       // Configuración adicional para Supabase
-      connectionTimeoutMillis: 30000,
-      idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 30000,
+  idleTimeoutMillis: 30000,
     };
 
 const pool = new Pool(poolConfig);
@@ -42,9 +42,9 @@ if (process.env.NODE_ENV !== 'test') {
           `Conectado a Supabase: ${url.hostname}:${url.port || 5432}/${url.pathname.slice(1)}`,
         );
       } else {
-        console.log(
+      console.log(
           `Conectado a: ${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
-        );
+      );
       }
     })
     .catch((err) => {
@@ -54,15 +54,15 @@ if (process.env.NODE_ENV !== 'test') {
         console.log('DATABASE_URL: Configurado');
       } else {
         console.log(`DATABASE_URL: No configurado`);
-        console.log(`DB_HOST: ${process.env.DB_HOST || 'No configurado'}`);
-        console.log(`DB_PORT: ${process.env.DB_PORT || 'No configurado'}`);
-        console.log(`DB_USER: ${process.env.DB_USER || 'No configurado'}`);
-        console.log(`DB_NAME: ${process.env.DB_NAME || 'No configurado'}`);
-        console.log(
-          `DB_PASSWORD: ${
-            process.env.DB_PASSWORD ? 'Configurado' : 'No configurado'
-          }`,
-        );
+      console.log(`DB_HOST: ${process.env.DB_HOST || 'No configurado'}`);
+      console.log(`DB_PORT: ${process.env.DB_PORT || 'No configurado'}`);
+      console.log(`DB_USER: ${process.env.DB_USER || 'No configurado'}`);
+      console.log(`DB_NAME: ${process.env.DB_NAME || 'No configurado'}`);
+      console.log(
+        `DB_PASSWORD: ${
+          process.env.DB_PASSWORD ? 'Configurado' : 'No configurado'
+        }`,
+      );
       }
     });
 }
