@@ -10,6 +10,7 @@
 		"start": "node app.js",
 		"dev": "npx nodemon app.js",
 		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
 		"migrate:add-alcohol": "node ./scripts/addAlcoholPercentage.js",
 		"verify:config": "node ./scripts/verifyConfig.js"
 	},

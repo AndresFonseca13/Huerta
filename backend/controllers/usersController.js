@@ -144,7 +144,7 @@ export const resetUserPassword = async (req, res) => {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     return res.status(200).json({ 
       mensaje: 'Contraseña restablecida exitosamente',
-      username: upd.rows[0].username 
+      username: upd.rows[0].username, 
     });
   } catch (error) {
     console.error('Error restableciendo contraseña:', error);

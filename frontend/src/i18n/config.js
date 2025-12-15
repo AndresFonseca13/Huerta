@@ -19,16 +19,16 @@ i18n
   .init({
     resources: {
       es: es,
-      en: en
+      en: en,
     },
     lng: getDefaultLanguage(),
     fallbackLng: 'es',
     interpolation: {
-      escapeValue: false // React ya escapa por defecto
+      escapeValue: false, // React ya escapa por defecto
     },
     react: {
-      useSuspense: false // Evitar suspense para mayor compatibilidad
-    }
+      useSuspense: false, // Evitar suspense para mayor compatibilidad
+    },
   });
 
 // Guardar idioma cuando cambie

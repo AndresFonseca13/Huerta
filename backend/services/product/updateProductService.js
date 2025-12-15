@@ -45,7 +45,7 @@ async function deleteImagesFromSupabase(imageUrls) {
         error.message,
       );
     }
-    } catch (err) {
+  } catch (err) {
     console.error(
       'Error inesperado al borrar imágenes en Supabase Storage:',
       err.message,

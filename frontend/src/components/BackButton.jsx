@@ -1,8 +1,8 @@
-import React from "react";
-import { FiChevronLeft } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { FiChevronLeft } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
-const BackButton = ({ className = "" }) => {
+const BackButton = ({ className = '' }) => {
   const navigate = useNavigate();
   return (
     <button

@@ -20,8 +20,11 @@
     "test:backend": "cd backend && npm test",
     "test:frontend": "cd frontend && npm test",
     "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:fix": "npm run lint:fix:backend && npm run lint:fix:frontend",
     "lint:backend": "cd backend && npm run lint",
-    "lint:frontend": "cd frontend && npm run lint"
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:fix:backend": "cd backend && npm run lint:fix",
+    "lint:fix:frontend": "cd frontend && npm run lint:fix"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
