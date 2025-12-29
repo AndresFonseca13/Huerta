@@ -148,9 +148,9 @@ const FilteredCocktails = () => {
           </p>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-4 justify-center p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-6 max-w-[1600px] mx-auto">
           {cocktails.length === 0 ? (
-            <div className="text-center py-20 w-full">
+            <div className="col-span-full text-center py-20 w-full">
               <p className="text-xl" style={{ color: '#b8b8b8' }}>
                 {t('pageTitle.noResults')}
               </p>

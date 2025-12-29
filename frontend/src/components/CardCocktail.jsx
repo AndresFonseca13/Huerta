@@ -43,13 +43,13 @@ const CardCocktail = ({ cocktail, onClick }) => {
 
   return (
     <div
-      className="rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] flex flex-col"
+      className="w-full rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] flex flex-col"
       style={{
         backgroundColor: '#2a2a2a',
         borderColor: '#3a3a3a',
         border: '1px solid',
-        width: '380px', // Ancho fijo para todas las cards
-        height: '400px', // Altura fija reducida
+        maxWidth: '380px', // Ancho máximo para mantener consistencia
+        minHeight: '400px', // Altura mínima para uniformidad
       }}
       onClick={() => onClick && onClick(cocktail)}
     >

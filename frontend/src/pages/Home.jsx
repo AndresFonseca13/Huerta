@@ -54,7 +54,7 @@ const Home = () => {
   return (
     <>
       <div ref={topRef} />
-      <div className="flex flex-wrap gap-4 justify-center p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-6 max-w-[1600px] mx-auto">
         {cocktails.map((cocktail, index) => (
           <div
             key={cocktail.id}
