@@ -43,16 +43,18 @@ const CardCocktail = ({ cocktail, onClick }) => {
 
   return (
     <div
-      className="w-full max-w-sm rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98]"
+      className="rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] flex flex-col"
       style={{
         backgroundColor: '#2a2a2a',
         borderColor: '#3a3a3a',
         border: '1px solid',
+        width: '380px', // Ancho fijo para todas las cards
+        height: '400px', // Altura fija reducida
       }}
       onClick={() => onClick && onClick(cocktail)}
     >
       {/* Imagen */}
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <img
           src={imageUrl}
           alt={name}
@@ -80,38 +82,46 @@ const CardCocktail = ({ cocktail, onClick }) => {
       </div>
 
       {/* Contenido */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-grow">
         {/* Título y precio */}
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3
-            className="text-xl font-semibold capitalize leading-tight"
+            className="text-xl font-semibold capitalize leading-tight line-clamp-2"
             style={{ color: '#e9cc9e' }}
           >
             {name}
           </h3>
           <div
-            className="text-base font-semibold whitespace-nowrap"
+            className="text-base font-semibold whitespace-nowrap flex-shrink-0"
             style={{ color: '#e9cc9e' }}
           >
 						${Number(price).toLocaleString()}
           </div>
         </div>
 
-        {/* Descripción */}
+        {/* Descripción con límite de líneas */}
         {description && (
-          <p className="text-sm mb-3" style={{ color: '#b8b8b8' }}>
+          <p
+            className="text-sm mb-3 line-clamp-2"
+            style={{ color: '#b8b8b8' }}
+            title={description}
+          >
             {description}
           </p>
         )}
 
         {/* Separador */}
-        <div className="my-2" style={{ borderTop: '1px solid #3a3a3a' }} />
+        <div
+          className="my-2 flex-shrink-0"
+          style={{ borderTop: '1px solid #3a3a3a' }}
+        />
 
         {/* Ingredientes */}
         {ingredients.length > 0 && (
           <p
             className="text-sm italic line-clamp-2"
             style={{ color: '#9a9a9a' }}
+            title={ingredients.join(', ')}
           >
             {ingredients.join(', ')}
           </p>
