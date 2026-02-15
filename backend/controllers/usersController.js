@@ -70,6 +70,11 @@ export const updateUserRole = async (req, res) => {
     );
     if (!upd.rows.length)
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    console.log(
+      `[AUDIT] Role change | admin: ${req.user.username} (${req.user.id}) | target: ${id} | new_role: ${role} | ip: ${req.ip} | date: ${new Date().toISOString()}`,
+    );
+
     return res.status(200).json({ mensaje: 'Rol actualizado' });
   } catch (error) {
     console.error('Error actualizando rol:', error);
@@ -116,6 +121,11 @@ export const deleteUser = async (req, res) => {
     );
     if (!del.rows.length)
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    console.log(
+      `[AUDIT] User deleted | admin: ${req.user.username} (${req.user.id}) | target: ${id} | ip: ${req.ip} | date: ${new Date().toISOString()}`,
+    );
+
     return res.status(200).json({ mensaje: 'Usuario eliminado' });
   } catch (error) {
     console.error('Error eliminando usuario:', error);
@@ -126,6 +136,7 @@ export const deleteUser = async (req, res) => {
 export const resetUserPassword = async (req, res) => {
   const { id } = req.params;
   const { newPassword } = req.body;
+  const adminUser = req.user;
   const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
@@ -137,16 +148,22 @@ export const resetUserPassword = async (req, res) => {
   }
   try {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
+
     const upd = await pool.query(
       'UPDATE users SET password = $1 WHERE id = $2 RETURNING id, username',
       [hashedPassword, id],
     );
     if (!upd.rows.length)
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-    return res.status(200).json({ 
+
+    const targetUser = upd.rows[0];
+    console.log(
+      `[AUDIT] Password reset | admin: ${adminUser.username} (${adminUser.id}) | target: ${targetUser.username} (${targetUser.id}) | ip: ${req.ip} | date: ${new Date().toISOString()}`,
+    );
+
+    return res.status(200).json({
       mensaje: 'Contraseña restablecida exitosamente',
-      username: upd.rows[0].username, 
+      username: targetUser.username,
     });
   } catch (error) {
     console.error('Error restableciendo contraseña:', error);
