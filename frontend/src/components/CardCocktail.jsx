@@ -10,12 +10,12 @@ const CardCocktail = ({ cocktail, onClick }) => {
   const imageUrl =
 		images && images.length > 0 && images[0]
 		  ? images[0]
-		  : 'https://via.placeholder.com/600x400?text=Sin+Imagen';
+		  : null;
 
   const categories = Array.isArray(translatedProduct.categories)
     ? translatedProduct.categories.filter(Boolean)
     : [];
-  // Preferir etiquetas calculadas por backend: destilado o clasificación de comida
+
   const primaryCategory =
 		translatedProduct.food_classification_name ||
 		translatedProduct.destilado_name ||
@@ -43,87 +43,92 @@ const CardCocktail = ({ cocktail, onClick }) => {
 
   return (
     <div
-      className="w-full rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] flex flex-col"
+      className="w-full cursor-pointer transition-all duration-200 hover:bg-[#2f2f2f] flex flex-row gap-4 p-4 rounded-xl group"
       style={{
-        backgroundColor: '#2a2a2a',
-        borderColor: '#3a3a3a',
-        border: '1px solid',
-        maxWidth: '380px', // Ancho máximo para mantener consistencia
-        minHeight: '400px', // Altura mínima para uniformidad
+        backgroundColor: 'transparent',
+        borderBottom: '1px solid #2a2a2a',
       }}
       onClick={() => onClick && onClick(cocktail)}
     >
-      {/* Imagen */}
-      <div className="relative flex-shrink-0">
-        <img
-          src={imageUrl}
-          alt={name}
-          className="w-full h-56 object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-        {/* Badge de destilado/categoría principal */}
-        <div
-          className="absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full capitalize"
-          style={{ backgroundColor: '#e9cc9e', color: '#191919' }}
-        >
-          {primaryCategory}
+      {/* Imagen pequeña redonda */}
+      {imageUrl && (
+        <div className="flex-shrink-0 self-start">
+          <img
+            src={imageUrl}
+            alt={name}
+            className="w-20 h-20 rounded-full object-cover border-2 transition-transform duration-300 group-hover:scale-105"
+            style={{ borderColor: '#3a3a3a' }}
+            loading="lazy"
+            decoding="async"
+          />
         </div>
-        {/* Porcentaje de alcohol (solo si existe) */}
-        {alcoholPct !== null && (
-          <div
-            className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1"
-            style={{ backgroundColor: '#e9cc9e', color: '#191919' }}
-          >
-            <FaWineBottle className="opacity-90" />
-            {Number(alcoholPct).toFixed(0)}%
-          </div>
-        )}
-      </div>
+      )}
 
-      {/* Contenido */}
-      <div className="p-4 flex flex-col flex-grow">
-        {/* Título y precio */}
-        <div className="flex items-start justify-between gap-3 mb-2">
+      {/* Contenido textual */}
+      <div className="flex-grow min-w-0">
+        {/* Fila: Nombre ··· Precio */}
+        <div className="flex items-baseline gap-2 mb-1">
           <h3
-            className="text-xl font-semibold capitalize leading-tight line-clamp-2"
+            className="text-lg font-semibold capitalize leading-tight truncate"
             style={{ color: '#e9cc9e' }}
           >
             {name}
           </h3>
+          {/* Línea punteada de relleno */}
           <div
+            className="flex-grow border-b border-dotted mx-1"
+            style={{ borderColor: '#4a4a4a', minWidth: '20px', marginBottom: '4px' }}
+          />
+          {/* Precio */}
+          <span
             className="text-base font-semibold whitespace-nowrap flex-shrink-0"
             style={{ color: '#e9cc9e' }}
           >
-						${Number(price).toLocaleString()}
-          </div>
+            ${Number(price).toLocaleString()}
+          </span>
         </div>
 
-        {/* Descripción con límite de líneas */}
+        {/* Tags: categoría + alcohol */}
+        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+          <span
+            className="text-xs font-medium capitalize tracking-wide"
+            style={{ color: '#8a8a7a' }}
+          >
+            {primaryCategory}
+          </span>
+          {alcoholPct !== null && (
+            <>
+              <span style={{ color: '#4a4a4a' }}>·</span>
+              <span
+                className="text-xs font-medium flex items-center gap-1"
+                style={{ color: '#8a8a7a' }}
+              >
+                <FaWineBottle className="text-[10px] opacity-70" />
+                {Number(alcoholPct).toFixed(0)}%
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Descripción */}
         {description && (
           <p
-            className="text-sm mb-3 line-clamp-2"
-            style={{ color: '#b8b8b8' }}
+            className="text-sm leading-relaxed line-clamp-2 mb-1.5"
+            style={{ color: '#9a9a9a' }}
             title={description}
           >
             {description}
           </p>
         )}
 
-        {/* Separador */}
-        <div
-          className="my-2 flex-shrink-0"
-          style={{ borderTop: '1px solid #3a3a3a' }}
-        />
-
         {/* Ingredientes */}
         {ingredients.length > 0 && (
           <p
-            className="text-sm italic line-clamp-2"
-            style={{ color: '#9a9a9a' }}
+            className="text-xs italic line-clamp-1"
+            style={{ color: '#6a6a6a' }}
             title={ingredients.join(', ')}
           >
-            {ingredients.join(', ')}
+            {ingredients.join(' · ')}
           </p>
         )}
       </div>
