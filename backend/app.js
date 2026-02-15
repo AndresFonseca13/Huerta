@@ -11,6 +11,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { validateEnv } from './config/validateEnv.js';
+import errorHandler from './middleware/errorHandler.js';
 
 validateEnv();
 
@@ -56,6 +57,9 @@ app.get('/bienvenido', (req, res) => {
   const mensaje = 'Bienvenido a Huerta';
   res.json({ mensaje });
 });
+
+// Middleware centralizado de errores
+app.use(errorHandler);
 
 // Solo escuchar si no estamos en Vercel
 if (process.env.NODE_ENV !== 'production') {
