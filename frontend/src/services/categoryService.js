@@ -1,10 +1,9 @@
-import { api, apiConfig } from '../config/api';
-// Usamos el proxy de Vite: todas las rutas del backend están bajo `/api`
+import { api } from '../config/api';
 
 
 export const searchCategories = async (term) => {
   const response = await api.get(
-    `${apiConfig.baseURL}/categories/search?searchTerm=${term}`,
+    `/categories/search?searchTerm=${term}`,
   );
   return response.data;
 };
@@ -12,7 +11,7 @@ export const searchCategories = async (term) => {
 export const getAllCategories = async (showAll = false) => {
   try {
     const response = await api.get(
-      `${apiConfig.baseURL}/categories?showAll=${showAll}`,
+      `/categories?showAll=${showAll}`,
     );
     return response.data;
   } catch (error) {
@@ -25,7 +24,7 @@ export const getAllCategories = async (showAll = false) => {
 export const getFoodCategories = async () => {
   try {
     const response = await api.get(
-      `${apiConfig.baseURL}/categories?onlyFood=true`,
+      `/categories?onlyFood=true`,
     );
     return response.data;
   } catch (error) {
@@ -38,7 +37,7 @@ export const getFoodCategories = async () => {
 export const getBeverageCategories = async () => {
   try {
     const response = await api.get(
-      `${apiConfig.baseURL}/categories?onlyBeverage=true`,
+      `/categories?onlyBeverage=true`,
     );
     return response.data;
   } catch (error) {
@@ -49,7 +48,7 @@ export const getBeverageCategories = async () => {
 
 export const createCategory = async (data) => {
   try {
-    const response = await api.post(`${apiConfig.baseURL}/categories`, data);
+    const response = await api.post(`/categories`, data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -58,7 +57,7 @@ export const createCategory = async (data) => {
 
 export const updateCategory = async (id, data) => {
   try {
-    const response = await api.put(`${apiConfig.baseURL}/categories/${id}`, data);
+    const response = await api.put(`/categories/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -68,7 +67,7 @@ export const updateCategory = async (id, data) => {
 export const toggleCategoryActive = async (id, is_active) => {
   try {
     const response = await api.patch(
-      `${apiConfig.baseURL}/categories/${id}/active`,
+      `/categories/${id}/active`,
       { is_active },
     );
     return response.data;
@@ -80,7 +79,7 @@ export const toggleCategoryActive = async (id, is_active) => {
 export const toggleCategoryPriority = async (id, is_priority) => {
   try {
     const response = await api.patch(
-      `${apiConfig.baseURL}/categories/${id}/priority`,
+      `/categories/${id}/priority`,
       { is_priority },
     );
     return response.data;
@@ -92,7 +91,7 @@ export const toggleCategoryPriority = async (id, is_priority) => {
 export const deleteCategory = async (id) => {
   try {
     const response = await api.delete(
-      `${apiConfig.baseURL}/categories/${id}?logical=false`,
+      `/categories/${id}?logical=false`,
     );
     return response.data;
   } catch (error) {
