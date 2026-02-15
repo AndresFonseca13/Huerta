@@ -12,7 +12,6 @@ const createIngredient = async (req, res) => {
     console.error('Error al crear el ingrediente:', error);
     res.status(500).json({
       message: 'Error al crear el ingrediente',
-      error: error.message,
     });
   }
 };
@@ -30,7 +29,6 @@ const deleteIngredient = async (req, res) => {
     console.error('Error al eliminar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al eliminar el ingrediente',
-      error: error.message,
     });
   }
 };
@@ -46,7 +44,6 @@ const getAllIngredients = async (req, res) => {
     console.error('Error al obtener los ingredientes:', error);
     res.status(500).json({
       message: 'Error al obtener los ingredientes',
-      error: error.message,
     });
   }
 };
@@ -68,7 +65,6 @@ const getIngredientById = async (req, res) => {
     console.error('Error al obtener el ingrediente:', error);
     res.status(500).json({
       message: 'Error al obtener el ingrediente',
-      error: error.message,
     });
   }
 };
@@ -89,7 +85,6 @@ const updateIngredient = async (req, res) => {
     console.error('Error al actualizar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al actualizar el ingrediente',
-      error: error.message,
     });
   }
 };
@@ -116,7 +111,6 @@ const searchIngredient = async (req, res) => {
     console.error('Error al buscar el ingrediente:', error);
     res.status(500).json({
       message: 'Error al buscar el ingrediente',
-      error: error.message,
     });
   }
 };

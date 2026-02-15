@@ -2,8 +2,8 @@
 import productServices from '../services/product/index.js';
 
 const getAllProducts = async (req, res) => {
-  const pagina = parseInt(req.query.page || req.query.pagina, 10) || 1;
-  const limite = parseInt(req.query.limit || req.query.limite, 10) || 10;
+  const pagina = Math.max(1, parseInt(req.query.page || req.query.pagina, 10) || 1);
+  const limite = Math.min(100, Math.max(1, parseInt(req.query.limit || req.query.limite, 10) || 10));
   const offset = (pagina - 1) * limite;
 
   const categoria = req.query.categoria || null;
@@ -33,8 +33,8 @@ const getAllProducts = async (req, res) => {
 };
 
 const getAllProductsAdmin = async (req, res) => {
-  const pagina = parseInt(req.query.page || req.query.pagina, 10) || 1;
-  const limite = parseInt(req.query.limit || req.query.limite, 10) || 10;
+  const pagina = Math.max(1, parseInt(req.query.page || req.query.pagina, 10) || 1);
+  const limite = Math.min(100, Math.max(1, parseInt(req.query.limit || req.query.limite, 10) || 10));
   const offset = (pagina - 1) * limite;
 
   const categoria = req.query.categoria || null;
@@ -68,11 +68,7 @@ const getProductById = async (req, res) => {
   const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
-    return res.status(400).json({
-      mensaje: 'ID inválido',
-      error: 'El ID debe ser un UUID válido',
-      idRecibido: id,
-    });
+    return res.status(400).json({ mensaje: 'ID inválido' });
   }
 
   try {
@@ -162,6 +158,9 @@ const searchProducts = async (req, res) => {
   if (!searchTerm || searchTerm.trim().length === 0) {
     return res.status(400).json({ mensaje: 'Término de búsqueda requerido' });
   }
+  if (searchTerm.length > 100) {
+    return res.status(400).json({ mensaje: 'El término de búsqueda no puede exceder 100 caracteres' });
+  }
   try {
     const products = await productServices.searchProductsService(
       searchTerm.trim(),
@@ -177,8 +176,8 @@ const searchProducts = async (req, res) => {
 
 const getFoodProducts = async (req, res) => {
   try {
-    const pagina = parseInt(req.query.page || req.query.pagina, 10) || 1;
-    const limite = parseInt(req.query.limit || req.query.limite, 10) || 10;
+    const pagina = Math.max(1, parseInt(req.query.page || req.query.pagina, 10) || 1);
+    const limite = Math.min(100, Math.max(1, parseInt(req.query.limit || req.query.limite, 10) || 10));
     const offset = (pagina - 1) * limite;
     const categoria = req.query.categoria || null;
     const orden = req.query.orden || 'name';

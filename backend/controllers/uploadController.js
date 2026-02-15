@@ -157,7 +157,6 @@ export const uploadImage = async (req, res) => {
     res.status(500).json({
       error: true,
       mensaje: 'Error al subir la imagen',
-      detalle: error.message,
     });
   }
 };

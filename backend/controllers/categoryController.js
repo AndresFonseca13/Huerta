@@ -18,9 +18,7 @@ const createCategory = async (req, res) => {
       return res.status(409).json({ mensaje: err.message });
     }
     console.error('Error al crear la categoría:', err);
-    res
-      .status(500)
-      .json({ mensaje: 'Error interno del servidor', error: err.message });
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 };
 
@@ -33,11 +31,7 @@ const deleteCategory = async (req, res) => {
   const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(id)) {
-    return res.status(400).json({
-      mensaje: 'ID inválido',
-      error: 'El ID debe ser un UUID válido',
-      idRecibido: id,
-    });
+    return res.status(400).json({ mensaje: 'ID inválido' });
   }
   try {
     const deletedCategory = await categoryService.deleteCategoryService(
@@ -61,7 +55,6 @@ const deleteCategory = async (req, res) => {
     console.error('Error al eliminar la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al eliminar la categoría',
-      error: error.message,
     });
   }
 };
@@ -87,7 +80,6 @@ const getAllCategories = async (req, res) => {
     console.error('Error al obtener las categorías:', error);
     res.status(500).json({
       mensaje: 'Error al obtener las categorías',
-      error: error.message,
     });
   }
 };
@@ -99,11 +91,7 @@ const getCategoryById = async (req, res) => {
   const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
-    return res.status(400).json({
-      mensaje: 'ID inválido',
-      error: 'El ID debe ser un UUID válido',
-      idRecibido: id,
-    });
+    return res.status(400).json({ mensaje: 'ID inválido' });
   }
 
   try {
@@ -132,11 +120,7 @@ const updateCategory = async (req, res) => {
   const uuidRegex =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!id || !uuidRegex.test(id)) {
-    return res.status(400).json({
-      mensaje: 'ID inválido',
-      error: 'El ID debe ser un UUID válido',
-      idRecibido: id,
-    });
+    return res.status(400).json({ mensaje: 'ID inválido' });
   }
   if (!name || !type) {
     return res.status(400).json({ mensaje: 'Nombre y tipo son requeridos' });
@@ -160,7 +144,6 @@ const updateCategory = async (req, res) => {
     console.error('Error al actualizar la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al actualizar la categoría',
-      error: error.message,
     });
   }
 };
@@ -187,7 +170,6 @@ const searchCategory = async (req, res) => {
     console.error('Error al buscar la categoría:', error);
     res.status(500).json({
       message: 'Error al buscar la categoría',
-      error: error.message,
     });
   }
 };
@@ -223,7 +205,6 @@ const setCategoryActive = async (req, res) => {
     console.error('Error al cambiar estado de la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al cambiar estado de la categoría',
-      error: error.message,
     });
   }
 };
@@ -256,7 +237,6 @@ const setCategoryPriority = async (req, res) => {
     console.error('Error al cambiar prioridad de la categoría:', error);
     res.status(500).json({
       mensaje: 'Error al cambiar prioridad de la categoría',
-      error: error.message,
     });
   }
 };
