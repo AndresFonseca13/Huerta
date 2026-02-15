@@ -11,13 +11,6 @@ export const loginUser = async (username, password) => {
 
     const { token } = response.data;
     localStorage.setItem('token', token);
-    // guardar rol para UI condicional
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload?.role) localStorage.setItem('role', payload.role);
-    } catch (_e) {
-      void _e;
-    }
     return response.data;
   } catch (error) {
     // Manejar diferentes tipos de errores con mensajes amigables
@@ -57,12 +50,6 @@ export const loginAdmin = async (username, password) => {
 
     const { token } = response.data;
     localStorage.setItem('token', token);
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload?.role) localStorage.setItem('role', payload.role);
-    } catch (_e) {
-      void _e;
-    }
     return response.data;
   } catch (error) {
     // Manejar diferentes tipos de errores con mensajes amigables
@@ -95,7 +82,6 @@ export const loginAdmin = async (username, password) => {
 // Función para cerrar sesión
 export const logout = () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('role');
   // Opcional: redirigir al usuario a la página de login
   window.location.href = '/admin/login';
 };
