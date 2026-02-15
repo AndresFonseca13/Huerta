@@ -8,6 +8,9 @@ import ingredientRoutes from './routes/ingredients.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import promotionsRoutes from './routes/promotions.routes.js';
 import cors from 'cors';
+import { validateEnv } from './config/validateEnv.js';
+
+validateEnv();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -44,19 +47,6 @@ app.get('/bienvenido', (req, res) => {
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
-    console.log('Variables de entorno cargadas:');
-    console.log(
-      'SUPABASE_URL:',
-      process.env.SUPABASE_URL ? 'Configurado' : 'No configurado',
-    );
-    console.log(
-      'SUPABASE_SERVICE_ROLE_KEY:',
-      process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Configurado' : 'No configurado',
-    );
-    console.log(
-      'DATABASE_URL:',
-      process.env.DATABASE_URL ? 'Configurado' : 'No configurado',
-    );
   });
 }
 
