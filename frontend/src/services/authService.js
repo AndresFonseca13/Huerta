@@ -45,6 +45,12 @@ export const loginAdmin = async (username, password) => {
 
 export const logout = async () => {
   try {
+    const { clearPermissionsCache } = await import('../hooks/usePermissions');
+    clearPermissionsCache();
+  } catch {
+    // Ignorar si no se puede importar
+  }
+  try {
     await api.post('/auth/logout');
   } catch {
     // Ignorar errores de logout
