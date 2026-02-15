@@ -105,7 +105,7 @@ const pageAnimate = { opacity: 1, y: 0 };
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { permissions } = usePermissions();
+  const { permissions, loading: permissionsLoading } = usePermissions();
   const [menuOptions, setMenuOptions] = useState([]);
 
   useEffect(() => {
@@ -124,6 +124,17 @@ const AdminLayout = () => {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
   }, [location.pathname]);
+
+  if (permissionsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#191919' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#e9cc9e' }}></div>
+          <p style={{ color: '#b8b8b8' }}>Cargando panel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#191919' }}>
