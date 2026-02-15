@@ -8,6 +8,8 @@ import ingredientRoutes from './routes/ingredients.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import promotionsRoutes from './routes/promotions.routes.js';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { validateEnv } from './config/validateEnv.js';
 
 validateEnv();
@@ -15,20 +17,32 @@ validateEnv();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Esto habilita CORS para todos los dominios (en desarrollo está bien)
+// Security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false,
+}));
+
+// Rate limiting global: 100 peticiones por IP cada 15 min
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { mensaje: 'Demasiadas peticiones, intenta de nuevo más tarde.' },
+}));
+
 app.use(
   cors({
     origin: [
-      process.env.FRONTEND_URL, // Frontend en producción (Vercel)
-      'http://localhost:5173', // Desarrollo local
-    ].filter(Boolean), // Filtrar valores undefined
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+    ].filter(Boolean),
     credentials: true,
   }),
 );
 
-// Tu configuración actual
 app.use(express.json());
-// app.use('/api/...') etc
 
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
