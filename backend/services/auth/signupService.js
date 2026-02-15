@@ -1,7 +1,13 @@
 import bcrypt from 'bcrypt';
 import pool from '../../config/db.js';
+import { validatePassword } from '../../utils/validatePassword.js';
 
 const signupService = async (username, password, roleName = 'ventas') => {
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    throw new Error(passwordError);
+  }
+
   const checkUser = await pool.query(
     'SELECT * FROM users WHERE username = $1',
     [username],
