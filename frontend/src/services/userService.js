@@ -1,63 +1,36 @@
-import axios from 'axios';
-import { getAuthHeaders } from './authService';
-import { apiConfig } from '../config/api';
+import { api } from '../config/api';
 
 export const getUsers = async () => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.get(`${apiConfig.baseURL}/users`, { headers });
+  const { data } = await api.get('/users');
   return data.users || [];
 };
 
 export const getUserById = async (id) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.get(`${apiConfig.baseURL}/users/${id}`, { headers });
+  const { data } = await api.get(`/users/${id}`);
   return data;
 };
 
 export const updateUserRole = async (id, role) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.patch(
-    `${apiConfig.baseURL}/users/${id}/role`,
-    { role },
-    { headers },
-  );
+  const { data } = await api.patch(`/users/${id}/role`, { role });
   return data;
 };
 
 export const createUser = async ({ username, password, role }) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.post(
-    `${apiConfig.baseURL}/auth/signup`,
-    { username, password, role },
-    { headers },
-  );
+  const { data } = await api.post('/auth/signup', { username, password, role });
   return data;
 };
 
 export const updateUserStatus = async (id, isActive) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.patch(
-    `${apiConfig.baseURL}/users/${id}/status`,
-    { isActive },
-    { headers },
-  );
+  const { data } = await api.patch(`/users/${id}/status`, { isActive });
   return data;
 };
 
 export const deleteUser = async (id) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.delete(`${apiConfig.baseURL}/users/${id}`, {
-    headers,
-  });
+  const { data } = await api.delete(`/users/${id}`);
   return data;
 };
 
 export const resetUserPassword = async (id, newPassword) => {
-  const headers = getAuthHeaders();
-  const { data } = await axios.patch(
-    `${apiConfig.baseURL}/users/${id}/reset-password`,
-    { newPassword },
-    { headers },
-  );
+  const { data } = await api.patch(`/users/${id}/reset-password`, { newPassword });
   return data;
 };

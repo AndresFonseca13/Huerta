@@ -1,26 +1,23 @@
-/**
- * Decodifica el payload del JWT almacenado en localStorage.
- * Retorna null si no hay token, está expirado o es inválido.
- */
-export function getTokenPayload() {
-  const token = localStorage.getItem('token');
-  if (!token) return null;
+import { api } from '../config/api';
 
+/**
+ * Verifica la sesión con el backend y retorna los datos del usuario.
+ * Retorna null si no hay sesión válida.
+ */
+export async function checkSession() {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const now = Date.now() / 1000;
-    if (payload.exp && payload.exp < now) return null;
-    return payload;
+    const response = await api.get('/auth/me');
+    return response.data;
   } catch {
     return null;
   }
 }
 
 /**
- * Obtiene el rol del usuario desde el JWT, no desde localStorage.
- * Retorna null si no hay token válido.
+ * Obtiene el rol del usuario desde el backend.
+ * Retorna null si no hay sesión válida.
  */
-export function getUserRole() {
-  const payload = getTokenPayload();
-  return payload?.role || null;
+export async function getUserRole() {
+  const user = await checkSession();
+  return user?.role || null;
 }

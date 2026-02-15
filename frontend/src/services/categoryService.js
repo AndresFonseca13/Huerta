@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { apiConfig } from '../config/api';
+import { api, apiConfig } from '../config/api';
 // Usamos el proxy de Vite: todas las rutas del backend están bajo `/api`
 
 
 export const searchCategories = async (term) => {
-  const response = await axios.get(
+  const response = await api.get(
     `${apiConfig.baseURL}/categories/search?searchTerm=${term}`,
   );
   return response.data;
@@ -12,7 +11,7 @@ export const searchCategories = async (term) => {
 
 export const getAllCategories = async (showAll = false) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${apiConfig.baseURL}/categories?showAll=${showAll}`,
     );
     return response.data;
@@ -25,7 +24,7 @@ export const getAllCategories = async (showAll = false) => {
 // Obtener solo categorías de comida (type=clasificacion comida) asociadas a productos de comida
 export const getFoodCategories = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${apiConfig.baseURL}/categories?onlyFood=true`,
     );
     return response.data;
@@ -38,7 +37,7 @@ export const getFoodCategories = async () => {
 // Obtener solo categorías de bebidas (type=clasificacion bebida)
 export const getBeverageCategories = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${apiConfig.baseURL}/categories?onlyBeverage=true`,
     );
     return response.data;
@@ -50,12 +49,7 @@ export const getBeverageCategories = async () => {
 
 export const createCategory = async (data) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`${apiConfig.baseURL}/categories`, data, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
-      },
-    });
+    const response = await api.post(`${apiConfig.baseURL}/categories`, data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -64,12 +58,7 @@ export const createCategory = async (data) => {
 
 export const updateCategory = async (id, data) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.put(`${apiConfig.baseURL}/categories/${id}`, data, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
-      },
-    });
+    const response = await api.put(`${apiConfig.baseURL}/categories/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -78,15 +67,9 @@ export const updateCategory = async (id, data) => {
 
 export const toggleCategoryActive = async (id, is_active) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.patch(
+    const response = await api.patch(
       `${apiConfig.baseURL}/categories/${id}/active`,
       { is_active },
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      },
     );
     return response.data;
   } catch (error) {
@@ -96,15 +79,9 @@ export const toggleCategoryActive = async (id, is_active) => {
 
 export const toggleCategoryPriority = async (id, is_priority) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.patch(
+    const response = await api.patch(
       `${apiConfig.baseURL}/categories/${id}/priority`,
       { is_priority },
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      },
     );
     return response.data;
   } catch (error) {
@@ -114,14 +91,8 @@ export const toggleCategoryPriority = async (id, is_priority) => {
 
 export const deleteCategory = async (id) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.delete(
+    const response = await api.delete(
       `${apiConfig.baseURL}/categories/${id}?logical=false`,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      },
     );
     return response.data;
   } catch (error) {

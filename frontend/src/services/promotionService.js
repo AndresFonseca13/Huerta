@@ -1,14 +1,10 @@
-import { getAuthHeaders } from './authService';
 import { apiConfig } from '../config/api';
 
 
 export const getEligiblePromotionNow = async () => {
   const url = `${apiConfig.baseURL}/promotions/eligible-now?_t=${Date.now()}`;
-  console.log('[Promo] Fetch elegible-now:', url);
   const res = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
-  console.log('[Promo] HTTP status:', res.status);
   const data = await res.json().catch(() => ({}));
-  console.log('[Promo] Response body:', data);
   if (!res.ok) throw new Error(data.mensaje || 'Error al consultar promoción');
   if (Array.isArray(data.promotions)) return data.promotions;
   return data.promotion ? [data.promotion] : [];
@@ -20,7 +16,8 @@ export const listPromotions = async (page = 1, limit = 20) => {
     limit: String(limit),
   });
   const res = await fetch(`${apiConfig.baseURL}/promotions?${params}`, {
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.mensaje || 'Error al listar promociones');
@@ -29,7 +26,8 @@ export const listPromotions = async (page = 1, limit = 20) => {
 
 export const getPromotionById = async (id) => {
   const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.mensaje || 'Error al obtener promoción');
@@ -39,7 +37,8 @@ export const getPromotionById = async (id) => {
 export const createPromotion = async (payload) => {
   const res = await fetch(`${apiConfig.baseURL}/promotions`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   const data = await res.json();
@@ -50,7 +49,8 @@ export const createPromotion = async (payload) => {
 export const updatePromotion = async (id, payload) => {
   const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
     method: 'PUT',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   const data = await res.json().catch(() => ({}));
@@ -64,7 +64,8 @@ export const updatePromotion = async (id, payload) => {
 export const deletePromotion = async (id) => {
   const res = await fetch(`${apiConfig.baseURL}/promotions/${id}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.mensaje || 'Error al eliminar promoción');

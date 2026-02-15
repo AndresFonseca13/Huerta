@@ -21,7 +21,6 @@ import {
   FiLock,
   FiCheckCircle,
 } from 'react-icons/fi';
-import axios from 'axios'; // eslint-disable-line no-unused-vars
 
 const ROLES = ['admin', 'ventas', 'chef', 'barmanager'];
 
@@ -66,16 +65,17 @@ const UsersAdmin = () => {
       }
     };
     fetchUsers();
-    try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload?.id) setCurrentUserId(payload.id);
-        if (payload?.role) setCurrentUserRole(payload.role);
+    const fetchCurrentUser = async () => {
+      try {
+        const { checkAuth } = await import('../services/authService');
+        const user = await checkAuth();
+        if (user?.id) setCurrentUserId(user.id);
+        if (user?.role) setCurrentUserRole(user.role);
+      } catch (_e) {
+        // noop
       }
-    } catch (_e) {
-      // noop
-    }
+    };
+    fetchCurrentUser();
   }, []);
 
   const filtered = useMemo(() => {
