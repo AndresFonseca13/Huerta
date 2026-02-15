@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
+import { validatePassword } from '../utils/validatePassword.js';
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -130,8 +131,9 @@ export const resetUserPassword = async (req, res) => {
   if (!id || !uuidRegex.test(id)) {
     return res.status(400).json({ mensaje: 'ID inválido' });
   }
-  if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
-    return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 6 caracteres' });
+  const passwordError = validatePassword(newPassword);
+  if (passwordError) {
+    return res.status(400).json({ mensaje: passwordError });
   }
   try {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
