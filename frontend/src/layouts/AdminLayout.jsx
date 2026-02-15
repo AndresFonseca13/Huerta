@@ -99,8 +99,6 @@ const SidebarItem = ({ active, icon: Icon, label, onClick }) => (
   </div>
 );
 
-const pageInitial = { opacity: 0, y: 6 };
-const pageAnimate = { opacity: 1, y: 0 };
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -209,16 +207,9 @@ const AdminLayout = () => {
             </div>
           </aside>
 
-          {/* Contenido con transición */}
+          {/* Contenido */}
           <div className="lg:col-span-9">
-            <Motion.div
-              key={location.pathname}
-              initial={pageInitial}
-              animate={pageAnimate}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </Motion.div>
+            <Outlet />
           </div>
         </div>
       </div>
