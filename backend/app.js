@@ -10,6 +10,7 @@ import promotionsRoutes from './routes/promotions.routes.js';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { validateEnv } from './config/validateEnv.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -43,6 +44,7 @@ app.use(
   }),
 );
 
+app.use(cookieParser());
 app.use(express.json());
 
 app.use('/api/products', productsRoutes);

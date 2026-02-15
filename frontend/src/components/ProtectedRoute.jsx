@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated } from '../services/authService';
+import { checkAuth } from '../services/authService';
 
 const ProtectedRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -8,14 +8,12 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Verificar autenticación
-    const checkAuth = () => {
-      const authenticated = isAuthenticated();
-      setIsAuth(authenticated);
+    const verify = async () => {
+      const user = await checkAuth();
+      setIsAuth(!!user);
       setIsLoading(false);
     };
-
-    checkAuth();
+    verify();
   }, []);
 
   if (isLoading) {
@@ -30,7 +28,6 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuth) {
-    // Redirigir al login con la ubicación actual para volver después del login
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 

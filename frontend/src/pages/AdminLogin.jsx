@@ -35,11 +35,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await loginAdmin(formData.username, formData.password);
-
-      // Guardar token en localStorage
-      localStorage.setItem('adminToken', response.token);
-      localStorage.setItem('adminUsername', response.username);
+      await loginAdmin(formData.username, formData.password);
 
       // Redirigir a la página de destino o al panel de administración
       navigate(from, { replace: true });

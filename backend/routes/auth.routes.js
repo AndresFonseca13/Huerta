@@ -30,5 +30,8 @@ router.post(
   authController.signup,
 );
 router.post('/login', loginLimiter, authController.login);
+router.post('/refresh', authController.refresh);
+router.post('/logout', authController.logout);
+router.get('/me', authMiddleware, authController.me);
 
 export default router;

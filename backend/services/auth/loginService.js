@@ -18,13 +18,22 @@ const loginService = async (username, password) => {
   if (!passwordMatch) {
     throw new Error('Usuario o contraseña incorrectos');
   }
-  const token = jwt.sign(
+
+  const accessToken = jwt.sign(
     { id: user.id, username: user.username, role: user.role_name },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' },
+    { expiresIn: '15m' },
   );
+
+  const refreshToken = jwt.sign(
+    { id: user.id, type: 'refresh' },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' },
+  );
+
   return {
-    token,
+    accessToken,
+    refreshToken,
     username: user.username,
     role: user.role_name,
   };

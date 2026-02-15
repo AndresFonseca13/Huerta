@@ -1,4 +1,3 @@
-import { getAuthHeaders } from './authService';
 import { apiConfig } from '../config/api';
 
 export const uploadImages = async (files, productName) => {
@@ -12,9 +11,7 @@ export const uploadImages = async (files, productName) => {
 
   const response = await fetch(`${apiConfig.baseURL}/upload/upload`, {
     method: 'POST',
-    headers: {
-      Authorization: getAuthHeaders().Authorization,
-    },
+    credentials: 'include',
     body: formData,
   });
 

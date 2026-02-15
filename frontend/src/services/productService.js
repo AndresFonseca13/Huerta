@@ -1,4 +1,3 @@
-import { getAuthHeaders } from './authService';
 import { apiConfig } from '../config/api';
 
 // Públicas
@@ -46,87 +45,62 @@ export const getProductsAdmin = async (
   if (tipo) params.append('tipo', tipo);
 
   const response = await fetch(`${apiConfig.baseURL}/products/admin/all?${params}`, {
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
   const data = await response.json();
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/admin/login';
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    }
+  if (!response.ok)
     throw new Error(data.mensaje || 'Error al obtener productos');
-  }
   return data;
 };
 
 export const createProduct = async (productData) => {
   const response = await fetch(`${apiConfig.baseURL}/products`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(productData),
   });
   const data = await response.json();
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/admin/login';
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    }
+  if (!response.ok)
     throw new Error(data.mensaje || 'Error al crear producto');
-  }
   return data;
 };
 
 export const updateProduct = async (id, productData) => {
   const response = await fetch(`${apiConfig.baseURL}/products/${id}`, {
     method: 'PUT',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(productData),
   });
   const data = await response.json();
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/admin/login';
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    }
+  if (!response.ok)
     throw new Error(data.mensaje || 'Error al actualizar producto');
-  }
   return data;
 };
 
 export const updateProductStatus = async (id, isActive) => {
   const response = await fetch(`${apiConfig.baseURL}/products/${id}/status`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ isActive }),
   });
   const data = await response.json();
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/admin/login';
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    }
+  if (!response.ok)
     throw new Error(data.mensaje || 'Error al actualizar estado del producto');
-  }
   return data;
 };
 
 export const deleteProduct = async (id) => {
   const response = await fetch(`${apiConfig.baseURL}/products/${id}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
   const data = await response.json();
-  if (!response.ok) {
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/admin/login';
-      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    }
+  if (!response.ok)
     throw new Error(data.mensaje || 'Error al eliminar producto');
-  }
   return data;
 };

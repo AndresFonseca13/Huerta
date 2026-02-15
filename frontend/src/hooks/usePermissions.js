@@ -1,37 +1,31 @@
-import { useMemo } from 'react';
-
-// Función para obtener información del usuario desde el JWT
-const getUserInfo = () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return { username: 'Usuario', role: 'admin' };
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log('usePermissions - JWT payload:', payload);
-
-    const userInfo = {
-      username: payload.username || payload.name || 'Usuario',
-      role: payload.role || 'admin',
-      userId: payload.id || payload.userId,
-    };
-
-    console.log('usePermissions - Información del usuario extraída:', userInfo);
-    return userInfo;
-  } catch (error) {
-    console.error('usePermissions - Error al decodificar JWT:', error);
-    return { username: 'Usuario', role: 'admin' };
-  }
-};
+import { useMemo, useState, useEffect } from 'react';
+import { checkAuth } from '../services/authService';
 
 // Hook para verificar permisos del usuario
 export const usePermissions = () => {
-  console.log('usePermissions - Hook ejecutándose...');
-  const userInfo = getUserInfo();
+  const [userInfo, setUserInfo] = useState({ username: 'Usuario', role: null, userId: null });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUserInfo({
+          username: user.username || 'Usuario',
+          role: user.role || 'admin',
+          userId: user.id,
+        });
+      }
+      setLoading(false);
+    };
+    fetchUser();
+  }, []);
+
   const userRole = userInfo.role;
 
   const permissions = useMemo(() => {
-    console.log('usePermissions - Generando permisos para rol:', userRole);
-    const perms = {
+    if (!userRole) return {};
+    return {
       // Dashboard - Todos los roles tienen acceso
       canAccessDashboard: true,
 
@@ -39,13 +33,13 @@ export const usePermissions = () => {
       canAccessBeverages: ['admin', 'ventas', 'barmanager'].includes(userRole),
       canCreateBeverages: ['admin', 'ventas', 'barmanager'].includes(userRole),
       canEditBeverages: ['admin', 'ventas', 'barmanager'].includes(userRole),
-      canDeleteBeverages: ['admin', 'ventas', 'barmanager'].includes(userRole), // Barmanager puede eliminar bebidas
+      canDeleteBeverages: ['admin', 'ventas', 'barmanager'].includes(userRole),
 
       // Comida - Solo admin, ventas y chef
       canAccessFood: ['admin', 'ventas', 'chef'].includes(userRole),
       canCreateFood: ['admin', 'ventas', 'chef'].includes(userRole),
       canEditFood: ['admin', 'ventas', 'chef'].includes(userRole),
-      canDeleteFood: ['admin', 'ventas', 'chef'].includes(userRole), // Chef puede eliminar platos
+      canDeleteFood: ['admin', 'ventas', 'chef'].includes(userRole),
 
       // Categorías - Todos los roles pueden hacer CRUD completo
       canAccessCategories: true,
@@ -76,20 +70,13 @@ export const usePermissions = () => {
         userRole,
       ),
     };
-
-    console.log(
-      'usePermissions - Permisos generados para rol',
-      userRole,
-      ':',
-      perms,
-    );
-    return perms;
   }, [userRole]);
 
   return {
     userRole,
     username: userInfo.username,
     userId: userInfo.userId,
+    loading,
     permissions,
     hasPermission: (permission) => permissions[permission] || false,
   };
