@@ -10,7 +10,7 @@ const poolConfig = process.env.DATABASE_URL
   ? {
     connectionString: process.env.DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false, // Para Supabase PostgreSQL
+      rejectUnauthorized: process.env.NODE_ENV === 'production',
     },
   }
   : {
@@ -20,7 +20,7 @@ const poolConfig = process.env.DATABASE_URL
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     ssl: {
-      rejectUnauthorized: false, // Para Supabase PostgreSQL
+      rejectUnauthorized: process.env.NODE_ENV === 'production',
     },
     // Configuración adicional para Supabase
     connectionTimeoutMillis: 30000,
