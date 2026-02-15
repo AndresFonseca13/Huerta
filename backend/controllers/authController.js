@@ -2,12 +2,10 @@ import jwt from 'jsonwebtoken';
 import signupService from '../services/auth/signupService.js';
 import loginService from '../services/auth/loginService.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
-
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? 'none' : 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
 };
 
 const signup = async (req, res) => {
