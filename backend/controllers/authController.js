@@ -80,15 +80,15 @@ const refresh = async (req, res) => {
 
     res.status(200).json({ mensaje: 'Token renovado', username: user.username, role: user.role_name });
   } catch {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token', { path: '/api/auth' });
+    res.clearCookie('access_token', COOKIE_OPTIONS);
+    res.clearCookie('refresh_token', { ...COOKIE_OPTIONS, path: '/api/auth' });
     return res.status(401).json({ mensaje: 'Refresh token expirado o inválido' });
   }
 };
 
 const logout = async (_req, res) => {
-  res.clearCookie('access_token');
-  res.clearCookie('refresh_token', { path: '/api/auth' });
+  res.clearCookie('access_token', COOKIE_OPTIONS);
+  res.clearCookie('refresh_token', { ...COOKIE_OPTIONS, path: '/api/auth' });
   res.status(200).json({ mensaje: 'Sesión cerrada' });
 };
 
