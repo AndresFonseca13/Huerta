@@ -35,10 +35,12 @@ const Navbar = () => {
             style={{ objectPosition: 'center' }}
           />
           <h1
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-wider flex items-center truncate"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl flex items-center truncate uppercase"
             style={{
               fontFamily: '\'Playfair Display\', serif',
               color: '#e9cc9e',
+              fontWeight: '500',
+              letterSpacing: '0.15em',
             }}
           >
 						Huerta

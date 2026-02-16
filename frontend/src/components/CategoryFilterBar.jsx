@@ -63,7 +63,7 @@ const CategoryFilterBar = () => {
     fetchCategories();
   }, [tipo, t]);
 
-  // Verificar qué categorías tienen productos asociados
+  // Verificar qué categorías tienen productos con UNA sola llamada
   useEffect(() => {
     const checkCategoriesWithProducts = async () => {
       if (allCategories.length === 0) {
@@ -72,53 +72,29 @@ const CategoryFilterBar = () => {
       }
 
       try {
-        // Filtrar categorías por tipo primero
-        const filteredByType = tipo === 'clasificacion' 
-          ? allCategories.filter((c) => c.type === 'clasificacion comida')
-          : allCategories.filter((c) => c.type === tipo);
-
-        if (filteredByType.length === 0) {
-          setCategoriesWithProducts(new Set());
-          return;
-        }
-
         const productType = tipo === 'clasificacion' ? 'clasificacion' : tipo;
+        // Una sola llamada con límite alto para obtener todos los productos del tipo
+        const data = await getProducts(1, 200, null, productType);
+        const products = Array.isArray(data.cocteles) ? data.cocteles : [];
+
+        // Extraer nombres de categorías que aparecen en los productos
         const categoriesSet = new Set();
-
-        // Verificar cada categoría individualmente
-        // Hacemos llamadas paralelas para ser más eficientes
-        const checkPromises = filteredByType.map(async (category) => {
-          try {
-            // Hacer una llamada con límite 1 para verificar si hay productos
-            const data = await getProducts(1, 1, category.name, productType);
-            const products = Array.isArray(data.cocteles) ? data.cocteles : [];
-            const totalRecords = data.paginacion?.totalRecords || 0;
-						
-            // Si hay al menos 1 producto, agregar la categoría
-            if (totalRecords > 0 || products.length > 0) {
-              return { name: category.name, hasProducts: true };
-            }
-            return { name: category.name, hasProducts: false };
-          } catch (_err) {
-            // Si hay error al verificar una categoría, no la incluimos
-            return { name: category.name, hasProducts: false, error: true };
+        products.forEach((product) => {
+          if (Array.isArray(product.categories)) {
+            product.categories.forEach((cat) => {
+              if (cat?.name) categoriesSet.add(cat.name);
+            });
           }
-        });
-
-        // Esperar todas las verificaciones
-        const results = await Promise.all(checkPromises);
-				
-        // Agregar solo las categorías que tienen productos
-        results.forEach((result) => {
-          if (result.hasProducts) {
-            categoriesSet.add(result.name);
-          }
+          // Campos directos que podrían indicar categoría
+          if (product.destilado_name) categoriesSet.add(product.destilado_name);
+          if (product.food_classification_name) categoriesSet.add(product.food_classification_name);
         });
 
         setCategoriesWithProducts(categoriesSet);
       } catch (_err) {
-        // Si hay error general, no mostrar ninguna categoría (más seguro)
-        setCategoriesWithProducts(new Set());
+        // En caso de error, mostrar todas las categorías (mejor UX que no mostrar ninguna)
+        const allNames = new Set(allCategories.map((c) => c.name));
+        setCategoriesWithProducts(allNames);
       }
     };
 
@@ -183,127 +159,186 @@ const CategoryFilterBar = () => {
     return Boolean(categoria) && categoria === name;
   };
 
+  const allIsActive =
+    !categoria &&
+    (location.pathname === '/bebidas' || location.pathname === '/comida');
+
   return (
     <div className="w-full flex flex-col gap-3 md:gap-4 items-center mb-4">
       {/* Botón flotante - ahora maneja su propia navegación */}
       <FloatingTypeSwitcher />
 
-      {/* Botones de categorías - scroll horizontal */}
+      {/* Filtros de categorías - estilo menú de bar */}
       <div className="w-full max-w-7xl px-4">
-        <div
-          className="flex flex-nowrap items-center gap-2 md:gap-3 overflow-x-auto scroll-smooth no-scrollbar"
+        {/* Línea decorativa superior */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+          <span
+            className="text-[10px] md:text-xs uppercase tracking-[0.25em] font-medium"
+            style={{ color: '#8a7a5a' }}
+          >
+            {tipo === 'destilado' ? t('categoryFilter.allBeverages') : t('categoryFilter.allFood')}
+          </span>
+          <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+        </div>
+
+        <nav
+          className="flex flex-nowrap items-center gap-1 md:gap-0 overflow-x-auto scroll-smooth no-scrollbar justify-start md:justify-center"
           role="tablist"
           aria-label="Filtros por categoría"
         >
+          {/* Botón "Todas" */}
           <button
-            className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm ${
-              !categoria &&
-							(location.pathname === '/bebidas' ||
-								location.pathname === '/comida')
-                ? 'border-[#e9cc9e] text-[#191919]'
-                : 'bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-            }`}
-            style={
-              !categoria &&
-							(location.pathname === '/bebidas' ||
-								location.pathname === '/comida')
-                ? {
-                  backgroundColor: '#e9cc9e',
-                  WebkitAppearance: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-								  }
-                : {
-                  WebkitAppearance: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-								  }
-            }
+            className="group relative flex-shrink-0 px-4 md:px-5 py-2.5 text-sm md:text-base tracking-wide transition-all duration-300 uppercase"
+            style={{
+              color: allIsActive ? '#e9cc9e' : '#7a7a6a',
+              fontWeight: allIsActive ? '600' : '400',
+              letterSpacing: '0.08em',
+              background: 'transparent',
+              border: 'none',
+              WebkitAppearance: 'none',
+              WebkitTapHighlightColor: 'transparent',
+            }}
             onClick={() => handleSelectCategoria(null)}
+            role="tab"
+            aria-selected={allIsActive}
           >
-            {tipo === 'destilado'
-              ? t('categoryFilter.allBeverages')
-              : t('categoryFilter.allFood')}
+            {t('categoryFilter.all')}
+            {/* Indicador inferior animado */}
+            <span
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+              style={{
+                width: allIsActive ? '60%' : '0%',
+                backgroundColor: '#e9cc9e',
+              }}
+            />
+            {/* Hover glow sutil */}
+            {!allIsActive && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{
+                  width: '40%',
+                  backgroundColor: '#5a5a4a',
+                }}
+              />
+            )}
           </button>
+
+          {/* Separador */}
+          <span
+            className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline"
+            style={{ color: '#3a3a3a' }}
+          >
+            ·
+          </span>
 
           {loading && (
             <span
-              className="flex-shrink-0 text-sm"
-              style={{ color: '#b8b8b8' }}
+              className="flex-shrink-0 text-xs uppercase tracking-widest"
+              style={{ color: '#5a5a4a' }}
             >
               {t('categoryFilter.loading')}
             </span>
           )}
           {error && (
-            <span className="flex-shrink-0 text-sm text-red-400">{error}</span>
+            <span className="flex-shrink-0 text-xs text-red-400/70">{error}</span>
           )}
 
           {!loading &&
-						!error &&
-						categoriasFiltradas.map((cat) => {
-						  // Traducir categorías de comida (entrada, fuerte, postre, adiciones)
-						  const getCategoryLabel = (categoryName) => {
-						    if (tipo === 'clasificacion') {
-						      // Normalizar el nombre removiendo espacios y convirtiendo a minúsculas
-						      const normalizedName = categoryName
-						        .toLowerCase()
-						        .trim()
-						        .replace(/\s+/g, '');
+            !error &&
+            categoriasFiltradas.map((cat, index) => {
+              const getCategoryLabel = (categoryName) => {
+                if (tipo === 'clasificacion') {
+                  const normalizedName = categoryName
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, '');
 
-						      // Mapear variaciones comunes de categorías
-						      const categoryMap = {
-						        entrada: 'entrada',
-						        entradas: 'entrada',
-						        fuerte: 'fuerte',
-						        fuertes: 'fuerte',
-						        platofuerte: 'fuerte',
-						        platosfuertes: 'fuerte',
-						        postre: 'postre',
-						        postres: 'postre',
-						        adiciones: 'adiciones',
-						        adicion: 'adiciones',
-						        acompañamientos: 'adiciones',
-						        acompañamiento: 'adiciones',
-						      };
+                  const categoryMap = {
+                    entrada: 'entrada',
+                    entradas: 'entrada',
+                    fuerte: 'fuerte',
+                    fuertes: 'fuerte',
+                    platofuerte: 'fuerte',
+                    platosfuertes: 'fuerte',
+                    postre: 'postre',
+                    postres: 'postre',
+                    adiciones: 'adiciones',
+                    adicion: 'adiciones',
+                    acompañamientos: 'adiciones',
+                    acompañamiento: 'adiciones',
+                  };
 
-						      const mappedName =
-										categoryMap[normalizedName] || normalizedName;
-						      const translationKey = `foodCategory.${mappedName}`;
-						      const translated = t(translationKey);
+                  const mappedName =
+                    categoryMap[normalizedName] || normalizedName;
+                  const translationKey = `foodCategory.${mappedName}`;
+                  const translated = t(translationKey);
 
-						      // Si la traducción es igual a la clave, significa que no existe, usar nombre original
-						      return translated !== translationKey
-						        ? translated
-						        : categoryName;
-						    }
-						    return categoryName;
-						  };
+                  return translated !== translationKey
+                    ? translated
+                    : categoryName;
+                }
+                return categoryName;
+              };
 
-						  return (
-						    <button
-						      key={cat.id}
-						      className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base capitalize transition-all shadow-sm ${
-						        isSelected(cat.name)
-						          ? 'border-[#e9cc9e] text-[#191919]'
-						          : 'bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-						      }`}
-						      style={
-						        isSelected(cat.name)
-						          ? {
-						            backgroundColor: '#e9cc9e',
-						            WebkitAppearance: 'none',
-						            WebkitTapHighlightColor: 'transparent',
-											  }
-						          : {
-						            WebkitAppearance: 'none',
-						            WebkitTapHighlightColor: 'transparent',
-											  }
-						      }
-						      onClick={() => handleSelectCategoria(cat.name)}
-						    >
-						      {getCategoryLabel(cat.name)}
-						    </button>
-						  );
-						})}
-        </div>
+              const active = isSelected(cat.name);
+
+              return (
+                <React.Fragment key={cat.id}>
+                  <button
+                    className="group relative flex-shrink-0 px-4 md:px-5 py-2.5 text-sm md:text-base capitalize tracking-wide transition-all duration-300"
+                    style={{
+                      color: active ? '#e9cc9e' : '#7a7a6a',
+                      fontWeight: active ? '600' : '400',
+                      letterSpacing: '0.08em',
+                      background: 'transparent',
+                      border: 'none',
+                      WebkitAppearance: 'none',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                    onClick={() => handleSelectCategoria(cat.name)}
+                    role="tab"
+                    aria-selected={active}
+                  >
+                    {getCategoryLabel(cat.name)}
+                    {/* Indicador inferior animado */}
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                      style={{
+                        width: active ? '60%' : '0%',
+                        backgroundColor: '#e9cc9e',
+                      }}
+                    />
+                    {/* Hover glow sutil */}
+                    {!active && (
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                        style={{
+                          width: '40%',
+                          backgroundColor: '#5a5a4a',
+                        }}
+                      />
+                    )}
+                  </button>
+                  {/* Separador entre items (excepto el último) */}
+                  {index < categoriasFiltradas.length - 1 && (
+                    <span
+                      className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline"
+                      style={{ color: '#3a3a3a' }}
+                    >
+                      ·
+                    </span>
+                  )}
+                </React.Fragment>
+              );
+            })}
+        </nav>
+
+        {/* Línea decorativa inferior */}
+        <div
+          className="mt-3 h-px w-full"
+          style={{ backgroundColor: '#3a3a3a' }}
+        />
       </div>
     </div>
   );

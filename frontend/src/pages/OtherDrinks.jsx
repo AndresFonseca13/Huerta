@@ -73,160 +73,67 @@ const OtherDrinks = () => {
     fetchCategories();
   }, []);
 
-  // Verificar qué categorías principales tienen productos
+  // Verificar qué categorías y subcategorías tienen productos con UNA sola llamada
   useEffect(() => {
-    const checkCategoriesWithProducts = async () => {
+    const checkAllCategoriesWithProducts = async () => {
       if (beverageCategories.length === 0) return;
 
       try {
-        const categoriesSet = new Set();
+        // Una sola llamada masiva para obtener todos los productos
+        const data = await getProducts(1, 200, null, null);
+        const allProducts = Array.isArray(data.cocteles) ? data.cocteles : [];
 
-        // Verificar cada categoría individualmente
-        const checkPromises = beverageCategories.map(async (category) => {
-          try {
-            const data = await getProducts(1, 1, normalize(category.name), null);
-            const products = Array.isArray(data.cocteles) ? data.cocteles : [];
-            const totalRecords = data.paginacion?.totalRecords || 0;
+        // Filtrar solo "otras bebidas" (excluir comida y cócteles)
+        const otherDrinks = allProducts.filter((p) => {
+          const hasFood = p.categories?.some(
+            (c) => normalize(c.type) === 'clasificacion comida',
+          );
+          const isCocktail = p.categories?.some(
+            (c) =>
+              normalize(c.name) === 'cocktail' &&
+              normalize(c.type) === 'clasificacion',
+          );
+          return !hasFood && !isCocktail;
+        });
 
-            // Excluir comida y cócteles
-            const others = products.filter((p) => {
-              const hasFood = p.categories?.some(
-                (c) => normalize(c.type) === 'clasificacion comida',
-              );
-              const isCocktail = p.categories?.some(
-                (c) =>
-                  normalize(c.name) === 'cocktail' &&
-									normalize(c.type) === 'clasificacion',
-              );
-              return !hasFood && !isCocktail;
+        // Extraer todas las categorías presentes en estos productos
+        const mainCatsSet = new Set();
+        const wineCatsSet = new Set();
+        const destiladoCatsSet = new Set();
+
+        const bevCatNames = new Set(beverageCategories.map((c) => normalize(c.name)));
+        const wineCatNames = new Set(wineSubcategories.map((c) => normalize(c.name)));
+        const destCatNames = new Set(destiladoSubcategories.map((c) => normalize(c.name)));
+
+        otherDrinks.forEach((product) => {
+          if (Array.isArray(product.categories)) {
+            product.categories.forEach((cat) => {
+              const catName = normalize(cat.name);
+              if (bevCatNames.has(catName)) mainCatsSet.add(catName);
+              if (wineCatNames.has(catName)) wineCatsSet.add(catName);
+              if (destCatNames.has(catName)) destiladoCatsSet.add(catName);
             });
-
-            if (totalRecords > 0 || others.length > 0) {
-              return normalize(category.name);
-            }
-            return null;
-          } catch (_err) {
-            return null;
+          }
+          // Campos directos
+          if (product.destilado_name) {
+            const dn = normalize(product.destilado_name);
+            if (destCatNames.has(dn)) destiladoCatsSet.add(dn);
           }
         });
 
-        const results = await Promise.all(checkPromises);
-        results.forEach((categoryName) => {
-          if (categoryName) {
-            categoriesSet.add(categoryName);
-          }
-        });
-
-        setCategoriesWithProducts(categoriesSet);
+        setCategoriesWithProducts(mainCatsSet);
+        setWineSubcatsWithProducts(wineCatsSet);
+        setDestiladoSubcatsWithProducts(destiladoCatsSet);
       } catch (_err) {
-        setCategoriesWithProducts(new Set());
+        // En caso de error, mostrar todas (mejor UX)
+        setCategoriesWithProducts(new Set(beverageCategories.map((c) => normalize(c.name))));
+        setWineSubcatsWithProducts(new Set(wineSubcategories.map((c) => normalize(c.name))));
+        setDestiladoSubcatsWithProducts(new Set(destiladoSubcategories.map((c) => normalize(c.name))));
       }
     };
 
-    checkCategoriesWithProducts();
-  }, [beverageCategories]);
-
-  // Verificar qué subcategorías de vino tienen productos
-  useEffect(() => {
-    const checkWineSubcategories = async () => {
-      if (wineSubcategories.length === 0) return;
-
-      try {
-        const categoriesSet = new Set();
-
-        const checkPromises = wineSubcategories.map(async (category) => {
-          try {
-            const data = await getProducts(1, 1, normalize(category.name), null);
-            const products = Array.isArray(data.cocteles) ? data.cocteles : [];
-            const totalRecords = data.paginacion?.totalRecords || 0;
-
-            const others = products.filter((p) => {
-              const hasFood = p.categories?.some(
-                (c) => normalize(c.type) === 'clasificacion comida',
-              );
-              const isCocktail = p.categories?.some(
-                (c) =>
-                  normalize(c.name) === 'cocktail' &&
-									normalize(c.type) === 'clasificacion',
-              );
-              return !hasFood && !isCocktail;
-            });
-
-            if (totalRecords > 0 || others.length > 0) {
-              return normalize(category.name);
-            }
-            return null;
-          } catch (_err) {
-            return null;
-          }
-        });
-
-        const results = await Promise.all(checkPromises);
-        results.forEach((categoryName) => {
-          if (categoryName) {
-            categoriesSet.add(categoryName);
-          }
-        });
-
-        setWineSubcatsWithProducts(categoriesSet);
-      } catch (_err) {
-        setWineSubcatsWithProducts(new Set());
-      }
-    };
-
-    checkWineSubcategories();
-  }, [wineSubcategories]);
-
-  // Verificar qué subcategorías de destilados tienen productos
-  useEffect(() => {
-    const checkDestiladoSubcategories = async () => {
-      if (destiladoSubcategories.length === 0) return;
-
-      try {
-        const categoriesSet = new Set();
-
-        const checkPromises = destiladoSubcategories.map(async (category) => {
-          try {
-            const data = await getProducts(1, 1, normalize(category.name), null);
-            const products = Array.isArray(data.cocteles) ? data.cocteles : [];
-            const totalRecords = data.paginacion?.totalRecords || 0;
-
-            const others = products.filter((p) => {
-              const hasFood = p.categories?.some(
-                (c) => normalize(c.type) === 'clasificacion comida',
-              );
-              const isCocktail = p.categories?.some(
-                (c) =>
-                  normalize(c.name) === 'cocktail' &&
-									normalize(c.type) === 'clasificacion',
-              );
-              return !hasFood && !isCocktail;
-            });
-
-            if (totalRecords > 0 || others.length > 0) {
-              return normalize(category.name);
-            }
-            return null;
-          } catch (_err) {
-            return null;
-          }
-        });
-
-        const results = await Promise.all(checkPromises);
-        results.forEach((categoryName) => {
-          if (categoryName) {
-            categoriesSet.add(categoryName);
-          }
-        });
-
-        setDestiladoSubcatsWithProducts(categoriesSet);
-      } catch (_err) {
-        setDestiladoSubcatsWithProducts(new Set());
-      }
-    };
-
-    checkDestiladoSubcategories();
-  }, [destiladoSubcategories]);
+    checkAllCategoriesWithProducts();
+  }, [beverageCategories, wineSubcategories, destiladoSubcategories]);
 
   // Resetear a página 1 cuando cambia el filtro
   useEffect(() => {
@@ -301,274 +208,342 @@ const OtherDrinks = () => {
       <FloatingTypeSwitcher />
 
       <div ref={topRef} />
-      <motion.div
-        className="text-center mb-6 px-4"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+
+      {/* Título */}
+      <div className="text-center mb-6 px-4">
         <h1
-          className="text-3xl md:text-4xl font-bold mb-2"
-          style={{ color: '#e9cc9e' }}
+          className="text-2xl md:text-3xl lg:text-4xl uppercase mb-3"
+          style={{
+            color: '#e9cc9e',
+            fontFamily: '\'Playfair Display\', serif',
+            fontWeight: '500',
+            letterSpacing: '0.12em',
+          }}
         >
           {t('pageTitle.otherDrinks')}
         </h1>
-        <p className="text-gray-400">
+        <p
+          className="text-xs md:text-sm uppercase tracking-[0.15em] font-medium"
+          style={{ color: '#5a5a4a' }}
+        >
           {totalRecords > 0
             ? t('pageTitle.foundBeverages', { count: totalRecords })
             : t('pageTitle.noResults')}
         </p>
-      </motion.div>
+      </div>
 
-      {/* Filtros principales */}
+      {/* Filtros principales - estilo menú de bar */}
       <div className="w-full max-w-7xl mx-auto px-4 mb-4">
-        <div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
-          {/* Filtro "Todos" siempre presente */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+          <span
+            className="text-[10px] md:text-xs uppercase tracking-[0.25em] font-medium"
+            style={{ color: '#8a7a5a' }}
+          >
+            {t('pageTitle.otherDrinks')}
+          </span>
+          <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+        </div>
+
+        <nav
+          className="flex flex-nowrap items-center gap-1 md:gap-0 overflow-x-auto scroll-smooth no-scrollbar justify-start md:justify-center"
+          role="tablist"
+        >
+          {/* Filtro "Todos" */}
           <button
-            className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm ${
-              filter === 'todos'
-                ? 'border-[#e9cc9e] text-[#191919]'
-                : 'bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-            }`}
-            style={filter === 'todos' ? { backgroundColor: '#e9cc9e' } : {}}
+            className="group relative flex-shrink-0 px-4 md:px-5 py-2.5 text-sm md:text-base tracking-wide transition-all duration-300 uppercase"
+            style={{
+              color: filter === 'todos' ? '#e9cc9e' : '#7a7a6a',
+              fontWeight: filter === 'todos' ? '600' : '400',
+              letterSpacing: '0.08em',
+              background: 'transparent',
+              border: 'none',
+            }}
             onClick={() => {
               setFilter('todos');
               setSubFilter(null);
               setCurrentPage(1);
             }}
+            role="tab"
+            aria-selected={filter === 'todos'}
           >
             {t('categoryFilter.all')}
+            <span
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+              style={{
+                width: filter === 'todos' ? '60%' : '0%',
+                backgroundColor: '#e9cc9e',
+              }}
+            />
+            {filter !== 'todos' && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+              />
+            )}
           </button>
-          {/* Filtros dinámicos desde categorías de clasificacion bebida - solo las que tienen productos */}
+
+          {/* Filtros dinámicos */}
           {beverageCategories
             .filter((cat) => {
-              // Si aún no se han verificado las categorías, mostrar todas temporalmente
               if (categoriesWithProducts.size === 0 && beverageCategories.length > 0) {
                 return false;
               }
-              // Filtrar solo las que tienen productos
               return categoriesWithProducts.has(normalize(cat.name));
             })
-            .map((cat) => (
-              <button
-                key={cat.id}
-                className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm md:text-base transition-all shadow-sm capitalize ${
-                  filter === normalize(cat.name)
-                    ? 'border-[#e9cc9e] text-[#191919]'
-                    : 'bg-[#2a2a2a] text-[#e9cc9e] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-                }`}
-                style={
-                  filter === normalize(cat.name)
-                    ? { backgroundColor: '#e9cc9e' }
-                    : {}
-                }
-                onClick={() => {
-                  setFilter(normalize(cat.name));
-                  setSubFilter(null);
-                  setCurrentPage(1);
-                }}
-              >
-                {cat.name}
-              </button>
-            ))}
-        </div>
+            .map((cat, index, arr) => {
+              const isActive = filter === normalize(cat.name);
+              return (
+                <React.Fragment key={cat.id}>
+                  <span
+                    className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline"
+                    style={{ color: '#3a3a3a' }}
+                  >
+                    ·
+                  </span>
+                  <button
+                    className="group relative flex-shrink-0 px-4 md:px-5 py-2.5 text-sm md:text-base capitalize tracking-wide transition-all duration-300"
+                    style={{
+                      color: isActive ? '#e9cc9e' : '#7a7a6a',
+                      fontWeight: isActive ? '600' : '400',
+                      letterSpacing: '0.08em',
+                      background: 'transparent',
+                      border: 'none',
+                    }}
+                    onClick={() => {
+                      setFilter(normalize(cat.name));
+                      setSubFilter(null);
+                      setCurrentPage(1);
+                    }}
+                    role="tab"
+                    aria-selected={isActive}
+                  >
+                    {cat.name}
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                      style={{
+                        width: isActive ? '60%' : '0%',
+                        backgroundColor: '#e9cc9e',
+                      }}
+                    />
+                    {!isActive && (
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                        style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+                      />
+                    )}
+                  </button>
+                </React.Fragment>
+              );
+            })}
+        </nav>
+
+        <div className="mt-3 h-px w-full" style={{ backgroundColor: '#3a3a3a' }} />
       </div>
 
       {/* Subfiltros de vino */}
       {filter === 'vino' && 
-				wineSubcategories.filter((cat) => {
-				  if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) {
-				    return false;
-				  }
-				  return wineSubcatsWithProducts.has(normalize(cat.name));
-				}).length > 0 && (
+        wineSubcategories.filter((cat) => {
+          if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) {
+            return false;
+          }
+          return wineSubcatsWithProducts.has(normalize(cat.name));
+        }).length > 0 && (
         <div className="w-full max-w-7xl mx-auto px-4 mb-4">
           <p
-            className="text-xs mb-2 px-1"
-            style={{ color: '#e9cc9e', opacity: 0.7 }}
+            className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium mb-2 text-center"
+            style={{ color: '#5a5a4a' }}
           >
-						Tipos de vino:
+            Tipos de vino
           </p>
-          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
+          <nav className="flex flex-nowrap items-center gap-1 md:gap-0 overflow-x-auto scroll-smooth no-scrollbar justify-start md:justify-center">
             <button
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
-                !subFilter
-                  ? 'border-[#e9cc9e] text-[#191919]'
-                  : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-              }`}
-              style={
-                !subFilter
-                  ? { backgroundColor: '#e9cc9e' }
-                  : { color: '#e9cc9e' }
-              }
-              onClick={() => {
-                setSubFilter(null);
-                setCurrentPage(1);
+              className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm tracking-wide transition-all duration-300 uppercase"
+              style={{
+                color: !subFilter ? '#e9cc9e' : '#7a7a6a',
+                fontWeight: !subFilter ? '600' : '400',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
               }}
+              onClick={() => { setSubFilter(null); setCurrentPage(1); }}
             >
               {t('categoryFilter.allWines')}
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                style={{ width: !subFilter ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+              />
             </button>
             {wineSubcategories
               .filter((cat) => {
-                if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) {
-                  return false;
-                }
+                if (wineSubcatsWithProducts.size === 0 && wineSubcategories.length > 0) return false;
                 return wineSubcatsWithProducts.has(normalize(cat.name));
               })
-              .map((cat) => (
-                <button
-                  key={cat.id}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
-                    subFilter === normalize(cat.name)
-                      ? 'border-[#e9cc9e] text-[#191919]'
-                      : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-                  }`}
-                  style={
-                    subFilter === normalize(cat.name)
-                      ? { backgroundColor: '#e9cc9e' }
-                      : { color: '#e9cc9e' }
-                  }
-                  onClick={() => {
-                    setSubFilter(normalize(cat.name));
-                    setCurrentPage(1);
-                  }}
-                >
-                  {cat.name}
-                </button>
-              ))}
-          </div>
+              .map((cat) => {
+                const isActive = subFilter === normalize(cat.name);
+                return (
+                  <React.Fragment key={cat.id}>
+                    <span className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+                    <button
+                      className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm capitalize tracking-wide transition-all duration-300"
+                      style={{
+                        color: isActive ? '#e9cc9e' : '#7a7a6a',
+                        fontWeight: isActive ? '600' : '400',
+                        letterSpacing: '0.08em',
+                        background: 'transparent',
+                        border: 'none',
+                      }}
+                      onClick={() => { setSubFilter(normalize(cat.name)); setCurrentPage(1); }}
+                    >
+                      {cat.name}
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                        style={{ width: isActive ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+                      />
+                      {!isActive && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100" style={{ width: '40%', backgroundColor: '#5a5a4a' }} />
+                      )}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+          </nav>
         </div>
       )}
 
-      {/* Subfiltros de botellas - mostrar destilados */}
+      {/* Subfiltros de botellas */}
       {filter === 'botellas' && 
-				destiladoSubcategories.filter((cat) => {
-				  if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
-				    return false;
-				  }
-				  return destiladoSubcatsWithProducts.has(normalize(cat.name));
-				}).length > 0 && (
+        destiladoSubcategories.filter((cat) => {
+          if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) return false;
+          return destiladoSubcatsWithProducts.has(normalize(cat.name));
+        }).length > 0 && (
         <div className="w-full max-w-7xl mx-auto px-4 mb-4">
           <p
-            className="text-xs mb-2 px-1"
-            style={{ color: '#e9cc9e', opacity: 0.7 }}
+            className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium mb-2 text-center"
+            style={{ color: '#5a5a4a' }}
           >
-						Tipo de destilado:
+            Tipo de destilado
           </p>
-          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
+          <nav className="flex flex-nowrap items-center gap-1 md:gap-0 overflow-x-auto scroll-smooth no-scrollbar justify-start md:justify-center">
             <button
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
-                !subFilter
-                  ? 'border-[#e9cc9e] text-[#191919]'
-                  : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-              }`}
-              style={
-                !subFilter
-                  ? { backgroundColor: '#e9cc9e' }
-                  : { color: '#e9cc9e' }
-              }
-              onClick={() => {
-                setSubFilter(null);
-                setCurrentPage(1);
+              className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm tracking-wide transition-all duration-300 uppercase"
+              style={{
+                color: !subFilter ? '#e9cc9e' : '#7a7a6a',
+                fontWeight: !subFilter ? '600' : '400',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
               }}
+              onClick={() => { setSubFilter(null); setCurrentPage(1); }}
             >
-							Todas las botellas
+              Todas las botellas
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                style={{ width: !subFilter ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+              />
             </button>
             {destiladoSubcategories
               .filter((cat) => {
-                if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
-                  return false;
-                }
+                if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) return false;
                 return destiladoSubcatsWithProducts.has(normalize(cat.name));
               })
-              .map((cat) => (
-                <button
-                  key={cat.id}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
-                    subFilter === normalize(cat.name)
-                      ? 'border-[#e9cc9e] text-[#191919]'
-                      : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-                  }`}
-                  style={
-                    subFilter === normalize(cat.name)
-                      ? { backgroundColor: '#e9cc9e' }
-                      : { color: '#e9cc9e' }
-                  }
-                  onClick={() => {
-                    setSubFilter(normalize(cat.name));
-                    setCurrentPage(1);
-                  }}
-                >
-                  {cat.name}
-                </button>
-              ))}
-          </div>
+              .map((cat) => {
+                const isActive = subFilter === normalize(cat.name);
+                return (
+                  <React.Fragment key={cat.id}>
+                    <span className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+                    <button
+                      className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm capitalize tracking-wide transition-all duration-300"
+                      style={{
+                        color: isActive ? '#e9cc9e' : '#7a7a6a',
+                        fontWeight: isActive ? '600' : '400',
+                        letterSpacing: '0.08em',
+                        background: 'transparent',
+                        border: 'none',
+                      }}
+                      onClick={() => { setSubFilter(normalize(cat.name)); setCurrentPage(1); }}
+                    >
+                      {cat.name}
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                        style={{ width: isActive ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+                      />
+                      {!isActive && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100" style={{ width: '40%', backgroundColor: '#5a5a4a' }} />
+                      )}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+          </nav>
         </div>
       )}
 
-      {/* Subfiltros de tragos - mostrar destilados */}
+      {/* Subfiltros de tragos */}
       {filter === 'tragos' && 
-				destiladoSubcategories.filter((cat) => {
-				  if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
-				    return false;
-				  }
-				  return destiladoSubcatsWithProducts.has(normalize(cat.name));
-				}).length > 0 && (
+        destiladoSubcategories.filter((cat) => {
+          if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) return false;
+          return destiladoSubcatsWithProducts.has(normalize(cat.name));
+        }).length > 0 && (
         <div className="w-full max-w-7xl mx-auto px-4 mb-4">
           <p
-            className="text-xs mb-2 px-1"
-            style={{ color: '#e9cc9e', opacity: 0.7 }}
+            className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium mb-2 text-center"
+            style={{ color: '#5a5a4a' }}
           >
-						Tipo de destilado:
+            Tipo de destilado
           </p>
-          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar">
+          <nav className="flex flex-nowrap items-center gap-1 md:gap-0 overflow-x-auto scroll-smooth no-scrollbar justify-start md:justify-center">
             <button
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all ${
-                !subFilter
-                  ? 'border-[#e9cc9e] text-[#191919]'
-                  : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-              }`}
-              style={
-                !subFilter
-                  ? { backgroundColor: '#e9cc9e' }
-                  : { color: '#e9cc9e' }
-              }
-              onClick={() => {
-                setSubFilter(null);
-                setCurrentPage(1);
+              className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm tracking-wide transition-all duration-300 uppercase"
+              style={{
+                color: !subFilter ? '#e9cc9e' : '#7a7a6a',
+                fontWeight: !subFilter ? '600' : '400',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
               }}
+              onClick={() => { setSubFilter(null); setCurrentPage(1); }}
             >
               {t('categoryFilter.allDrinks')}
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                style={{ width: !subFilter ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+              />
             </button>
             {destiladoSubcategories
               .filter((cat) => {
-                if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) {
-                  return false;
-                }
+                if (destiladoSubcatsWithProducts.size === 0 && destiladoSubcategories.length > 0) return false;
                 return destiladoSubcatsWithProducts.has(normalize(cat.name));
               })
-              .map((cat) => (
-                <button
-                  key={cat.id}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs md:text-sm transition-all capitalize ${
-                    subFilter === normalize(cat.name)
-                      ? 'border-[#e9cc9e] text-[#191919]'
-                      : 'bg-[#2a2a2a] border-[#3a3a3a] hover:bg-[#3a3a3a]'
-                  }`}
-                  style={
-                    subFilter === normalize(cat.name)
-                      ? { backgroundColor: '#e9cc9e' }
-                      : { color: '#e9cc9e' }
-                  }
-                  onClick={() => {
-                    setSubFilter(normalize(cat.name));
-                    setCurrentPage(1);
-                  }}
-                >
-                  {cat.name}
-                </button>
-              ))}
-          </div>
+              .map((cat) => {
+                const isActive = subFilter === normalize(cat.name);
+                return (
+                  <React.Fragment key={cat.id}>
+                    <span className="flex-shrink-0 text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+                    <button
+                      className="group relative flex-shrink-0 px-3 md:px-4 py-2 text-xs md:text-sm capitalize tracking-wide transition-all duration-300"
+                      style={{
+                        color: isActive ? '#e9cc9e' : '#7a7a6a',
+                        fontWeight: isActive ? '600' : '400',
+                        letterSpacing: '0.08em',
+                        background: 'transparent',
+                        border: 'none',
+                      }}
+                      onClick={() => { setSubFilter(normalize(cat.name)); setCurrentPage(1); }}
+                    >
+                      {cat.name}
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                        style={{ width: isActive ? '60%' : '0%', backgroundColor: '#e9cc9e' }}
+                      />
+                      {!isActive && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100" style={{ width: '40%', backgroundColor: '#5a5a4a' }} />
+                      )}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+          </nav>
         </div>
       )}
 
@@ -585,169 +560,228 @@ const OtherDrinks = () => {
             />
           </div>
           <p className="text-lg" style={{ color: '#b8b8b8' }}>
-						Cargando...
+            Cargando...
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 px-4 sm:px-8 max-w-[1100px] mx-auto">
           {filteredItems.length === 0 ? (
-            <div className="col-span-2 text-center py-20">
+            <div className="col-span-full text-center py-20 w-full">
               <p className="text-xl" style={{ color: '#b8b8b8' }}>
                 {t('pageTitle.noResults')}
               </p>
             </div>
           ) : (
-            filteredItems.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-xl border shadow-sm hover:shadow-lg transition-all p-4 md:p-5"
-                style={{
-                  backgroundColor: '#2a2a2a',
-                  borderColor: '#3a3a3a',
-                }}
-              >
-                {/* Sección superior: Imagen horizontal + Info */}
-                <div className="flex gap-4">
-                  {/* Imagen - object-contain para no cortar botellas */}
+            filteredItems.map((p) => {
+              const bevCategories = p.categories
+                ? p.categories.filter((cat) => cat.type === 'clasificacion bebida')
+                : [];
+
+              return (
+                <div
+                  key={p.id}
+                  className="w-full cursor-pointer transition-all duration-200 hover:bg-[#2f2f2f] flex flex-row gap-4 p-4 rounded-xl group"
+                  style={{
+                    backgroundColor: 'transparent',
+                    borderBottom: '1px solid #2a2a2a',
+                  }}
+                >
+                  {/* Imagen centrada */}
                   {p.images?.[0] && (
-                    <div
-                      className="flex-shrink-0 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: '#1a1a1a' }}
-                    >
+                    <div className="flex-shrink-0 self-center">
                       <img
                         src={p.images[0]}
                         alt={p.name}
-                        className="w-24 h-32 md:w-28 md:h-36 object-contain"
+                        className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-2 transition-transform duration-300 group-hover:scale-105"
+                        style={{ borderColor: '#3a3a3a' }}
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )}
 
-                  {/* Info principal: Nombre y Precio */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <h3
-                      className="text-lg md:text-xl font-bold capitalize mb-2"
-                      style={{ color: '#e9cc9e' }}
-                    >
-                      {p.name}
-                    </h3>
-                    <div
-                      className="text-xl md:text-2xl font-bold mb-2"
-                      style={{ color: '#e9cc9e' }}
-                    >
-                      {currency(p.price)}
+                  {/* Contenido textual */}
+                  <div className="flex-grow min-w-0">
+                    {/* Nombre ··· Precio */}
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <h3
+                        className="text-base md:text-lg capitalize leading-tight truncate"
+                        style={{
+                          color: '#e9cc9e',
+                          fontWeight: '500',
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        {p.name}
+                      </h3>
+                      <div
+                        className="flex-grow border-b border-dotted mx-1"
+                        style={{ borderColor: '#4a4a4a', minWidth: '20px', marginBottom: '4px' }}
+                      />
+                      <span
+                        className="text-sm md:text-base whitespace-nowrap flex-shrink-0"
+                        style={{
+                          color: '#e9cc9e',
+                          fontWeight: '500',
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        {currency(p.price)}
+                      </span>
                     </div>
 
-                    {/* Porcentaje de alcohol si existe */}
-                    {p.alcohol_percentage && (
-                      <span
-                        className="inline-block px-2 py-0.5 text-xs font-semibold rounded w-fit"
-                        style={{ backgroundColor: '#e9cc9e', color: '#191919' }}
+                    {/* Categoría + Alcohol */}
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      {bevCategories.length > 0 && (
+                        <span
+                          className="text-xs font-medium capitalize tracking-wide"
+                          style={{ color: '#8a8a7a' }}
+                        >
+                          {bevCategories[0].name}
+                        </span>
+                      )}
+                      {p.alcohol_percentage && (
+                        <>
+                          <span style={{ color: '#4a4a4a' }}>·</span>
+                          <span
+                            className="text-xs font-medium"
+                            style={{ color: '#8a8a7a' }}
+                          >
+                            {p.alcohol_percentage}% Vol.
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Descripción */}
+                    {p.description && (
+                      <p
+                        className="text-sm leading-relaxed line-clamp-2 mb-1.5"
+                        style={{ color: '#9a9a9a' }}
+                        title={p.description}
                       >
-                        {p.alcohol_percentage}% Vol.
-                      </span>
+                        {p.description}
+                      </p>
+                    )}
+
+                    {/* Categorías adicionales */}
+                    {bevCategories.length > 1 && (
+                      <p
+                        className="text-xs italic line-clamp-1"
+                        style={{ color: '#6a6a6a' }}
+                      >
+                        {bevCategories.slice(1).map((c) => c.name).join(' · ')}
+                      </p>
                     )}
                   </div>
                 </div>
-
-                {/* Descripción */}
-                {p.description && (
-                  <p
-                    className="text-sm line-clamp-2 mt-3 mb-3"
-                    style={{ color: '#b8b8b8' }}
-                  >
-                    {p.description}
-                  </p>
-                )}
-
-                {/* Categorías */}
-                {p.categories && p.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {p.categories
-                      .filter((cat) => cat.type === 'clasificacion bebida')
-                      .slice(0, 4)
-                      .map((cat, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-block px-2.5 py-1 text-xs font-medium rounded-full border capitalize"
-                          style={{
-                            backgroundColor: '#3a3a3a',
-                            color: '#e9cc9e',
-                            borderColor: '#4a4a4a',
-                          }}
-                        >
-                          {cat.name}
-                        </span>
-                      ))}
-                    {p.categories.filter(
-                      (cat) => cat.type === 'clasificacion bebida',
-                    ).length > 4 && (
-                      <span
-                        className="inline-block px-2.5 py-1 text-xs font-medium rounded-full"
-                        style={{ backgroundColor: '#3a3a3a', color: '#b8b8b8' }}
-                      >
-										+
-                        {p.categories.filter(
-                          (cat) => cat.type === 'clasificacion bebida',
-                        ).length - 4}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            )))}
+              );
+            })
+          )}
         </div>
       )}
 
       {/* Paginación */}
       {!loading && totalPages > 0 && (
-        <div className="flex justify-center items-center space-x-2 mt-6 mb-8">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-            className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
-            style={{
-              color: '#e9cc9e',
-              backgroundColor: '#2a2a2a',
-              border: '1px solid #3a3a3a',
-            }}
-          >
-						‹ Anterior
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-3 py-2 rounded-lg transition-all ${
-                page === currentPage ? 'font-bold' : ''
-              }`}
-              style={
-                page === currentPage
-                  ? { backgroundColor: '#e9cc9e', color: '#191919' }
-                  : {
-                    backgroundColor: '#2a2a2a',
-                    color: '#e9cc9e',
-                    border: '1px solid #3a3a3a',
-									  }
-              }
+        <div className="flex flex-col items-center mt-8 mb-6 px-4 max-w-xl mx-auto">
+          <div className="flex items-center gap-3 w-full mb-4">
+            <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+            <span
+              className="text-[10px] md:text-xs uppercase tracking-[0.25em] font-medium whitespace-nowrap"
+              style={{ color: '#8a7a5a' }}
             >
-              {page}
+              {filteredItems.length} de {totalRecords} bebidas
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+          </div>
+
+          <nav className="flex items-center gap-1 md:gap-0">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+              className="group relative px-3 md:px-4 py-2 text-base md:text-lg tracking-wide uppercase transition-all duration-300 disabled:opacity-30"
+              style={{
+                color: '#7a7a6a',
+                fontWeight: '500',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
+              }}
+            >
+              ‹
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+              />
             </button>
-          ))}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() =>
-              handlePageChange(Math.min(currentPage + 1, totalPages))
-            }
-            className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
-            style={{
-              color: '#e9cc9e',
-              backgroundColor: '#2a2a2a',
-              border: '1px solid #3a3a3a',
-            }}
+
+            <span className="text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              const isActive = page === currentPage;
+              return (
+                <React.Fragment key={page}>
+                  <button
+                    onClick={() => handlePageChange(page)}
+                    className="group relative px-3 md:px-4 py-2 text-sm md:text-base transition-all duration-300"
+                    style={{
+                      color: isActive ? '#e9cc9e' : '#7a7a6a',
+                      fontWeight: isActive ? '600' : '500',
+                      letterSpacing: '0.08em',
+                      background: 'transparent',
+                      border: 'none',
+                    }}
+                  >
+                    {page}
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                      style={{
+                        width: isActive ? '50%' : '0%',
+                        backgroundColor: '#e9cc9e',
+                      }}
+                    />
+                    {!isActive && (
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                        style={{ width: '30%', backgroundColor: '#5a5a4a' }}
+                      />
+                    )}
+                  </button>
+                  {page < totalPages && (
+                    <span className="text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+                  )}
+                </React.Fragment>
+              );
+            })}
+
+            <span className="text-lg font-extralight select-none hidden md:inline" style={{ color: '#3a3a3a' }}>·</span>
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+              className="group relative px-3 md:px-4 py-2 text-base md:text-lg tracking-wide uppercase transition-all duration-300 disabled:opacity-30"
+              style={{
+                color: '#7a7a6a',
+                fontWeight: '500',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
+              }}
+            >
+              ›
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+              />
+            </button>
+          </nav>
+
+          <span
+            className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium mt-2"
+            style={{ color: '#5a5a4a' }}
           >
-						Siguiente ›
-          </button>
+            Página {currentPage} de {totalPages}
+          </span>
         </div>
       )}
     </div>

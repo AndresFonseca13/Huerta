@@ -118,12 +118,20 @@ const FilteredCocktails = () => {
       <CategoryFilterBar />
       <div className="text-center mb-6 px-4">
         <h1
-          className="text-3xl md:text-4xl font-bold mb-2 capitalize"
-          style={{ color: '#e9cc9e' }}
+          className="text-2xl md:text-3xl lg:text-4xl uppercase mb-3 capitalize"
+          style={{
+            color: '#e9cc9e',
+            fontFamily: '\'Playfair Display\', serif',
+            fontWeight: '500',
+            letterSpacing: '0.12em',
+          }}
         >
           {getFilterTitle()}
         </h1>
-        <p className="text-gray-400">
+        <p
+          className="text-xs md:text-sm uppercase tracking-[0.15em] font-medium"
+          style={{ color: '#5a5a4a' }}
+        >
           {totalRecords > 0
             ? tipo === 'destilado'
               ? t('pageTitle.foundBeverages', { count: totalRecords })
@@ -173,60 +181,132 @@ const FilteredCocktails = () => {
       )}
 
       {!loading && totalPages > 0 && (
-        <div className="flex flex-col items-center mt-4 space-y-2 mb-4 px-4">
-          <div className="text-sm" style={{ color: '#b8b8b8' }}>
-						Mostrando {cocktails.length} de {totalRecords}{' '}
-            {tipo === 'destilado' ? 'bebidas' : 'platos'} (Página {currentPage}{' '}
-						de {totalPages})
+        <div className="flex flex-col items-center mt-8 mb-6 px-4 max-w-xl mx-auto">
+          {/* Línea decorativa superior */}
+          <div className="flex items-center gap-3 w-full mb-4">
+            <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
+            <span
+              className="text-[10px] md:text-xs uppercase tracking-[0.25em] font-medium whitespace-nowrap"
+              style={{ color: '#8a7a5a' }}
+            >
+              {cocktails.length} de {totalRecords}{' '}
+              {tipo === 'destilado' ? 'bebidas' : 'platos'}
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: '#3a3a3a' }} />
           </div>
-          <div className="flex justify-center space-x-2 overflow-x-auto">
+
+          {/* Navegación de páginas */}
+          <nav className="flex items-center gap-1 md:gap-0">
+            {/* Anterior */}
             <button
               disabled={currentPage === 1}
               onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-              className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+              className="group relative px-3 md:px-4 py-2 text-base md:text-lg tracking-wide uppercase transition-all duration-300 disabled:opacity-30"
               style={{
-                color: '#e9cc9e',
-                backgroundColor: '#2a2a2a',
-                border: '1px solid #3a3a3a',
+                color: '#7a7a6a',
+                fontWeight: '500',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
               }}
             >
-							‹ Anterior
+              ‹
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+              />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-3 py-2 rounded-lg transition-all ${
-                  page === currentPage ? 'font-bold' : ''
-                }`}
-                style={
-                  page === currentPage
-                    ? { backgroundColor: '#e9cc9e', color: '#191919' }
-                    : {
-                      backgroundColor: '#2a2a2a',
-                      color: '#e9cc9e',
-                      border: '1px solid #3a3a3a',
-										  }
-                }
-              >
-                {page}
-              </button>
-            ))}
+
+            {/* Separador */}
+            <span
+              className="text-lg font-extralight select-none hidden md:inline"
+              style={{ color: '#3a3a3a' }}
+            >
+              ·
+            </span>
+
+            {/* Números de página */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              const isActive = page === currentPage;
+              return (
+                <React.Fragment key={page}>
+                  <button
+                    onClick={() => handlePageChange(page)}
+                    className="group relative px-3 md:px-4 py-2 text-sm md:text-base transition-all duration-300"
+                    style={{
+                      color: isActive ? '#e9cc9e' : '#7a7a6a',
+                      fontWeight: isActive ? '600' : '500',
+                      letterSpacing: '0.08em',
+                      background: 'transparent',
+                      border: 'none',
+                    }}
+                  >
+                    {page}
+                    {/* Indicador inferior animado */}
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-300"
+                      style={{
+                        width: isActive ? '50%' : '0%',
+                        backgroundColor: '#e9cc9e',
+                      }}
+                    />
+                    {!isActive && (
+                      <span
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                        style={{ width: '30%', backgroundColor: '#5a5a4a' }}
+                      />
+                    )}
+                  </button>
+                  {page < totalPages && (
+                    <span
+                      className="text-lg font-extralight select-none hidden md:inline"
+                      style={{ color: '#3a3a3a' }}
+                    >
+                      ·
+                    </span>
+                  )}
+                </React.Fragment>
+              );
+            })}
+
+            {/* Separador */}
+            <span
+              className="text-lg font-extralight select-none hidden md:inline"
+              style={{ color: '#3a3a3a' }}
+            >
+              ·
+            </span>
+
+            {/* Siguiente */}
             <button
               disabled={currentPage === totalPages}
               onClick={() =>
                 handlePageChange(Math.min(currentPage + 1, totalPages))
               }
-              className="px-4 py-2 rounded-lg disabled:opacity-50 transition-all"
+              className="group relative px-3 md:px-4 py-2 text-base md:text-lg tracking-wide uppercase transition-all duration-300 disabled:opacity-30"
               style={{
-                color: '#e9cc9e',
-                backgroundColor: '#2a2a2a',
-                border: '1px solid #3a3a3a',
+                color: '#7a7a6a',
+                fontWeight: '500',
+                letterSpacing: '0.08em',
+                background: 'transparent',
+                border: 'none',
               }}
             >
-							Siguiente ›
+              ›
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] transition-all duration-300 opacity-0 group-hover:opacity-100"
+                style={{ width: '40%', backgroundColor: '#5a5a4a' }}
+              />
             </button>
-          </div>
+          </nav>
+
+          {/* Info de página */}
+          <span
+            className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium mt-2"
+            style={{ color: '#5a5a4a' }}
+          >
+            Página {currentPage} de {totalPages}
+          </span>
         </div>
       )}
 

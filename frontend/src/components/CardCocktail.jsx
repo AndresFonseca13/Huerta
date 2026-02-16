@@ -50,13 +50,13 @@ const CardCocktail = ({ cocktail, onClick }) => {
       }}
       onClick={() => onClick && onClick(cocktail)}
     >
-      {/* Imagen pequeña redonda */}
+      {/* Imagen redonda centrada verticalmente */}
       {imageUrl && (
-        <div className="flex-shrink-0 self-start">
+        <div className="flex-shrink-0 self-center">
           <img
             src={imageUrl}
             alt={name}
-            className="w-20 h-20 rounded-full object-cover border-2 transition-transform duration-300 group-hover:scale-105"
+            className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-2 transition-transform duration-300 group-hover:scale-105"
             style={{ borderColor: '#3a3a3a' }}
             loading="lazy"
             decoding="async"
@@ -69,8 +69,12 @@ const CardCocktail = ({ cocktail, onClick }) => {
         {/* Fila: Nombre ··· Precio */}
         <div className="flex items-baseline gap-2 mb-1">
           <h3
-            className="text-lg font-semibold capitalize leading-tight truncate"
-            style={{ color: '#e9cc9e' }}
+            className="text-base md:text-lg capitalize leading-tight truncate"
+            style={{
+              color: '#e9cc9e',
+              fontWeight: '500',
+              letterSpacing: '0.04em',
+            }}
           >
             {name}
           </h3>
@@ -81,8 +85,12 @@ const CardCocktail = ({ cocktail, onClick }) => {
           />
           {/* Precio */}
           <span
-            className="text-base font-semibold whitespace-nowrap flex-shrink-0"
-            style={{ color: '#e9cc9e' }}
+            className="text-sm md:text-base whitespace-nowrap flex-shrink-0"
+            style={{
+              color: '#e9cc9e',
+              fontWeight: '500',
+              letterSpacing: '0.04em',
+            }}
           >
             ${Number(price).toLocaleString()}
           </span>
